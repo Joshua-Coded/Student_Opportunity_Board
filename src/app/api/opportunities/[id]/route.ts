@@ -13,7 +13,7 @@ export async function GET(
       where: { id: params.id },
       include: {
         author: { select: { id: true, name: true, image: true, university: true, bio: true } },
-        _count: { select: { payments: true } },
+        _count: { select: { payments: true, applications: true } },
       },
     });
 

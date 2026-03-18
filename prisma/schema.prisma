@@ -23,6 +23,7 @@ model User {
   updatedAt      DateTime      @updatedAt
   opportunities  Opportunity[]
   payments       Payment[]
+  applications   Application[]
 
   @@map("users")
 }
@@ -68,6 +69,7 @@ model Opportunity {
   authorId             String
   author               User              @relation(fields: [authorId], references: [id])
   payments             Payment[]
+  applications         Application[]
   expiresAt            DateTime?
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
@@ -78,10 +80,36 @@ model Opportunity {
   @@map("opportunities")
 }
 
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
+}
+
 enum PaymentStatus {
   PENDING
   CONFIRMED
   FAILED
+}
+
+model Application {
+  id            String            @id @default(cuid())
+  opportunityId String
+  applicantId   String
+  coverLetter   String            @db.Text
+  portfolioUrl  String?
+  status        ApplicationStatus @default(PENDING)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  opportunity   Opportunity       @relation(fields: [opportunityId], references: [id])
+  applicant     User              @relation(fields: [applicantId], references: [id])
+
+  @@unique([opportunityId, applicantId])
+  @@index([applicantId])
+  @@index([opportunityId])
+  @@map("applications")
 }
 
 model Payment {

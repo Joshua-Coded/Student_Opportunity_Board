@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       },
       include: {
         author: { select: { id: true, name: true, image: true, university: true } },
-        _count: { select: { payments: true } },
+        _count: { select: { payments: true, applications: true } },
       },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * limit,

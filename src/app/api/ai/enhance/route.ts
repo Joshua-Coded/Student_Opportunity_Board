@@ -24,13 +24,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 });
     }
 
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 503 });
+    }
+
     const result = await enhanceOpportunityListing(parsed.data);
     if (!result) {
       return NextResponse.json({ error: "AI enhancement failed" }, { status: 500 });
     }
 
     return NextResponse.json(result);
-  } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: any) {
+    const msg = err?.message || "Internal server error";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
