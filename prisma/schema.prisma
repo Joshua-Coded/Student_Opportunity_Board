@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  password       String
+  name           String?
+  image          String?
+  bio            String?
+  university     String?
+  major          String?
+  graduationYear Int?
+  walletAddress  String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  opportunities  Opportunity[]
+  payments       Payment[]
+
+  @@map("users")
+}
+
+enum OpportunityType {
+  GIG
+  INTERNSHIP
+  PART_TIME
+  FULL_TIME
+  VOLUNTEER
+  RESEARCH
+}
+
+enum PaymentType {
+  FREE
+  CRYPTO
+  NEGOTIABLE
+}
+
+enum OpportunityStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+model Opportunity {
+  id                   String            @id @default(cuid())
+  title                String
+  description          String            @db.Text
+  type                 OpportunityType
+  status               OpportunityStatus @default(ACTIVE)
+  paymentType          PaymentType       @default(FREE)
+  compensationAmount   Decimal?          @db.Decimal(18, 8)
+  compensationCurrency String?
+  cryptoNetworkChain   String?
+  isRemote             Boolean           @default(true)
+  location             String?
+  skills               String[]
+  tags                 String[]
+  images               String[]
+  aiEnhanced           Boolean           @default(false)
+  aiSummary            String?
+  authorId             String
+  author               User              @relation(fields: [authorId], references: [id])
+  payments             Payment[]
+  expiresAt            DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@index([type, status])
+  @@index([authorId])
+  @@index([createdAt(sort: Desc)])
+  @@map("opportunities")
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  opportunityId     String
+  payerId           String
+  cryptoAmount      Decimal       @db.Decimal(18, 8)
+  cryptoCurrency    String
+  networkChain      String
+  toWalletAddress   String
+  fromWalletAddress String?
+  txHash            String?       @unique
+  blockNumber       BigInt?
+  status            PaymentStatus @default(PENDING)
+  createdAt         DateTime      @default(now())
+  confirmedAt       DateTime?
+  updatedAt         DateTime      @updatedAt
+  opportunity       Opportunity   @relation(fields: [opportunityId], references: [id])
+  payer             User          @relation(fields: [payerId], references: [id])
+
+  @@map("payments")
+}
