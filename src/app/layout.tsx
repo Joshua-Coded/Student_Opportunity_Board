@@ -1,7 +1,9 @@
 "use client";
 
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { ChakraProvider, createSystem, defaultConfig } from "@chakra-ui/react";
 import { SessionProvider } from "next-auth/react";
+
+const system = createSystem(defaultConfig);
 
 export default function RootLayout({
   children,
@@ -10,9 +12,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body style={{ margin: 0, padding: 0, background: "#050510" }}>
         <SessionProvider>
-          <ChakraProvider value={defaultSystem}>
+          <ChakraProvider value={system}>
             {children}
           </ChakraProvider>
         </SessionProvider>
