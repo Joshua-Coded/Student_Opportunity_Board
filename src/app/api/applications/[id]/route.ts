@@ -35,7 +35,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       data: { status: parsed.data.status },
       include: {
         applicant: { select: { name: true, email: true } },
-        opportunity: { select: { id: true, title: true } },
+        opportunity: {
+          select: { id: true, title: true, author: { select: { name: true, email: true } } },
+        },
       },
     });
 
@@ -51,6 +53,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         opportunityTitle: updated.opportunity.title,
         opportunityId: updated.opportunity.id,
         status: parsed.data.status as "ACCEPTED" | "REJECTED" | "REVIEWED",
+        posterName: updated.opportunity.author?.name || undefined,
+        posterEmail: updated.opportunity.author?.email || undefined,
       }).catch((err) => console.error("[email] status change:", err));
     }
 

@@ -5,3 +5,7 @@ node_modules/
 out/
 prisma/migrations/
 *.log
+
+# Presentation files
+*.pdf
+*.docx

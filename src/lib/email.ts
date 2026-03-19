@@ -90,18 +90,24 @@ export async function sendApplicationStatusEmail({
   opportunityTitle,
   opportunityId,
   status,
+  posterName,
+  posterEmail,
 }: {
   to: string;
   applicantName: string;
   opportunityTitle: string;
   opportunityId: string;
   status: "ACCEPTED" | "REJECTED" | "REVIEWED";
+  posterName?: string;
+  posterEmail?: string;
 }) {
   const statusConfig = {
     ACCEPTED: {
       emoji: "🎉",
       heading: "Application Accepted!",
-      message: "Congratulations! The poster has accepted your application. Reach out to get started.",
+      message: posterName && posterEmail
+        ? `Congratulations! <strong style="color:#fff;">${posterName}</strong> has accepted your application. Reply to this email or reach out directly at <a href="mailto:${posterEmail}" style="color:#a78bfa;">${posterEmail}</a> to get started.`
+        : "Congratulations! The poster has accepted your application. Log in to get in touch and get started.",
       color: "#22c55e",
       bg: "rgba(34,197,94,0.08)",
       border: "rgba(34,197,94,0.2)",
@@ -137,6 +143,13 @@ export async function sendApplicationStatusEmail({
     </div>
 
     <p style="color:#9ca3af;font-size:14px;line-height:1.6;margin:0 0 24px;">${cfg.message}</p>
+
+    ${status === "ACCEPTED" && posterName && posterEmail ? `
+    <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);border-radius:12px;padding:16px;margin-bottom:24px;">
+      <p style="color:#a78bfa;font-size:12px;font-weight:600;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.05em;">📬 Contact the Poster</p>
+      <p style="color:#fff;font-size:15px;font-weight:600;margin:0 0 4px;">${posterName}</p>
+      <a href="mailto:${posterEmail}" style="color:#818cf8;font-size:13px;text-decoration:none;">${posterEmail}</a>
+    </div>` : ""}
 
     <a href="${APP_URL}/opportunities/${opportunityId}"
       style="display:inline-block;background:linear-gradient(to right,#7c3aed,#2563eb);color:#fff;font-size:14px;font-weight:600;padding:12px 24px;border-radius:10px;text-decoration:none;">
