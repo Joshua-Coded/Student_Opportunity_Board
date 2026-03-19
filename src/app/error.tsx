@@ -7,10 +7,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
   useEffect(() => { console.error(error); }, [error]);
 
   return (
-    <Box minH="100vh" bg="gray.950" display="flex" alignItems="center" justifyContent="center" color="white">
-      <Stack align="center" gap={6} textAlign="center">
+    <Box minH="100vh" bg="#050510" display="flex" alignItems="center" justifyContent="center" color="white">
+      <Stack align="center" spacing={6} textAlign="center">
         <Text fontSize="5xl">⚠️</Text>
-        <Stack gap={2}>
+        <Stack spacing={2}>
           <Heading size="lg">Something went wrong</Heading>
           <Text color="gray.500" maxW="sm">An unexpected error occurred. Please try again.</Text>
         </Stack>

@@ -1,10 +1,31 @@
 "use client";
 
-import { ChakraProvider, createSystem, defaultConfig } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 
-const system = createSystem(defaultConfig);
+const theme = extendTheme({
+  config: { initialColorMode: "dark", useSystemColorMode: false },
+  styles: {
+    global: {
+      body: { bg: "#050510", color: "white" },
+    },
+  },
+  colors: {
+    brand: {
+      50: "#f5f3ff",
+      100: "#ede9fe",
+      500: "#7c3aed",
+      600: "#6d28d9",
+      700: "#5b21b6",
+    },
+  },
+  components: {
+    Button: {
+      defaultProps: { colorScheme: "purple" },
+    },
+  },
+});
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <SessionProvider>
-          <ChakraProvider value={system}>
+          <ChakraProvider theme={theme}>
             {children}
           </ChakraProvider>
         </SessionProvider>

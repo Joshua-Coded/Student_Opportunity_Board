@@ -1,7 +1,8 @@
 "use client";
 
 import {
-  Box, Button, Container, Flex, Heading, Input, Stack, Text,
+  Box, Button, Flex, FormControl, FormLabel, FormErrorMessage,
+  Heading, Input, Stack, Text, useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const toast = useToast();
   const [form, setForm] = useState({ name: "", email: "", password: "", university: "", major: "" });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
@@ -30,78 +32,74 @@ export default function RegisterPage() {
     setLoading(false);
     if (!res.ok) {
       setErrors(data.error || {});
-    } else {
-      router.push("/login?registered=1");
+      return;
     }
+    toast({ title: "Account created! Please sign in.", status: "success", duration: 3000 });
+    router.push("/login");
   }
 
-  const field = (label: string, key: string, type = "text", placeholder = "") => (
-    <Stack gap={1}>
-      <Text color="gray.400" fontSize="sm">{label}</Text>
-      <Input
-        type={type} value={(form as any)[key]} onChange={(e) => set(key, e.target.value)}
-        placeholder={placeholder}
-        bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
-        color="white" _placeholder={{ color: "gray.600" }}
-        _focus={{ borderColor: "purple.500", boxShadow: "0 0 0 1px #7c3aed" }}
-        borderRadius="xl" px={4} py={5}
-      />
-      {errors[key] && <Text color="red.400" fontSize="xs">{errors[key][0]}</Text>}
-    </Stack>
-  );
+  const inputStyle = {
+    bg: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+    color: "white", _placeholder: { color: "gray.600" },
+    _focus: { borderColor: "purple.500", boxShadow: "0 0 0 1px #7c3aed" },
+    borderRadius: "xl",
+  };
 
   return (
-    <Box minH="100vh" bg="gray.950" display="flex" alignItems="center" justifyContent="center" py={10}>
+    <Box minH="100vh" bg="#050510" display="flex" alignItems="center" justifyContent="center" px={4} py={10}>
       <Box position="absolute" top="10%" right="20%" w="350px" h="350px" borderRadius="full"
-        bg="blue.600" opacity={0.06} filter="blur(80px)" pointerEvents="none" />
-
-      <Container maxW="sm" position="relative">
-        <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)"
-          borderRadius="2xl" p={8} shadow="2xl">
-          <Stack gap={6}>
-            <Stack gap={1} textAlign="center">
+        bgColor="blue.900" opacity={0.12} filter="blur(80px)" pointerEvents="none" />
+      <Box w="full" maxW="sm" position="relative">
+        <Box bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.08)"
+          borderRadius="2xl" p={8} boxShadow="2xl">
+          <Stack spacing={6}>
+            <Stack spacing={1} textAlign="center">
               <Link href="/">
                 <Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)"
                   bgClip="text" cursor="pointer">OpportunityBoard</Heading>
               </Link>
-              <Heading size="lg" color="white">Create account</Heading>
+              <Heading size="lg" color="white" mt={2}>Create account</Heading>
               <Text color="gray.500" fontSize="sm">Join thousands of students</Text>
             </Stack>
 
             <form onSubmit={handleSubmit}>
-              <Stack gap={4}>
-                {field("Full Name", "name", "text", "Your name")}
-                {field("Email", "email", "email", "you@university.edu")}
-                {field("Password", "password", "password", "Min. 8 characters")}
-                {field("University", "university", "text", "e.g. University of Lagos")}
-                {field("Major", "major", "text", "e.g. Computer Science")}
+              <Stack spacing={4}>
+                {[
+                  { label: "Full Name", key: "name", type: "text", placeholder: "Your name" },
+                  { label: "Email", key: "email", type: "email", placeholder: "you@university.edu" },
+                  { label: "Password", key: "password", type: "password", placeholder: "Min. 8 characters" },
+                  { label: "University", key: "university", type: "text", placeholder: "e.g. University of Lagos" },
+                  { label: "Major", key: "major", type: "text", placeholder: "e.g. Computer Science" },
+                ].map(({ label, key, type, placeholder }) => (
+                  <FormControl key={key} isInvalid={!!errors[key]}>
+                    <FormLabel color="gray.400" fontSize="sm">{label}</FormLabel>
+                    <Input {...inputStyle} type={type} placeholder={placeholder}
+                      value={(form as any)[key]} onChange={(e) => set(key, e.target.value)}
+                      required={["name","email","password"].includes(key)} />
+                    {errors[key] && <FormErrorMessage>{errors[key][0]}</FormErrorMessage>}
+                  </FormControl>
+                ))}
 
-                {errors.general && (
-                  <Box bg="red.900" border="1px solid" borderColor="red.700" borderRadius="lg" px={4} py={2}>
-                    <Text color="red.300" fontSize="sm">{errors.general[0]}</Text>
-                  </Box>
-                )}
-
-                <Button type="submit" loading={loading}
+                <Button type="submit" isLoading={loading} w="full"
                   bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                   _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
-                  transition="all 0.2s" borderRadius="xl" py={5} fontSize="sm">
+                  transition="all 0.2s" borderRadius="xl" py={6}>
                   Create account
                 </Button>
               </Stack>
             </form>
 
-            <Flex justify="center" gap={1}>
+            <Flex justify="center">
               <Text color="gray.500" fontSize="sm">Already have an account?</Text>
               <Link href="/login">
-                <Text color="purple.400" fontSize="sm" _hover={{ color: "purple.300" }} cursor="pointer">
+                <Text color="purple.400" fontSize="sm" _hover={{ color: "purple.300" }} cursor="pointer" ml={1}>
                   Sign in
                 </Text>
               </Link>
             </Flex>
           </Stack>
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 }
