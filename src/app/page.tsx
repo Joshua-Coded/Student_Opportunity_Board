@@ -342,8 +342,7 @@ export default function HomePage() {
                   whileHover={{ y: -6, transition: { duration: 0.2 } }}
                   bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
                   borderRadius="2xl" p={6} cursor="default" position="relative" overflow="hidden"
-                  _hover={{ borderColor: "rgba(255,255,255,0.14)", bg: "rgba(255,255,255,0.04)" }}
-                  transition="all 0.25s">
+                  _hover={{ borderColor: "rgba(255,255,255,0.14)", bg: "rgba(255,255,255,0.04)" }}>
                   <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient={f.gradient} opacity={0.6} />
                   <Box w={10} h={10} borderRadius="xl" bgGradient={f.gradient} display="flex"
                     alignItems="center" justifyContent="center" fontSize="lg" mb={4} shadow="lg">
