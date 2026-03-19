@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sendNewApplicationEmail } from "@/lib/email";
 
 const applySchema = z.object({
   opportunityId: z.string(),
@@ -53,9 +54,23 @@ export async function POST(req: NextRequest) {
       },
       include: {
         applicant: { select: { name: true, email: true, university: true } },
-        opportunity: { select: { title: true } },
+        opportunity: {
+          select: { title: true, id: true, author: { select: { name: true, email: true } } },
+        },
       },
     });
+
+    // Notify the opportunity poster
+    if (application.opportunity.author?.email) {
+      sendNewApplicationEmail({
+        to: application.opportunity.author.email,
+        posterName: application.opportunity.author.name || "there",
+        applicantName: application.applicant.name || "A student",
+        opportunityTitle: application.opportunity.title,
+        opportunityId: application.opportunity.id,
+        applicationId: application.id,
+      }).catch((err) => console.error("[email] new application:", err));
+    }
 
     return NextResponse.json(application, { status: 201 });
   } catch {
@@ -91,7 +106,7 @@ export async function GET(req: NextRequest) {
     const applications = await prisma.application.findMany({
       where: { opportunity: { authorId: session.user.id } },
       include: {
-        applicant: { select: { id: true, name: true, email: true, university: true, major: true, bio: true } },
+        applicant: { select: { id: true, name: true, email: true, university: true, major: true, bio: true, image: true, walletAddress: true } },
         opportunity: { select: { id: true, title: true, type: true } },
       },
       orderBy: { createdAt: "desc" },
