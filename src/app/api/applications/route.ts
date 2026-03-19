@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
       where: { opportunity: { authorId: session.user.id } },
       include: {
         applicant: { select: { id: true, name: true, email: true, university: true, major: true, bio: true, image: true, walletAddress: true } },
-        opportunity: { select: { id: true, title: true, type: true } },
+        opportunity: { select: { id: true, title: true, type: true, paymentType: true, compensationAmount: true, compensationCurrency: true } },
       },
       orderBy: { createdAt: "desc" },
     });
