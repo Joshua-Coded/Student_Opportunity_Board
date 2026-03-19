@@ -15,11 +15,11 @@ const typeColor: Record<string, string> = {
 };
 
 const navItems = [
-  { label: "Overview", href: "/dashboard", icon: "🏠" },
-  { label: "Browse", href: "/opportunities", icon: "🔍" },
-  { label: "Post New", href: "/opportunities/new", icon: "➕" },
-  { label: "Applications", href: "/dashboard/applications", icon: "📨" },
-  { label: "Profile", href: "/dashboard/profile", icon: "👤" },
+  { label: "Overview", href: "/dashboard" },
+  { label: "Browse", href: "/opportunities" },
+  { label: "Post New", href: "/opportunities/new" },
+  { label: "Applications", href: "/dashboard/applications" },
+  { label: "Profile", href: "/dashboard/profile" },
 ];
 
 export default function DashboardPage() {
@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<any>(null);
   const [myOpps, setMyOpps] = useState<any[]>([]);
   const [recentOpps, setRecentOpps] = useState<any[]>([]);
+  const [paymentsReceived, setPaymentsReceived] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,11 +40,13 @@ export default function DashboardPage() {
     Promise.all([
       fetch("/api/profile").then((r) => r.json()),
       fetch("/api/opportunities?page=1").then((r) => r.json()),
-    ]).then(([prof, opps]) => {
+      fetch("/api/payments/received").then((r) => r.json()),
+    ]).then(([prof, opps, payments]) => {
       setProfile(prof);
       const all = opps.opportunities || [];
       setMyOpps(all.filter((o: any) => o.author?.id === session?.user?.id));
       setRecentOpps(all);
+      setPaymentsReceived(Array.isArray(payments) ? payments : []);
       setLoading(false);
     });
   }, [status, session]);
@@ -77,7 +80,6 @@ export default function DashboardPage() {
                     bg={item.href === "/dashboard" ? "rgba(139,92,246,0.1)" : "transparent"}
                     borderLeft="2px solid"
                     borderColor={item.href === "/dashboard" ? "purple.500" : "transparent"}>
-                    <Text>{item.icon}</Text>
                     <Text fontSize="sm" color={item.href === "/dashboard" ? "purple.300" : "gray.400"}
                       fontWeight={item.href === "/dashboard" ? "medium" : "normal"}>
                       {item.label}
@@ -133,7 +135,7 @@ export default function DashboardPage() {
                   <Flex gap={4} align="center">
                     <Avatar size="lg" name={session?.user?.name || "U"} src={session?.user?.image || undefined} bg="purple.600" color="white" />
                     <Stack spacing={0.5}>
-                      <Text color="gray.400" fontSize="sm">Welcome back 👋</Text>
+                      <Text color="gray.400" fontSize="sm">Welcome back</Text>
                       <Heading size="md" color="white">{session?.user?.name}</Heading>
                       {profile?.university && (
                         <Text color="purple.300" fontSize="sm">{profile.university}{profile?.major ? ` · ${profile.major}` : ""}</Text>
@@ -152,15 +154,14 @@ export default function DashboardPage() {
               {/* Stats */}
               <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
                 {[
-                  { label: "Total Listings", value: profile?._count?.opportunities ?? 0, icon: "📋" },
-                  { label: "Active Now", value: myOpps.filter((o) => o.status === "ACTIVE").length, icon: "✅" },
-                  { label: "Payments Made", value: profile?._count?.payments ?? 0, icon: "⚡" },
-                  { label: "Member Since", value: profile?.createdAt ? new Date(profile.createdAt).getFullYear() : "—", icon: "🎓" },
+                  { label: "Total Listings", value: profile?._count?.opportunities ?? 0 },
+                  { label: "Active Now", value: myOpps.filter((o) => o.status === "ACTIVE").length },
+                  { label: "Payments Received", value: paymentsReceived.filter((p) => p.status === "CONFIRMED").length },
+                  { label: "Member Since", value: profile?.createdAt ? new Date(profile.createdAt).getFullYear() : "—" },
                 ].map((stat) => (
                   <Box key={stat.label} bg="rgba(255,255,255,0.03)"
                     border="1px solid rgba(255,255,255,0.07)" borderRadius="xl" p={5}
                     _hover={{ bg: "rgba(255,255,255,0.05)" }} transition="all 0.2s">
-                    <Text fontSize="xl" mb={2}>{stat.icon}</Text>
                     <Text fontSize="2xl" fontWeight="black" color="white">{stat.value}</Text>
                     <Text color="gray.500" fontSize="xs" mt={1}>{stat.label}</Text>
                   </Box>
@@ -179,7 +180,6 @@ export default function DashboardPage() {
                 {myOpps.length === 0 ? (
                   <Box bg="rgba(255,255,255,0.02)" border="1px dashed rgba(255,255,255,0.08)"
                     borderRadius="2xl" p={10} textAlign="center">
-                    <Text fontSize="3xl" mb={3}>📋</Text>
                     <Text color="gray.500" fontSize="sm" mb={4}>No opportunities posted yet</Text>
                     <Link href="/opportunities/new">
                       <Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)"
@@ -206,6 +206,41 @@ export default function DashboardPage() {
                 )}
               </Stack>
 
+              {/* Payments Received */}
+              {paymentsReceived.length > 0 && (
+                <Stack spacing={4}>
+                  <Heading size="sm" color="white">Payments Received</Heading>
+                  <Stack spacing={3}>
+                    {paymentsReceived.map((p) => (
+                      <Box key={p.id} bg="rgba(255,255,255,0.03)"
+                        border={`1px solid ${p.status === "CONFIRMED" ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.07)"}`}
+                        borderRadius="xl" p={5}>
+                        <Flex justify="space-between" align="flex-start" flexWrap="wrap" gap={3}>
+                          <Stack spacing={1}>
+                            <Text fontWeight="semibold" color="white" fontSize="sm">{p.opportunity?.title}</Text>
+                            <Text color="gray.500" fontSize="xs">From: {p.payer?.name}</Text>
+                            <Text color="gray.600" fontSize="xs">{new Date(p.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</Text>
+                          </Stack>
+                          <Stack spacing={1} align="flex-end">
+                            <Text color="purple.300" fontWeight="bold" fontSize="lg">
+                              {p.cryptoAmount} {p.cryptoCurrency}
+                            </Text>
+                            <Badge colorScheme={p.status === "CONFIRMED" ? "green" : "yellow"} borderRadius="full" px={2} fontSize="xs">
+                              {p.status}
+                            </Badge>
+                            {p.txHash && (
+                              <Text color="gray.600" fontSize="xs" fontFamily="mono" noOfLines={1} maxW="180px">
+                                {p.txHash.slice(0, 18)}...
+                              </Text>
+                            )}
+                          </Stack>
+                        </Flex>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Stack>
+              )}
+
               {/* Recent on Platform */}
               <Stack spacing={4}>
                 <Flex justify="space-between" align="center">
@@ -222,7 +257,7 @@ export default function DashboardPage() {
                         _hover={{ bg: "rgba(255,255,255,0.05)", transform: "translateY(-1px)" }}>
                         <Flex justify="space-between" mb={2}>
                           <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">{opp.type}</Badge>
-                          {opp.paymentType === "CRYPTO" && <Badge colorScheme="purple" borderRadius="full" fontSize="xs">⚡</Badge>}
+                          {opp.paymentType === "CRYPTO" && <Badge colorScheme="purple" borderRadius="full" fontSize="xs">Crypto</Badge>}
                         </Flex>
                         <Text fontWeight="semibold" color="white" fontSize="sm" noOfLines={1}>{opp.title}</Text>
                         <Text color="gray.500" fontSize="xs" mt={1} noOfLines={1}>{opp.author?.university || opp.author?.name}</Text>
