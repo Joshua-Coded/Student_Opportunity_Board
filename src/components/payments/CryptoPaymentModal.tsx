@@ -17,6 +17,14 @@ export default function CryptoPaymentModal({ opportunity, applicantId, applicant
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Pre-fill poster's own wallet address from their profile
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((r) => r.json())
+      .then((data) => { if (data.walletAddress) setFromWallet(data.walletAddress); })
+      .catch(() => {});
+  }, []);
+
   // Live price state
   const [price, setPrice] = useState<number | null>(null);
   const [priceLoading, setPriceLoading] = useState(false);
