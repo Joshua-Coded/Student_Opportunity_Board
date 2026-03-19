@@ -36,6 +36,7 @@ export const profileSchema = z.object({
   major: z.string().optional(),
   graduationYear: z.number().int().min(2020).max(2035).optional(),
   walletAddress: z.string().optional(),
+  image: z.string().url().optional().or(z.literal("")),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
