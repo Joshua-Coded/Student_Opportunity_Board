@@ -10,17 +10,24 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { walletAddress: true },
+    // Find all opportunities where this user has an accepted application
+    const acceptedApplications = await prisma.application.findMany({
+      where: { applicantId: session.user.id, status: "ACCEPTED" },
+      select: { opportunityId: true },
     });
 
-    if (!user?.walletAddress) {
+    if (acceptedApplications.length === 0) {
       return NextResponse.json([]);
     }
 
+    const opportunityIds = acceptedApplications.map((a) => a.opportunityId);
+
+    // Find payments on those opportunities not made by the user themselves
     const payments = await prisma.payment.findMany({
-      where: { toWalletAddress: user.walletAddress },
+      where: {
+        opportunityId: { in: opportunityIds },
+        payerId: { not: session.user.id },
+      },
       include: {
         opportunity: { select: { id: true, title: true } },
         payer: { select: { name: true } },
