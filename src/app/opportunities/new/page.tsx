@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import UploadImage from "@/components/UploadImage";
 
 const TYPES = ["GIG", "INTERNSHIP", "PART_TIME", "FULL_TIME", "VOLUNTEER", "RESEARCH"];
 const PAYMENT_TYPES = ["FREE", "CRYPTO", "NEGOTIABLE"];
@@ -60,8 +61,8 @@ export default function NewOpportunityPage() {
     if (res.ok) {
       set("title", data.improvedTitle || form.title);
       set("description", data.improvedDescription || form.description);
-      if (data.suggestedTags) set("tags", [...new Set([...form.tags, ...data.suggestedTags])]);
-      if (data.suggestedSkills) set("skills", [...new Set([...form.skills, ...data.suggestedSkills])]);
+      if (data.suggestedTags) set("tags", Array.from(new Set([...form.tags, ...data.suggestedTags])));
+      if (data.suggestedSkills) set("skills", Array.from(new Set([...form.skills, ...data.suggestedSkills])));
     }
   }
 
@@ -99,8 +100,8 @@ export default function NewOpportunityPage() {
   };
 
   return (
-    <Box minH="100vh" bg="gray.950" color="white">
-      <Box bg="rgba(10,10,20,0.8)" backdropFilter="blur(20px)"
+    <Box minH="100vh" bg="#050510" color="white">
+      <Box bg="rgba(5,5,16,0.85)" backdropFilter="blur(20px)"
         borderBottom="1px solid rgba(255,255,255,0.07)" px={6} py={4}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
@@ -109,16 +110,16 @@ export default function NewOpportunityPage() {
       </Box>
 
       <Container maxW="3xl" py={10}>
-        <Stack gap={8}>
-          <Stack gap={1}>
+        <Stack spacing={8}>
+          <Stack spacing={1}>
             <Heading size="xl">Post an Opportunity</Heading>
             <Text color="gray.400">Fill in the details — or let Claude AI enhance it for you</Text>
           </Stack>
 
           <form onSubmit={handleSubmit}>
-            <Stack gap={6}>
+            <Stack spacing={6}>
               {/* Title */}
-              <Stack gap={1}>
+              <Stack spacing={1}>
                 <Text color="gray.400" fontSize="sm">Title *</Text>
                 <Input {...inputStyle} value={form.title} onChange={(e) => set("title", e.target.value)}
                   placeholder="e.g. UI Designer for FinTech Startup" required />
@@ -127,7 +128,7 @@ export default function NewOpportunityPage() {
 
               {/* Type & Payment */}
               <Flex gap={4} flexWrap="wrap">
-                <Stack gap={1} flex={1}>
+                <Stack spacing={1} flex={1}>
                   <Text color="gray.400" fontSize="sm">Type *</Text>
                   <Flex gap={2} flexWrap="wrap">
                     {TYPES.map((t) => (
@@ -141,7 +142,7 @@ export default function NewOpportunityPage() {
                     ))}
                   </Flex>
                 </Stack>
-                <Stack gap={1} flex={1}>
+                <Stack spacing={1} flex={1}>
                   <Text color="gray.400" fontSize="sm">Payment Type *</Text>
                   <Flex gap={2}>
                     {PAYMENT_TYPES.map((p) => (
@@ -160,12 +161,12 @@ export default function NewOpportunityPage() {
               {/* Crypto fields */}
               {form.paymentType === "CRYPTO" && (
                 <Flex gap={3} flexWrap="wrap">
-                  <Stack gap={1} flex={1}>
+                  <Stack spacing={1} flex={1}>
                     <Text color="gray.400" fontSize="sm">Amount</Text>
                     <Input {...inputStyle} type="number" step="0.0001" value={form.compensationAmount}
                       onChange={(e) => set("compensationAmount", e.target.value)} placeholder="0.05" />
                   </Stack>
-                  <Stack gap={1}>
+                  <Stack spacing={1}>
                     <Text color="gray.400" fontSize="sm">Currency</Text>
                     <Flex gap={2}>
                       {["ETH", "USDC", "MATIC"].map((c) => (
@@ -177,7 +178,7 @@ export default function NewOpportunityPage() {
                       ))}
                     </Flex>
                   </Stack>
-                  <Stack gap={1}>
+                  <Stack spacing={1}>
                     <Text color="gray.400" fontSize="sm">Chain</Text>
                     <Flex gap={2}>
                       {CHAINS.map((c) => (
@@ -193,10 +194,10 @@ export default function NewOpportunityPage() {
               )}
 
               {/* Description */}
-              <Stack gap={1}>
+              <Stack spacing={1}>
                 <Flex justify="space-between" align="center">
                   <Text color="gray.400" fontSize="sm">Description *</Text>
-                  <Button size="xs" onClick={handleEnhance} loading={enhancing}
+                  <Button size="xs" onClick={handleEnhance} isLoading={enhancing}
                     bg="rgba(139,92,246,0.15)" color="purple.300"
                     border="1px solid rgba(139,92,246,0.3)"
                     _hover={{ bg: "rgba(139,92,246,0.25)" }} borderRadius="full">
@@ -227,7 +228,7 @@ export default function NewOpportunityPage() {
               </Flex>
 
               {/* Skills */}
-              <Stack gap={2}>
+              <Stack spacing={2}>
                 <Text color="gray.400" fontSize="sm">Skills Required</Text>
                 <Flex gap={2}>
                   <Input {...inputStyle} value={form.skillInput}
@@ -251,7 +252,7 @@ export default function NewOpportunityPage() {
               </Stack>
 
               {/* Tags */}
-              <Stack gap={2}>
+              <Stack spacing={2}>
                 <Text color="gray.400" fontSize="sm">Tags</Text>
                 <Flex gap={2}>
                   <Input {...inputStyle} value={form.tagInput}
@@ -274,13 +275,23 @@ export default function NewOpportunityPage() {
                 )}
               </Stack>
 
+              {/* Cover Image */}
+              <Stack spacing={2}>
+                <Text color="gray.400" fontSize="sm">Cover Image <Text as="span" color="gray.600" fontWeight="normal">(optional)</Text></Text>
+                <UploadImage
+                  label="Upload gig cover image"
+                  currentUrl={form.images[0]}
+                  onUpload={(url) => set("images", [url])}
+                />
+              </Stack>
+
               {errors.general && (
                 <Box bg="red.900" border="1px solid" borderColor="red.700" borderRadius="lg" px={4} py={2}>
                   <Text color="red.300" fontSize="sm">{errors.general}</Text>
                 </Box>
               )}
 
-              <Button type="submit" loading={loading}
+              <Button type="submit" isLoading={loading}
                 bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                 _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                 transition="all 0.2s" borderRadius="xl" py={6} fontSize="md">
