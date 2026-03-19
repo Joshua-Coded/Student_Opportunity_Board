@@ -1,15 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
-
 export async function enhanceOpportunityListing(raw: {
   title: string;
   description: string;
   type: string;
   skills: string[];
 }) {
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
   const response = await anthropic.messages.create({
     model: "claude-opus-4-5",
     max_tokens: 1024,
