@@ -26,6 +26,7 @@ export const opportunitySchema = z.object({
   skills: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
   images: z.array(z.string()).default([]),
+  status: z.enum(["ACTIVE", "CLOSED"]).optional(),
   expiresAt: z.string().datetime().optional(),
 });
 
