@@ -104,15 +104,15 @@ export default function EditOpportunityPage() {
 
   if (loading || !form) {
     return (
-      <Box minH="100vh" bg="gray.950" display="flex" alignItems="center" justifyContent="center">
+      <Box minH="100vh" bg="#050510" display="flex" alignItems="center" justifyContent="center">
         <Text color="gray.500">Loading...</Text>
       </Box>
     );
   }
 
   return (
-    <Box minH="100vh" bg="gray.950" color="white">
-      <Box bg="rgba(10,10,20,0.8)" backdropFilter="blur(20px)"
+    <Box minH="100vh" bg="#050510" color="white">
+      <Box bg="rgba(5,5,16,0.85)" backdropFilter="blur(20px)"
         borderBottom="1px solid rgba(255,255,255,0.07)" px={6} py={4}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
@@ -121,14 +121,14 @@ export default function EditOpportunityPage() {
       </Box>
 
       <Container maxW="3xl" py={10}>
-        <Stack gap={8}>
-          <Stack gap={1}>
+        <Stack spacing={8}>
+          <Stack spacing={1}>
             <Heading size="xl">Edit Opportunity</Heading>
             <Text color="gray.400">Update your listing details</Text>
           </Stack>
 
           <form onSubmit={handleSubmit}>
-            <Stack gap={6}>
+            <Stack spacing={6}>
               {/* Status toggle */}
               <Flex gap={2} align="center">
                 <Text color="gray.400" fontSize="sm">Status:</Text>
@@ -141,14 +141,14 @@ export default function EditOpportunityPage() {
                 ))}
               </Flex>
 
-              <Stack gap={1}>
+              <Stack spacing={1}>
                 <Text color="gray.400" fontSize="sm">Title *</Text>
                 <Input {...inputStyle} value={form.title} onChange={(e) => set("title", e.target.value)} required />
                 {errors.title && <Text color="red.400" fontSize="xs">{errors.title[0]}</Text>}
               </Stack>
 
               <Flex gap={4} flexWrap="wrap">
-                <Stack gap={1} flex={1}>
+                <Stack spacing={1} flex={1}>
                   <Text color="gray.400" fontSize="sm">Type *</Text>
                   <Flex gap={2} flexWrap="wrap">
                     {TYPES.map((t) => (
@@ -160,7 +160,7 @@ export default function EditOpportunityPage() {
                     ))}
                   </Flex>
                 </Stack>
-                <Stack gap={1} flex={1}>
+                <Stack spacing={1} flex={1}>
                   <Text color="gray.400" fontSize="sm">Payment *</Text>
                   <Flex gap={2}>
                     {PAYMENT_TYPES.map((p) => (
@@ -176,12 +176,12 @@ export default function EditOpportunityPage() {
 
               {form.paymentType === "CRYPTO" && (
                 <Flex gap={3} flexWrap="wrap">
-                  <Stack gap={1} flex={1}>
+                  <Stack spacing={1} flex={1}>
                     <Text color="gray.400" fontSize="sm">Amount</Text>
                     <Input {...inputStyle} type="number" step="0.0001" value={form.compensationAmount}
                       onChange={(e) => set("compensationAmount", e.target.value)} placeholder="0.05" />
                   </Stack>
-                  <Stack gap={1}>
+                  <Stack spacing={1}>
                     <Text color="gray.400" fontSize="sm">Currency</Text>
                     <Flex gap={2}>
                       {["ETH", "USDC", "MATIC"].map((c) => (
@@ -193,7 +193,7 @@ export default function EditOpportunityPage() {
                       ))}
                     </Flex>
                   </Stack>
-                  <Stack gap={1}>
+                  <Stack spacing={1}>
                     <Text color="gray.400" fontSize="sm">Chain</Text>
                     <Flex gap={2}>
                       {CHAINS.map((c) => (
@@ -208,7 +208,7 @@ export default function EditOpportunityPage() {
                 </Flex>
               )}
 
-              <Stack gap={1}>
+              <Stack spacing={1}>
                 <Text color="gray.400" fontSize="sm">Description *</Text>
                 <Textarea {...inputStyle} value={form.description}
                   onChange={(e) => set("description", e.target.value)}
@@ -231,7 +231,7 @@ export default function EditOpportunityPage() {
                 )}
               </Flex>
 
-              <Stack gap={2}>
+              <Stack spacing={2}>
                 <Text color="gray.400" fontSize="sm">Skills</Text>
                 <Flex gap={2}>
                   <Input {...inputStyle} value={skillInput} onChange={(e) => setSkillInput(e.target.value)}
@@ -253,7 +253,7 @@ export default function EditOpportunityPage() {
                 )}
               </Stack>
 
-              <Stack gap={2}>
+              <Stack spacing={2}>
                 <Text color="gray.400" fontSize="sm">Tags</Text>
                 <Flex gap={2}>
                   <Input {...inputStyle} value={tagInput} onChange={(e) => setTagInput(e.target.value)}
@@ -275,7 +275,7 @@ export default function EditOpportunityPage() {
                 )}
               </Stack>
 
-              <Button type="submit" loading={saving}
+              <Button type="submit" isLoading={saving}
                 bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                 _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                 transition="all 0.2s" borderRadius="xl" py={6} fontSize="md">
