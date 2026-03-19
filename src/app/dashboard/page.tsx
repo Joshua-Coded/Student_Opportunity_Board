@@ -207,9 +207,14 @@ export default function DashboardPage() {
               </Stack>
 
               {/* Payments Received */}
-              {paymentsReceived.length > 0 && (
-                <Stack spacing={4}>
-                  <Heading size="sm" color="white">Payments Received</Heading>
+              <Stack spacing={4}>
+                <Heading size="sm" color="white">Payments Received</Heading>
+                {paymentsReceived.length === 0 ? (
+                  <Box bg="rgba(255,255,255,0.02)" border="1px dashed rgba(255,255,255,0.08)"
+                    borderRadius="xl" p={6} textAlign="center">
+                    <Text color="gray.600" fontSize="sm">No payments received yet</Text>
+                  </Box>
+                ) : (
                   <Stack spacing={3}>
                     {paymentsReceived.map((p) => (
                       <Box key={p.id} bg="rgba(255,255,255,0.03)"
@@ -238,8 +243,8 @@ export default function DashboardPage() {
                       </Box>
                     ))}
                   </Stack>
-                </Stack>
-              )}
+                )}
+              </Stack>
 
               {/* Recent on Platform */}
               <Stack spacing={4}>

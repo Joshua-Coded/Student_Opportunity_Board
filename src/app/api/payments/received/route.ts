@@ -10,22 +10,15 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find all opportunities where this user has an accepted application
-    const acceptedApplications = await prisma.application.findMany({
-      where: { applicantId: session.user.id, status: "ACCEPTED" },
-      select: { opportunityId: true },
-    });
-
-    if (acceptedApplications.length === 0) {
-      return NextResponse.json([]);
-    }
-
-    const opportunityIds = acceptedApplications.map((a) => a.opportunityId);
-
-    // Find payments on those opportunities not made by the user themselves
+    // Find payments on opportunities where this user has any application
+    // (covers ACCEPTED and cases where status may have changed after payment)
     const payments = await prisma.payment.findMany({
       where: {
-        opportunityId: { in: opportunityIds },
+        opportunity: {
+          applications: {
+            some: { applicantId: session.user.id },
+          },
+        },
         payerId: { not: session.user.id },
       },
       include: {
@@ -36,7 +29,8 @@ export async function GET() {
     });
 
     return NextResponse.json(payments);
-  } catch {
+  } catch (err) {
+    console.error("[payments/received]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
