@@ -3,6 +3,7 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 const navItems = [
   { label: "Home", href: "/dashboard", icon: "⊞" },
@@ -34,47 +35,31 @@ export default function MobileNav() {
           const active = pathname === item.href;
           return (
             <Link href={item.href} key={item.href}>
-              <Flex
-                direction="column"
-                align="center"
-                justify="center"
-                py={3}
-                px={3}
-                gap={1}
-                cursor="pointer"
-                position="relative"
-              >
+              <Flex direction="column" align="center" justify="center"
+                py={3} px={2} gap={1} cursor="pointer" position="relative">
                 {active && (
-                  <Box
-                    position="absolute"
-                    top={0}
-                    left="50%"
-                    transform="translateX(-50%)"
-                    w="24px"
-                    h="2px"
-                    bg="purple.400"
-                    borderRadius="full"
-                  />
+                  <Box position="absolute" top={0} left="50%" transform="translateX(-50%)"
+                    w="24px" h="2px" bg="purple.400" borderRadius="full" />
                 )}
-                <Text
-                  fontSize="18px"
-                  color={active ? "purple.300" : "gray.600"}
-                  lineHeight={1}
-                >
+                <Text fontSize="18px" color={active ? "purple.300" : "gray.600"} lineHeight={1}>
                   {item.icon}
                 </Text>
-                <Text
-                  fontSize="10px"
-                  fontWeight={active ? "semibold" : "normal"}
-                  color={active ? "purple.300" : "gray.600"}
-                  letterSpacing="wide"
-                >
+                <Text fontSize="10px" fontWeight={active ? "semibold" : "normal"}
+                  color={active ? "purple.300" : "gray.600"} letterSpacing="wide">
                   {item.label}
                 </Text>
               </Flex>
             </Link>
           );
         })}
+
+        {/* Sign out */}
+        <Flex direction="column" align="center" justify="center"
+          py={3} px={2} gap={1} cursor="pointer"
+          onClick={() => signOut({ callbackUrl: "/" })}>
+          <Text fontSize="18px" color="red.500" lineHeight={1}>⏻</Text>
+          <Text fontSize="10px" color="red.500" letterSpacing="wide">Logout</Text>
+        </Flex>
       </Flex>
     </Box>
   );
