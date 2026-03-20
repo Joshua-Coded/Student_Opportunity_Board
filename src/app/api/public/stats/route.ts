@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const [opportunities, users] = await Promise.all([
+    const [opportunities, users, totalOpportunities, totalUsers, totalPayments] = await Promise.all([
       prisma.opportunity.findMany({
         where: { status: "ACTIVE" },
         orderBy: { createdAt: "desc" },
@@ -32,10 +32,13 @@ export async function GET() {
           createdAt: true,
         },
       }),
+      prisma.opportunity.count({ where: { status: "ACTIVE" } }),
+      prisma.user.count(),
+      prisma.payment.count({ where: { status: "CONFIRMED" } }),
     ]);
 
-    return NextResponse.json({ opportunities, users });
+    return NextResponse.json({ opportunities, users, totalOpportunities, totalUsers, totalPayments });
   } catch {
-    return NextResponse.json({ opportunities: [], users: [] });
+    return NextResponse.json({ opportunities: [], users: [], totalOpportunities: 0, totalUsers: 0, totalPayments: 0 });
   }
 }

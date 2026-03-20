@@ -19,12 +19,6 @@ const features = [
   { icon: "☁️", title: "Rich Media", description: "Upload banners, logos and portfolio images via Cloudinary CDN. Fast globally, optimised automatically.", gradient: "linear(135deg, #d97706, #dc2626)" },
 ];
 
-const stats = [
-  { value: "12K+", label: "Students" },
-  { value: "3.1K", label: "Opportunities" },
-  { value: "$2.4M", label: "Paid in Crypto" },
-  { value: "47", label: "Countries" },
-];
 
 const testimonials = [
   { name: "Amara Diallo", role: "CS Student · Univ. of Lagos", text: "Found a Next.js gig that paid 0.15 ETH within 24 hours of posting. The AI enhanced my listing and made it look insanely professional.", avatar: "AD", color: "#7c3aed" },
@@ -105,7 +99,7 @@ export default function HomePage() {
   const { scrollYProgress } = useScroll({ target: heroRef });
   const yParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-  const [liveData, setLiveData] = useState<{ opportunities: any[]; users: any[] }>({ opportunities: [], users: [] });
+  const [liveData, setLiveData] = useState<{ opportunities: any[]; users: any[]; totalOpportunities: number; totalUsers: number; totalPayments: number }>({ opportunities: [], users: [], totalOpportunities: 0, totalUsers: 0, totalPayments: 0 });
 
   useEffect(() => {
     fetch("/api/public/stats").then(r => r.json()).then(setLiveData).catch(() => {});
@@ -324,20 +318,22 @@ export default function HomePage() {
                       </MotionBox>
                     ))}
                     {/* +N bubble */}
-                    <MotionBox
-                      initial={{ opacity: 0, scale: 0.4 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 1.15, type: "spring", stiffness: 300 }}
-                      style={{ marginLeft: -12, zIndex: 1 }}>
-                      <Box w="44px" h="44px" borderRadius="full"
-                        bg="rgba(124,58,237,0.25)" border="2.5px solid #050510"
-                        boxShadow="0 0 0 1px rgba(124,58,237,0.4)"
-                        display="flex" alignItems="center" justifyContent="center">
-                        <Text fontSize="10px" fontWeight="bold" color="purple.300">
-                          {liveData.users.length > 0 ? `+${Math.max(0, liveData.users.length - 6)}` : "+"}
-                        </Text>
-                      </Box>
-                    </MotionBox>
+                    {liveData.totalUsers > 6 && (
+                      <MotionBox
+                        initial={{ opacity: 0, scale: 0.4 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 1.15, type: "spring", stiffness: 300 }}
+                        style={{ marginLeft: -12, zIndex: 1 }}>
+                        <Box w="44px" h="44px" borderRadius="full"
+                          bg="rgba(124,58,237,0.25)" border="2.5px solid #050510"
+                          boxShadow="0 0 0 1px rgba(124,58,237,0.4)"
+                          display="flex" alignItems="center" justifyContent="center">
+                          <Text fontSize="10px" fontWeight="bold" color="purple.300">
+                            +{liveData.totalUsers - 6}
+                          </Text>
+                        </Box>
+                      </MotionBox>
+                    )}
                   </Flex>
                 </Flex>
 
@@ -347,7 +343,7 @@ export default function HomePage() {
                     style={{ animation: "pulse 2s infinite" }} />
                   <Text fontSize="sm" color="rgba(255,255,255,0.45)">
                     <Text as="span" color="white" fontWeight="bold">
-                      {liveData.users.length > 0 ? `${liveData.users.length}+` : "—"}
+                      {liveData.totalUsers > 0 ? liveData.totalUsers.toLocaleString() : "—"}
                     </Text>
                     {" "}students already on the platform
                   </Text>
@@ -361,13 +357,17 @@ export default function HomePage() {
       {/* ── Stats bar ───────────────────────────────────────────────── */}
       <Box py={14} borderY="1px solid rgba(255,255,255,0.05)" bg="rgba(255,255,255,0.015)">
         <Container maxW="3xl">
-          <SimpleGrid columns={{ base: 2, md: 4 }} gap={6} textAlign="center">
-            {stats.map((s, i) => (
+          <SimpleGrid columns={{ base: 2, md: 3 }} gap={6} textAlign="center">
+            {[
+              { value: liveData.totalUsers, label: "Students" },
+              { value: liveData.totalOpportunities, label: "Active Opportunities" },
+              { value: liveData.totalPayments, label: "Payments Made" },
+            ].map((s, i) => (
               <MotionBox key={s.label}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
                 <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" color="white">
-                  <Counter target={s.value} />
+                  {s.value > 0 ? s.value.toLocaleString() : "—"}
                 </Text>
                 <Text color="rgba(255,255,255,0.3)" fontSize="sm" mt={1} fontWeight="medium">{s.label}</Text>
               </MotionBox>
