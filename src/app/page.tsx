@@ -659,9 +659,6 @@ export default function HomePage() {
             letterSpacing="widest" textTransform="uppercase" mb={10}>Built with</Text>
           <Flex justify="center" align="center" flexWrap="wrap" gap={{ base: 8, md: 14 }}>
             {[
-              { name: "Next.js 14", desc: "App framework" },
-              { name: "Claude AI", desc: "MCP + AI enhance" },
-              { name: "Cloudinary", desc: "Image CDN" },
               { name: "Ethereum", desc: "Crypto payments" },
               { name: "Polygon", desc: "Low-fee chain" },
               { name: "Neon DB", desc: "Serverless Postgres" },
