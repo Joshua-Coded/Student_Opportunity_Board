@@ -152,6 +152,24 @@ export default function DashboardPage() {
                 </Flex>
               </Box>
 
+              {/* Wallet missing banner */}
+              {profile && !profile.walletAddress && (
+                <Box bg="rgba(234,179,8,0.08)" border="1px solid rgba(234,179,8,0.25)" borderRadius="xl" px={5} py={4}>
+                  <Flex align="center" justify="space-between" flexWrap="wrap" gap={3}>
+                    <Flex align="center" gap={3}>
+                      <Text fontSize="xl">🦊</Text>
+                      <Stack spacing={0}>
+                        <Text color="yellow.300" fontWeight="semibold" fontSize="sm">Set up your wallet to receive payments</Text>
+                        <Text color="gray.500" fontSize="xs">Gig posters can&apos;t pay you until you add a wallet address.</Text>
+                      </Stack>
+                    </Flex>
+                    <Link href="/dashboard/profile">
+                      <Button size="sm" colorScheme="yellow" variant="outline" borderRadius="lg">Add Wallet →</Button>
+                    </Link>
+                  </Flex>
+                </Box>
+              )}
+
               {/* Stats */}
               <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
                 {[
