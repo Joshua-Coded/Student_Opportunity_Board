@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { confirmPayment, getPaymentById } from "@/lib/crypto-payments";
+import { sendPaymentReceivedEmail } from "@/lib/email";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const verifySchema = z.object({
@@ -39,6 +41,25 @@ export async function POST(req: NextRequest) {
     }
 
     const confirmed = await confirmPayment(paymentId, fromWalletAddress, txHash ?? "");
+
+    // Send payment notification email to the student (recipient)
+    if (confirmed.txHash) {
+      const recipient = await prisma.user.findFirst({
+        where: { walletAddress: confirmed.toWalletAddress },
+        select: { email: true, name: true },
+      });
+      if (recipient?.email) {
+        sendPaymentReceivedEmail({
+          to: recipient.email,
+          studentName: recipient.name || "there",
+          gigTitle: confirmed.opportunity?.title || "Gig",
+          amount: confirmed.cryptoAmount.toString(),
+          currency: confirmed.cryptoCurrency,
+          txHash: confirmed.txHash,
+          fromName: confirmed.payer?.name || "Someone",
+        }).catch((err) => console.error("[email] payment received:", err));
+      }
+    }
 
     return NextResponse.json({
       paymentId: confirmed.id,
