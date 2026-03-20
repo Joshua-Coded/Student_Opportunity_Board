@@ -44,6 +44,42 @@ function baseTemplate(content: string) {
 </html>`;
 }
 
+// Sent to student when they receive a crypto payment
+export async function sendPaymentReceivedEmail({
+  to, studentName, gigTitle, amount, currency, txHash, fromName,
+}: {
+  to: string; studentName: string; gigTitle: string;
+  amount: string; currency: string; txHash: string; fromName: string;
+}) {
+  const etherscanUrl = `https://sepolia.etherscan.io/tx/${txHash}`;
+  const content = `
+    <h2 style="color:#fff;margin:0 0 8px;">💸 You just got paid!</h2>
+    <p style="color:#9ca3af;font-size:14px;margin:0 0 24px;">Hi ${studentName}, a payment has been sent to your wallet.</p>
+    <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:20px;margin-bottom:24px;">
+      <p style="color:#9ca3af;font-size:12px;font-weight:600;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.05em;">Gig</p>
+      <p style="color:#fff;font-size:16px;font-weight:600;margin:0 0 16px;">${gigTitle}</p>
+      <p style="color:#9ca3af;font-size:12px;font-weight:600;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.05em;">Amount</p>
+      <p style="color:#22c55e;font-size:28px;font-weight:800;margin:0 0 16px;">${amount} ${currency}</p>
+      <p style="color:#9ca3af;font-size:12px;font-weight:600;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.05em;">From</p>
+      <p style="color:#fff;font-size:14px;margin:0 0 16px;">${fromName}</p>
+      <p style="color:#9ca3af;font-size:12px;font-weight:600;margin:0 0 4px;text-transform:uppercase;letter-spacing:0.05em;">Transaction Hash</p>
+      <p style="color:#818cf8;font-size:11px;font-family:monospace;margin:0;word-break:break-all;">${txHash}</p>
+    </div>
+    <a href="${etherscanUrl}" style="display:inline-block;background:linear-gradient(to right,#22c55e,#10b981);color:#fff;font-size:14px;font-weight:600;padding:12px 24px;border-radius:10px;text-decoration:none;">
+      View on Etherscan ↗
+    </a><br/>
+    <a href="${APP_URL}/dashboard" style="display:inline-block;margin-top:12px;color:#7c3aed;font-size:13px;text-decoration:none;">
+      Go to Dashboard →
+    </a>`;
+
+  await transporter.sendMail({
+    from: `"OpportunityBoard" <${FROM}>`,
+    to,
+    subject: `💸 You received ${amount} ${currency} for "${gigTitle}"`,
+    html: baseTemplate(content),
+  });
+}
+
 // Sent to opportunity poster when someone applies
 export async function sendNewApplicationEmail({
   to,
