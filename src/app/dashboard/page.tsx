@@ -8,6 +8,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import MobileNav from "@/components/MobileNav";
 
 const typeColor: Record<string, string> = {
   GIG: "purple", INTERNSHIP: "blue", PART_TIME: "green",
@@ -126,7 +127,7 @@ export default function DashboardPage() {
             </Flex>
           </Box>
 
-          <Container maxW="5xl" py={8} px={{ base: 4, md: 8 }}>
+          <Container maxW="5xl" py={8} px={{ base: 4, md: 8 }} pb={{ base: 24, md: 8 }}>
             <Stack spacing={8}>
               {/* Welcome */}
               <Box bgGradient="linear(135deg, rgba(139,92,246,0.12), rgba(59,130,246,0.08))"
@@ -280,6 +281,7 @@ export default function DashboardPage() {
           </Container>
         </Box>
       </Flex>
+      <MobileNav />
     </Box>
   );
 }

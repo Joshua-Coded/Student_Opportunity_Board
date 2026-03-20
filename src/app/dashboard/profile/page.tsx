@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UploadImage from "@/components/UploadImage";
+import MobileNav from "@/components/MobileNav";
 
 const navItems = [
   { label: "Overview", href: "/dashboard", icon: "🏠" },
@@ -119,7 +120,7 @@ export default function ProfilePage() {
             bg="rgba(5,5,16,0.8)" backdropFilter="blur(20px)" position="sticky" top={0} zIndex={10}>
             <Heading size="md">Profile Settings</Heading>
           </Box>
-          <Container maxW="2xl" py={8} px={{ base: 4, md: 8 }}>
+          <Container maxW="2xl" py={8} px={{ base: 4, md: 8 }} pb={{ base: 24, md: 8 }}>
             <Stack spacing={6}>
               {/* Avatar card */}
               <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)" borderRadius="2xl" p={6}>
@@ -210,6 +211,7 @@ export default function ProfilePage() {
           </Container>
         </Box>
       </Flex>
+      <MobileNav />
     </Box>
   );
 }

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import CryptoPaymentModal from "@/components/payments/CryptoPaymentModal";
+import MobileNav from "@/components/MobileNav";
 
 const navItems = [
   { label: "Overview", href: "/dashboard", icon: "🏠" },
@@ -108,7 +109,7 @@ export default function ApplicationsPage() {
             <Heading size="md">Applications</Heading>
           </Box>
 
-          <Container maxW="4xl" py={8} px={{ base: 4, md: 8 }}>
+          <Container maxW="4xl" py={8} px={{ base: 4, md: 8 }} pb={{ base: 24, md: 8 }}>
             <Stack spacing={6}>
               {/* Tabs */}
               <Flex gap={2} bg="rgba(255,255,255,0.03)" p={1} borderRadius="xl"
@@ -280,6 +281,7 @@ export default function ApplicationsPage() {
         onClose={() => setPayTarget(null)}
       />
     )}
+    <MobileNav />
     </>
   );
 }
