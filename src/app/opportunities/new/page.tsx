@@ -102,17 +102,17 @@ export default function NewOpportunityPage() {
   return (
     <Box minH="100vh" bg="#050510" color="white">
       <Box bg="rgba(5,5,16,0.85)" backdropFilter="blur(20px)"
-        borderBottom="1px solid rgba(255,255,255,0.07)" px={6} py={4}>
+        borderBottom="1px solid rgba(255,255,255,0.07)" px={{ base: 4, md: 6 }} py={4}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
           <Link href="/opportunities"><Button variant="ghost" size="sm" color="gray.400">Cancel</Button></Link>
         </Flex>
       </Box>
 
-      <Container maxW="3xl" py={10}>
+      <Container maxW="3xl" py={{ base: 6, md: 10 }} px={{ base: 4, md: 6 }}>
         <Stack spacing={8}>
           <Stack spacing={1}>
-            <Heading size="xl">Post an Opportunity</Heading>
+            <Heading size={{ base: "lg", md: "xl" }}>Post an Opportunity</Heading>
             <Text color="gray.400">Fill in the details — or let Claude AI enhance it for you</Text>
           </Stack>
 
