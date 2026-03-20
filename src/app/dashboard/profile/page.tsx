@@ -48,7 +48,7 @@ export default function ProfilePage() {
 
   async function connectMetaMask() {
     if (!isMetaMaskInstalled()) {
-      toast({ title: "MetaMask not installed", description: "Install MetaMask to auto-fill your wallet address.", status: "warning", duration: 4000 });
+      window.open("https://metamask.io/download/", "_blank");
       return;
     }
     setConnectingWallet(true);
