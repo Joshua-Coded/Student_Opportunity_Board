@@ -94,12 +94,22 @@ function RollingTicker() {
   );
 }
 
+const typeColor: Record<string, string> = {
+  GIG: "purple", INTERNSHIP: "blue", PART_TIME: "green",
+  FULL_TIME: "teal", VOLUNTEER: "orange", RESEARCH: "pink",
+};
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef });
   const yParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const [liveData, setLiveData] = useState<{ opportunities: any[]; users: any[] }>({ opportunities: [], users: [] });
+
+  useEffect(() => {
+    fetch("/api/public/stats").then(r => r.json()).then(setLiveData).catch(() => {});
+  }, []);
 
   return (
     <Box minH="100vh" bg="#050510" color="white" overflow="hidden">
@@ -356,6 +366,112 @@ export default function HomePage() {
           </Stack>
         </Container>
       </Box>
+
+      {/* ── Live on the Platform ─────────────────────────────────── */}
+      {(liveData.opportunities.length > 0 || liveData.users.length > 0) && (
+        <Box py={24} bg="#050510">
+          <Container maxW="6xl">
+            <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={14}>
+              <Flex align="center" justify="center" gap={2} mb={4}>
+                <Box w={2} h={2} borderRadius="full" bg="green.400"
+                  sx={{ animation: "pulse 2s infinite", "@keyframes pulse": { "0%,100%": { opacity: 1 }, "50%": { opacity: 0.4 } } }} />
+                <Text fontSize="xs" fontWeight="bold" color="green.400" letterSpacing="widest" textTransform="uppercase">
+                  Live on the Platform
+                </Text>
+              </Flex>
+              <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em" color="white">
+                Real students, real opportunities
+              </Heading>
+              <Text color="rgba(255,255,255,0.4)" mt={3} fontSize="sm">
+                Posted right now by students like you
+              </Text>
+            </MotionBox>
+
+            {/* Recent users */}
+            {liveData.users.length > 0 && (
+              <Box mb={14}>
+                <Text color="rgba(255,255,255,0.3)" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="widest" mb={5} textAlign="center">
+                  Recently Joined
+                </Text>
+                <Flex justify="center" flexWrap="wrap" gap={3}>
+                  {liveData.users.map((u) => (
+                    <Link href={`/profile/${u.id}`} key={u.id}>
+                      <Flex align="center" gap={2} px={3} py={2}
+                        bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.07)"
+                        borderRadius="full" cursor="pointer"
+                        _hover={{ bg: "rgba(139,92,246,0.12)", borderColor: "rgba(139,92,246,0.3)" }}
+                        transition="all 0.2s">
+                        <Avatar size="xs" name={u.name || "?"} src={u.image || undefined} bg="purple.700" />
+                        <Text fontSize="sm" color="gray.300" fontWeight="medium">{u.name}</Text>
+                        {u.university && (
+                          <Text fontSize="xs" color="gray.600" display={{ base: "none", md: "block" }}>· {u.university}</Text>
+                        )}
+                      </Flex>
+                    </Link>
+                  ))}
+                </Flex>
+              </Box>
+            )}
+
+            {/* Live listings */}
+            {liveData.opportunities.length > 0 && (
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={5}>
+                {liveData.opportunities.map((opp, i) => (
+                  <MotionBox key={opp.id}
+                    initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }} transition={{ delay: i * 0.07 }}>
+                    <Link href={`/opportunities/${opp.id}`}>
+                      <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)"
+                        borderRadius="2xl" p={5} cursor="pointer" h="full"
+                        _hover={{ bg: "rgba(255,255,255,0.06)", borderColor: "rgba(139,92,246,0.4)", transform: "translateY(-2px)" }}
+                        transition="all 0.2s">
+                        <Flex justify="space-between" align="flex-start" mb={3}>
+                          <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">
+                            {opp.type}
+                          </Badge>
+                          {opp.paymentType === "CRYPTO" && (
+                            <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">Crypto</Badge>
+                          )}
+                        </Flex>
+                        <Text fontWeight="semibold" color="white" fontSize="sm" noOfLines={2} mb={2}>
+                          {opp.title}
+                        </Text>
+                        {opp.compensationAmount && (
+                          <Text color="purple.300" fontSize="sm" fontWeight="bold" mb={3}>
+                            {opp.compensationAmount} {opp.compensationCurrency}
+                          </Text>
+                        )}
+                        <Flex align="center" gap={2} mt="auto">
+                          <Avatar size="xs" name={opp.author?.name || "?"} src={opp.author?.image || undefined} bg="blue.700" />
+                          <Box>
+                            <Text color="gray.400" fontSize="xs" fontWeight="medium">{opp.author?.name}</Text>
+                            {opp.author?.university && (
+                              <Text color="gray.600" fontSize="xs" noOfLines={1}>{opp.author.university}</Text>
+                            )}
+                          </Box>
+                          <Text color="gray.700" fontSize="xs" ml="auto">
+                            {opp.isRemote ? "Remote" : opp.location}
+                          </Text>
+                        </Flex>
+                      </Box>
+                    </Link>
+                  </MotionBox>
+                ))}
+              </SimpleGrid>
+            )}
+
+            <Flex justify="center" mt={10}>
+              <Link href="/opportunities">
+                <Button variant="outline" borderColor="rgba(255,255,255,0.15)" color="gray.300"
+                  _hover={{ bg: "rgba(255,255,255,0.06)", borderColor: "purple.500", color: "white" }}
+                  borderRadius="xl" px={8}>
+                  View all opportunities →
+                </Button>
+              </Link>
+            </Flex>
+          </Container>
+        </Box>
+      )}
 
       {/* ── Testimonials ────────────────────────────────────────────── */}
       <Box py={24} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
