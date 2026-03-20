@@ -39,7 +39,7 @@ const CATEGORIES = [
 const FAQS = [
   { q: "Is it free to sign up?", a: "Yes — signing up, browsing, and applying are completely free. Posting opportunities is also free." },
   { q: "Do I need a crypto wallet to use the platform?", a: "Not to browse or apply. You only need a wallet address in your profile if you want to receive crypto payments for work you complete." },
-  { q: "Which cryptocurrencies are supported?", a: "ETH, USDC, and MATIC on Ethereum and Polygon networks. The poster specifies the chain when listing an opportunity." },
+  { q: "Which cryptocurrencies are supported?", a: "BTC, ETH, USDC, USDT, MATIC, BNB, SOL, AVAX, ADA, DOT, and more. We support all major chains — the poster specifies the currency when listing." },
   { q: "How does AI enhancement work?", a: "When posting, click 'Enhance with AI'. Claude rewrites your title and description to be clearer and more professional — powered by Claude MCP." },
   { q: "Can I post without offering crypto payment?", a: "Yes. Payment type is flexible — Free, Negotiable, or Crypto. Crypto is optional." },
   { q: "Is this platform only for students?", a: "Built with students in mind but open to anyone. Startups and independent posters can also list opportunities." },
@@ -49,6 +49,27 @@ const typeColor: Record<string, string> = {
   GIG: "purple", INTERNSHIP: "blue", PART_TIME: "green",
   FULL_TIME: "teal", VOLUNTEER: "orange", RESEARCH: "pink",
 };
+
+const CRYPTOS = [
+  { symbol: "BTC",  name: "Bitcoin",       color: "#F7931A" },
+  { symbol: "ETH",  name: "Ethereum",      color: "#627EEA" },
+  { symbol: "USDC", name: "USD Coin",      color: "#2775CA" },
+  { symbol: "USDT", name: "Tether",        color: "#26A17B" },
+  { symbol: "MATIC",name: "Polygon",       color: "#8247E5" },
+  { symbol: "BNB",  name: "BNB Chain",     color: "#F3BA2F" },
+  { symbol: "SOL",  name: "Solana",        color: "#9945FF" },
+  { symbol: "AVAX", name: "Avalanche",     color: "#E84142" },
+  { symbol: "ADA",  name: "Cardano",       color: "#0033AD" },
+  { symbol: "DOT",  name: "Polkadot",      color: "#E6007A" },
+  { symbol: "LINK", name: "Chainlink",     color: "#2A5ADA" },
+  { symbol: "UNI",  name: "Uniswap",       color: "#FF007A" },
+  { symbol: "DAI",  name: "DAI",           color: "#F5AC37" },
+  { symbol: "ARB",  name: "Arbitrum",      color: "#28A0F0" },
+  { symbol: "OP",   name: "Optimism",      color: "#FF0420" },
+  { symbol: "TON",  name: "TON",           color: "#0088CC" },
+  { symbol: "XRP",  name: "XRP",           color: "#346AA9" },
+  { symbol: "LTC",  name: "Litecoin",      color: "#BFBBBB" },
+];
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
@@ -110,6 +131,65 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
         )}
       </Box>
     </MotionBox>
+  );
+}
+
+function CryptoMarquee() {
+  const doubled = [...CRYPTOS, ...CRYPTOS];
+  return (
+    <Box py={14} overflow="hidden" borderY="1px solid rgba(255,255,255,0.05)">
+      <Container maxW="5xl">
+        <Text textAlign="center" fontSize="xs" color="rgba(255,255,255,0.2)" fontWeight="medium"
+          letterSpacing="widest" textTransform="uppercase" mb={8}>
+          Supported cryptocurrencies
+        </Text>
+      </Container>
+      <Box position="relative" overflow="hidden">
+        {/* Fade edges */}
+        <Box position="absolute" left={0} top={0} bottom={0} w="80px" zIndex={1}
+          bgGradient="linear(to-r, #050510, transparent)" pointerEvents="none" />
+        <Box position="absolute" right={0} top={0} bottom={0} w="80px" zIndex={1}
+          bgGradient="linear(to-l, #050510, transparent)" pointerEvents="none" />
+
+        <Box
+          display="flex"
+          style={{ animation: "marquee 28s linear infinite" }}
+          _hover={{ animationPlayState: "paused" } as any}
+        >
+          {doubled.map((coin, i) => (
+            <Flex key={i} align="center" gap={2} px={5} py={2.5} mx={2} flexShrink={0}
+              bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.07)"
+              borderRadius="full" transition="all 0.2s"
+              _hover={{ borderColor: coin.color + "88", bg: "rgba(255,255,255,0.08)", transform: "scale(1.05)" }}>
+              <Box w={2.5} h={2.5} borderRadius="full" bg={coin.color} flexShrink={0}
+                boxShadow={`0 0 6px ${coin.color}88`} />
+              <Text fontWeight="bold" fontSize="sm" color="white">{coin.symbol}</Text>
+              <Text fontSize="xs" color="rgba(255,255,255,0.3)">{coin.name}</Text>
+            </Flex>
+          ))}
+        </Box>
+
+        {/* Second row scrolling opposite */}
+        <Box
+          display="flex"
+          mt={3}
+          style={{ animation: "marquee-reverse 22s linear infinite" }}
+          _hover={{ animationPlayState: "paused" } as any}
+        >
+          {[...CRYPTOS].reverse().concat([...CRYPTOS].reverse()).map((coin, i) => (
+            <Flex key={i} align="center" gap={2} px={5} py={2.5} mx={2} flexShrink={0}
+              bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.06)"
+              borderRadius="full" transition="all 0.2s"
+              _hover={{ borderColor: coin.color + "88", bg: "rgba(255,255,255,0.07)", transform: "scale(1.05)" }}>
+              <Box w={2.5} h={2.5} borderRadius="full" bg={coin.color} flexShrink={0}
+                boxShadow={`0 0 6px ${coin.color}88`} />
+              <Text fontWeight="bold" fontSize="sm" color="white">{coin.symbol}</Text>
+              <Text fontSize="xs" color="rgba(255,255,255,0.3)">{coin.name}</Text>
+            </Flex>
+          ))}
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
@@ -652,58 +732,8 @@ export default function HomePage() {
         </Box>
       )}
 
-      {/* ── Tech stack trust strip ───────────────────────────────────── */}
-      <Box py={14} borderY="1px solid rgba(255,255,255,0.04)">
-        <Container maxW="5xl">
-          <Text textAlign="center" fontSize="xs" color="rgba(255,255,255,0.18)" fontWeight="medium"
-            letterSpacing="widest" textTransform="uppercase" mb={10}>Built with</Text>
-          <Flex justify="center" align="center" flexWrap="wrap" gap={{ base: 8, md: 14 }}>
-            {[
-              { name: "Ethereum", desc: "Crypto payments" },
-              { name: "Polygon", desc: "Low-fee chain" },
-              { name: "Neon DB", desc: "Serverless Postgres" },
-            ].map((tech) => (
-              <MotionBox key={tech.name}
-                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-                viewport={{ once: true }} whileHover={{ y: -2 }}>
-                <Flex direction="column" align="center" gap={1}>
-                  <Text fontWeight="bold" fontSize="sm" color="rgba(255,255,255,0.45)">{tech.name}</Text>
-                  <Text fontSize="10px" color="rgba(255,255,255,0.2)">{tech.desc}</Text>
-                </Flex>
-              </MotionBox>
-            ))}
-          </Flex>
-        </Container>
-      </Box>
-
-      {/* ── Supported crypto ─────────────────────────────────────────── */}
-      <Box py={14} bg="rgba(255,255,255,0.008)">
-        <Container maxW="3xl" textAlign="center">
-          <Text fontSize="xs" color="rgba(255,255,255,0.2)" fontWeight="medium" letterSpacing="widest"
-            textTransform="uppercase" mb={7}>Accepted cryptocurrencies</Text>
-          <Flex justify="center" flexWrap="wrap" gap={3}>
-            {[
-              { symbol: "ETH", name: "Ethereum", color: "#627EEA" },
-              { symbol: "USDC", name: "USD Coin", color: "#2775CA" },
-              { symbol: "MATIC", name: "Polygon", color: "#8247E5" },
-              { symbol: "BNB", name: "BNB Chain", color: "#F3BA2F" },
-            ].map((coin) => (
-              <MotionBox key={coin.symbol}
-                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }} whileHover={{ scale: 1.05 }}>
-                <Flex align="center" gap={2} px={5} py={2.5}
-                  bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.07)"
-                  borderRadius="full" transition="all 0.2s"
-                  _hover={{ borderColor: "rgba(255,255,255,0.15)", bg: "rgba(255,255,255,0.07)" }}>
-                  <Box w={2.5} h={2.5} borderRadius="full" bg={coin.color} flexShrink={0} />
-                  <Text fontWeight="bold" fontSize="sm" color="white">{coin.symbol}</Text>
-                  <Text fontSize="xs" color="rgba(255,255,255,0.3)">{coin.name}</Text>
-                </Flex>
-              </MotionBox>
-            ))}
-          </Flex>
-        </Container>
-      </Box>
+      {/* ── Crypto marquee ───────────────────────────────────────────── */}
+      <CryptoMarquee />
 
       {/* ── Testimonials ────────────────────────────────────────────── */}
       <Box py={24} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
@@ -827,6 +857,14 @@ export default function HomePage() {
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
+        }
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        @keyframes marquee-reverse {
+          from { transform: translateX(-50%); }
+          to { transform: translateX(0); }
         }
       `}</style>
     </Box>
