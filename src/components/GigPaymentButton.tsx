@@ -22,13 +22,7 @@ import {
   Code,
   Avatar,
 } from "@chakra-ui/react";
-import {
-  connectWallet,
-  switchToSepolia,
-  sendPaymentViaMetaMask,
-  isMetaMaskInstalled,
-  type TxParams,
-} from "@/lib/web3";
+import { connectWallet, switchToSepolia, isMetaMaskInstalled } from "@/lib/web3";
 
 interface GigPaymentButtonProps {
   opportunityId: string;
@@ -41,15 +35,7 @@ interface GigPaymentButtonProps {
   onSuccess?: (txHash: string) => void;
 }
 
-type Step =
-  | "idle"
-  | "connecting"
-  | "preparing"
-  | "confirming"
-  | "sending"
-  | "saving"
-  | "done"
-  | "error";
+type Step = "idle" | "connecting" | "confirming" | "sending" | "saving" | "done" | "error";
 
 export default function GigPaymentButton({
   opportunityId,
@@ -66,8 +52,6 @@ export default function GigPaymentButton({
 
   const [step, setStep] = useState<Step>("idle");
   const [connectedAddress, setConnectedAddress] = useState<string | null>(null);
-  const [txParams, setTxParams] = useState<TxParams | null>(null);
-  const [estimatedFee, setEstimatedFee] = useState<string | null>(null);
   const [toAddress, setToAddress] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -86,17 +70,16 @@ export default function GigPaymentButton({
 
     try {
       if (!isMetaMaskInstalled()) {
-        handleError("MetaMask is not installed. Please install it from metamask.io");
+        handleError("MetaMask is not installed. Please install it at metamask.io");
         return;
       }
 
-      // Step 1: Connect MetaMask wallet
+      // Step 1: Connect MetaMask and switch to Sepolia
       const account = await connectWallet();
       setConnectedAddress(account);
       await switchToSepolia();
 
-      // Step 2: Initiate payment in DB — validates accepted applicant & gets their wallet
-      setStep("preparing");
+      // Step 2: Create pending payment record in DB — validates applicant is accepted
       const initiateRes = await fetch("/api/payments/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -124,27 +107,6 @@ export default function GigPaymentButton({
         return;
       }
 
-      // Step 3: Prepare unsigned tx via API
-      const prepareRes = await fetch("/api/payment/prepare", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from: account,
-          to: initiated.toWalletAddress,
-          amount_eth: amountEth,
-          note: gigTitle,
-        }),
-      });
-
-      if (!prepareRes.ok) {
-        const data = await prepareRes.json();
-        handleError(data.error ?? "Failed to prepare transaction.");
-        return;
-      }
-
-      const prepared = await prepareRes.json();
-      setTxParams(prepared.txParams);
-      setEstimatedFee(prepared.summary.estimated_fee_eth);
       setStep("confirming");
     } catch (err: any) {
       handleError(err.message ?? "Something went wrong.");
@@ -152,37 +114,41 @@ export default function GigPaymentButton({
   }
 
   async function handleConfirm() {
-    if (!txParams || !paymentId || !connectedAddress) return;
+    if (!toAddress || !paymentId || !connectedAddress) return;
     setStep("sending");
 
     try {
-      // Step 4: MetaMask signs and broadcasts
-      const rawHash = await sendPaymentViaMetaMask(txParams);
-      const hash = typeof rawHash === "string" ? rawHash : String(rawHash);
+      // Convert ETH amount to wei in hex — the only format MetaMask accepts
+      const valueWei = BigInt(Math.round(parseFloat(amountEth) * 1e18));
+      const valueHex = "0x" + valueWei.toString(16);
 
-      if (!hash || hash === "undefined" || hash === "null" || hash.length < 10) {
-        handleError("MetaMask did not return a transaction hash. Please confirm the transaction in MetaMask.");
+      // MetaMask only needs from, to, value — it handles gas, nonce, chainId itself
+      const result = await (window as any).ethereum.request({
+        method: "eth_sendTransaction",
+        params: [{ from: connectedAddress, to: toAddress, value: valueHex }],
+      });
+
+      const hash: string = typeof result === "string" ? result : result?.txHash ?? "";
+
+      if (!hash || hash.length < 10) {
+        handleError("MetaMask did not return a transaction hash. Did you confirm the popup?");
         return;
       }
 
       setTxHash(hash);
 
-      // Step 5: Confirm payment in DB with real txHash
+      // Step 3: Save confirmed payment with real txHash to DB
       setStep("saving");
       await fetch("/api/payments/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          paymentId,
-          fromWalletAddress: connectedAddress,
-          txHash: hash,
-        }),
+        body: JSON.stringify({ paymentId, fromWalletAddress: connectedAddress, txHash: hash }),
       });
 
       setStep("done");
       onSuccess?.(hash);
       toast({
-        title: "Payment confirmed!",
+        title: "Payment sent!",
         description: `Paid ${amountEth} ETH to ${applicantName}`,
         status: "success",
         duration: 8000,
@@ -190,7 +156,7 @@ export default function GigPaymentButton({
       });
     } catch (err: any) {
       if (err.code === 4001) {
-        handleError("Transaction rejected in MetaMask.");
+        handleError("You rejected the transaction in MetaMask.");
       } else {
         handleError(err.message ?? "Transaction failed.");
       }
@@ -201,8 +167,6 @@ export default function GigPaymentButton({
     onClose();
     setTimeout(() => {
       setStep("idle");
-      setTxParams(null);
-      setEstimatedFee(null);
       setTxHash(null);
       setErrorMsg(null);
       setPaymentId(null);
@@ -236,19 +200,14 @@ export default function GigPaymentButton({
                 <HStack spacing={3}>
                   <Avatar size="sm" name={applicantName} src={applicantAvatar} bg="purple.600" />
                   <VStack align="start" spacing={0}>
-                    <Text color="white" fontWeight="semibold" fontSize="sm">
-                      {applicantName}
-                    </Text>
-                    <Text color="gray.500" fontSize="xs">
-                      {gigTitle}
-                    </Text>
+                    <Text color="white" fontWeight="semibold" fontSize="sm">{applicantName}</Text>
+                    <Text color="gray.500" fontSize="xs">{gigTitle}</Text>
                   </VStack>
                 </HStack>
               </Box>
 
-              {/* Amount */}
               <HStack justify="space-between">
-                <Text color="gray.400">Payment amount</Text>
+                <Text color="gray.400">Amount</Text>
                 <Text color="white" fontWeight="bold" fontSize="lg">
                   {amountEth} {currency || "ETH"}
                 </Text>
@@ -265,51 +224,37 @@ export default function GigPaymentButton({
 
               <Divider borderColor="gray.700" />
 
-              {/* Connecting / Preparing */}
-              {(step === "connecting" || step === "preparing") && (
+              {/* Connecting */}
+              {step === "connecting" && (
                 <HStack justify="center" py={4}>
                   <Spinner color="purple.400" size="sm" />
-                  <Text color="gray.300" fontSize="sm">
-                    {step === "connecting"
-                      ? "Connecting MetaMask..."
-                      : "Preparing transaction..."}
-                  </Text>
+                  <Text color="gray.300" fontSize="sm">Connecting MetaMask...</Text>
                 </HStack>
               )}
 
-              {/* Confirming */}
+              {/* Ready to confirm */}
               {step === "confirming" && (
                 <VStack spacing={3} align="stretch">
                   {connectedAddress && (
                     <HStack justify="space-between">
-                      <Text color="gray.400" fontSize="sm">From</Text>
+                      <Text color="gray.400" fontSize="sm">Connected wallet</Text>
                       <Code colorScheme="green" fontSize="xs">
                         {connectedAddress.slice(0, 6)}...{connectedAddress.slice(-4)}
                       </Code>
                     </HStack>
                   )}
-                  {estimatedFee && (
-                    <HStack justify="space-between">
-                      <Text color="gray.400" fontSize="sm">Est. gas fee</Text>
-                      <Text color="yellow.300" fontSize="sm">
-                        ~{parseFloat(estimatedFee).toFixed(6)} ETH
-                      </Text>
-                    </HStack>
-                  )}
-                  <Badge colorScheme="purple" textAlign="center" py={1} borderRadius="md">
-                    MetaMask will ask you to confirm
+                  <Badge colorScheme="purple" textAlign="center" py={2} borderRadius="md">
+                    🦊 MetaMask will open for you to confirm
                   </Badge>
                 </VStack>
               )}
 
-              {/* Sending / Saving */}
+              {/* Sending */}
               {(step === "sending" || step === "saving") && (
                 <HStack justify="center" py={4}>
                   <Spinner color="purple.400" size="sm" />
                   <Text color="gray.300" fontSize="sm">
-                    {step === "sending"
-                      ? "Broadcasting transaction..."
-                      : "Saving confirmation..."}
+                    {step === "sending" ? "Waiting for MetaMask confirmation..." : "Saving payment..."}
                   </Text>
                 </HStack>
               )}
@@ -342,12 +287,8 @@ export default function GigPaymentButton({
               {/* Error */}
               {step === "error" && (
                 <VStack spacing={2}>
-                  <Text color="red.400" fontWeight="bold">
-                    Payment failed
-                  </Text>
-                  <Text color="gray.400" fontSize="sm" textAlign="center">
-                    {errorMsg}
-                  </Text>
+                  <Text color="red.400" fontWeight="bold">Payment failed</Text>
+                  <Text color="gray.400" fontSize="sm" textAlign="center">{errorMsg}</Text>
                 </VStack>
               )}
             </VStack>
@@ -356,13 +297,11 @@ export default function GigPaymentButton({
           <ModalFooter gap={2}>
             {step === "confirming" && (
               <Button colorScheme="purple" onClick={handleConfirm} leftIcon={<span>🦊</span>}>
-                Confirm in MetaMask
+                Open MetaMask & Pay
               </Button>
             )}
             {step === "error" && (
-              <Button colorScheme="purple" variant="outline" onClick={handleOpen}>
-                Retry
-              </Button>
+              <Button colorScheme="purple" variant="outline" onClick={handleOpen}>Retry</Button>
             )}
             <Button variant="ghost" color="gray.400" onClick={handleClose}>
               {step === "done" ? "Close" : "Cancel"}
