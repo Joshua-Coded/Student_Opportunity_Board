@@ -93,12 +93,17 @@ export async function sendPaymentViaMetaMask(txParams: TxParams): Promise<string
     throw new Error("MetaMask is not installed.");
   }
 
-  const txHash: string = await window.ethereum!.request({
+  const result = await window.ethereum!.request({
     method: "eth_sendTransaction",
     params: [txParams],
   });
 
-  return txHash;
+  // Some wallet implementations return { txHash: "0x..." }, others return the string directly
+  if (result && typeof result === "object" && "txHash" in result) {
+    return (result as { txHash: string }).txHash;
+  }
+
+  return result as string;
 }
 
 // Parse TX_PARAMS JSON from MCP prepare_payment tool response text

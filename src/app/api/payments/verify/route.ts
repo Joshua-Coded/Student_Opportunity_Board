@@ -18,8 +18,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    console.log("[payments/verify] received:", JSON.stringify(body));
     const parsed = verifySchema.safeParse(body);
     if (!parsed.success) {
+      console.log("[payments/verify] validation errors:", JSON.stringify(parsed.error.flatten().fieldErrors));
       return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 });
     }
 

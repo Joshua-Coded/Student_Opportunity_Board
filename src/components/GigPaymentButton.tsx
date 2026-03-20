@@ -157,7 +157,8 @@ export default function GigPaymentButton({
 
     try {
       // Step 4: MetaMask signs and broadcasts
-      const hash = await sendPaymentViaMetaMask(txParams);
+      const rawHash = await sendPaymentViaMetaMask(txParams);
+      const hash = typeof rawHash === "string" ? rawHash : String(rawHash);
       setTxHash(hash);
 
       // Step 5: Confirm payment in DB with real txHash
