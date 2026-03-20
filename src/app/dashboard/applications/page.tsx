@@ -145,7 +145,18 @@ export default function ApplicationsPage() {
                           <Link href={`/opportunities/${app.opportunity?.id}`}>
                             <Text fontWeight="semibold" color="white" fontSize="sm" cursor="pointer" _hover={{ color: "purple.300" }}>{app.opportunity?.title}</Text>
                           </Link>
-                          <Text color="gray.600" fontSize="xs">Applied {new Date(app.createdAt).toLocaleDateString()}</Text>
+                          {app.opportunity?.author?.id && (
+                            <Link href={`/profile/${app.opportunity.author.id}`}>
+                              <Flex align="center" gap={2} mt={1} w="fit-content">
+                                <Avatar size="xs" name={app.opportunity.author.name || "?"} src={app.opportunity.author.image || undefined} bg="purple.700" />
+                                <Text color="gray.500" fontSize="xs" _hover={{ color: "purple.300" }}>
+                                  Posted by {app.opportunity.author.name}
+                                  {app.opportunity.author.university ? ` · ${app.opportunity.author.university}` : ""}
+                                </Text>
+                              </Flex>
+                            </Link>
+                          )}
+                          <Text color="gray.700" fontSize="xs">Applied {new Date(app.createdAt).toLocaleDateString()}</Text>
                         </Stack>
                         {app.status === "PENDING" && (
                           <Button size="xs" variant="outline" borderColor="rgba(239,68,68,0.3)"
