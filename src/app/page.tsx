@@ -540,7 +540,7 @@ export default function HomePage() {
               <MotionBox key={s.label}
                 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.12, duration: 0.6 }}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}>
+                whileHover={{ y: -4 }}>
                 <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)"
                   borderRadius="2xl" p={8} position="relative" overflow="hidden" h="full"
                   _hover={{ borderColor: "rgba(255,255,255,0.12)", bg: "rgba(255,255,255,0.05)" }}
@@ -916,7 +916,7 @@ export default function HomePage() {
               <MotionBox key={f.title}
                 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                whileHover={{ y: -5 }}
                 bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
                 borderRadius="2xl" p={8} position="relative" overflow="hidden"
                 _hover={{ borderColor: "rgba(255,255,255,0.13)", bg: "rgba(255,255,255,0.04)", boxShadow: `0 20px 60px ${f.glow}` }}
@@ -980,7 +980,7 @@ export default function HomePage() {
               <MotionBox key={cat.type}
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.07 }}
-                whileHover={{ y: -6, boxShadow: `0 20px 40px ${cat.glow}`, transition: { duration: 0.2 } }}>
+                whileHover={{ y: -6 }}>
                 <Link href={`/opportunities?type=${cat.type}`}>
                   <Flex direction="column" align="center" textAlign="center" gap={3}
                     px={4} py={7} bg={cat.bg} border={`1px solid ${cat.border}`}
@@ -1127,7 +1127,7 @@ export default function HomePage() {
               <MotionBox key={t.name}
                 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.12 }}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                whileHover={{ y: -6 }}
                 bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
                 borderRadius="2xl" p={8} position="relative" overflow="hidden"
                 _hover={{ borderColor: t.color + "55", boxShadow: `0 20px 60px ${t.color}22` }}
