@@ -52,7 +52,7 @@ export default function OpportunitiesPage() {
     <Box minH="100vh" bg="#050510" color="white">
       {/* Navbar */}
       <Box bg="rgba(5,5,16,0.85)" backdropFilter="blur(20px)"
-        borderBottom="1px solid rgba(255,255,255,0.07)" px={6} py={4}
+        borderBottom="1px solid rgba(255,255,255,0.07)" px={{ base: 4, md: 6 }} py={4}
         position="sticky" top={0} zIndex={50}>
         <Flex maxW="7xl" mx="auto" justify="space-between" align="center">
           <Link href="/">
@@ -80,11 +80,11 @@ export default function OpportunitiesPage() {
         </Flex>
       </Box>
 
-      <Container maxW="7xl" py={10}>
+      <Container maxW="7xl" py={{ base: 6, md: 10 }} px={{ base: 4, md: 6 }}>
         <Stack spacing={8}>
           <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
             <Box>
-              <Heading size="xl">Browse Opportunities</Heading>
+              <Heading size={{ base: "lg", md: "xl" }}>Browse Opportunities</Heading>
               <Text color="gray.400" mt={1}>Find gigs, internships, research and more</Text>
             </Box>
             {session && (
@@ -104,7 +104,7 @@ export default function OpportunitiesPage() {
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
               color="white" _placeholder={{ color: "gray.600" }}
-              _focus={{ borderColor: "purple.500" }} borderRadius="xl" maxW="360px" />
+              _focus={{ borderColor: "purple.500" }} borderRadius="xl" maxW={{ base: "full", md: "360px" }} />
             <Flex gap={2} flexWrap="wrap">
               {TYPES.map((t) => (
                 <Button key={t} size="sm" onClick={() => { setType(t); setPage(1); }}
