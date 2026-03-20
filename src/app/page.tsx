@@ -544,7 +544,7 @@ export default function HomePage() {
                 <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)"
                   borderRadius="2xl" p={8} position="relative" overflow="hidden" h="full"
                   _hover={{ borderColor: "rgba(255,255,255,0.12)", bg: "rgba(255,255,255,0.05)" }}
-                  transition="all 0.3s">
+                  sx={{ transition: "all 0.3s" }}>
                   <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient={s.gradient} opacity={0.7} />
                   <Box position="absolute" bottom={0} right={0} w="120px" h="120px" borderRadius="full"
                     bgGradient={s.gradient} opacity={0.04} filter="blur(20px)" />
@@ -920,7 +920,7 @@ export default function HomePage() {
                 bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
                 borderRadius="2xl" p={8} position="relative" overflow="hidden"
                 _hover={{ borderColor: "rgba(255,255,255,0.13)", bg: "rgba(255,255,255,0.04)", boxShadow: `0 20px 60px ${f.glow}` }}
-                transition="all 0.3s">
+                sx={{ transition: "all 0.3s" }}>
                 <Box position="absolute" top={0} left={0} right={0} h="2px" bgGradient={f.gradient} />
                 <Box position="absolute" bottom={-10} right={-10} w="140px" h="140px" borderRadius="full"
                   bgGradient={f.gradient} opacity={0.05} filter="blur(20px)" />
@@ -1131,7 +1131,7 @@ export default function HomePage() {
                 bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
                 borderRadius="2xl" p={8} position="relative" overflow="hidden"
                 _hover={{ borderColor: t.color + "55", boxShadow: `0 20px 60px ${t.color}22` }}
-                transition="all 0.3s">
+                sx={{ transition: "all 0.3s" }}>
                 <Box position="absolute" top={0} left={0} right={0} h="2px" bg={t.color} opacity={0.6} />
                 <Box position="absolute" top={4} right={5}>
                   <Text fontSize="5xl" color={t.color} opacity={0.12} lineHeight={1} fontFamily="Georgia, serif">&ldquo;</Text>
