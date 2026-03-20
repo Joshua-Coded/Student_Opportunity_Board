@@ -513,55 +513,300 @@ export default function HomePage() {
       </Box>
 
       {/* ── How it works ────────────────────────────────────────────── */}
-      <Box py={28}>
-        <Container maxW="5xl">
-          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={16}>
-            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
-              How it works
-            </Text>
-            <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em">
-              Up and running in minutes
+      <Box py={32} position="relative" overflow="hidden">
+        {/* Background */}
+        <Box position="absolute" inset={0} bgGradient="radial(ellipse at 20% 50%, rgba(124,58,237,0.06) 0%, transparent 60%)" />
+        <Box position="absolute" inset={0} bgGradient="radial(ellipse at 80% 50%, rgba(37,99,235,0.05) 0%, transparent 60%)" />
+
+        <Container maxW="6xl" position="relative">
+          {/* Header */}
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={24}>
+            <Flex align="center" justify="center" gap={2} mb={5}>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
+                How it works
+              </Text>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+            </Flex>
+            <Heading fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
+              From zero to paid in{" "}
+              <Box as="span" bgGradient="linear(to-r, purple.400, blue.400, cyan.300)" bgClip="text">
+                three steps
+              </Box>
             </Heading>
+            <Text color="rgba(255,255,255,0.35)" fontSize="lg" maxW="lg" mx="auto">
+              No agency. No bank. No middleman. Just students and opportunities.
+            </Text>
           </MotionBox>
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={10} position="relative">
-            {[
-              { step: "01", title: "Create your profile", desc: "Sign up, add your university, major, and crypto wallet address to receive payments.", icon: "👤", color: "rgba(124,58,237,0.15)", border: "rgba(124,58,237,0.3)" },
-              { step: "02", title: "Post or apply", desc: "Post an opportunity with one-click AI enhancement, or browse and apply to gigs, internships, and research roles.", icon: "📋", color: "rgba(37,99,235,0.12)", border: "rgba(37,99,235,0.3)" },
-              { step: "03", title: "Get paid in crypto", desc: "Accept an applicant and send ETH, USDC, or MATIC directly to their wallet — instant, borderless, no fees.", icon: "⚡", color: "rgba(5,150,105,0.12)", border: "rgba(5,150,105,0.3)" },
-            ].map((item, i) => (
-              <MotionBox key={item.step}
-                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: i * 0.15 }}>
-                <Flex direction="column" align="center" textAlign="center" gap={5}>
-                  <Box position="relative">
-                    <Box w={20} h={20} borderRadius="2xl" bg={item.color} border={`1px solid ${item.border}`}
-                      display="flex" alignItems="center" justifyContent="center" fontSize="2xl">
-                      {item.icon}
+
+          {/* Steps */}
+          <Stack spacing={0}>
+            {/* Step 01 */}
+            <MotionBox initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
+              <Flex gap={{ base: 8, lg: 16 }} align="center" direction={{ base: "column", md: "row" }} mb={0}>
+                {/* Content */}
+                <Box flex={1} py={12}>
+                  <Flex align="center" gap={4} mb={6}>
+                    <Box w={12} h={12} borderRadius="xl" bgGradient="linear(135deg, #7c3aed, #4f46e5)"
+                      display="flex" alignItems="center" justifyContent="center" shadow="0 0 30px rgba(124,58,237,0.4)" flexShrink={0}>
+                      <Text fontSize="lg">👤</Text>
                     </Box>
-                    <Box position="absolute" top={-2} right={-2} w={7} h={7} borderRadius="full"
-                      bg="rgba(124,58,237,0.9)" border="2px solid #050510"
-                      display="flex" alignItems="center" justifyContent="center">
-                      <Text fontSize="10px" fontWeight="black" color="white">{item.step}</Text>
+                    <Box>
+                      <Text fontSize="xs" color="purple.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>Step 01</Text>
+                      <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em" color="white">
+                        Build your identity
+                      </Heading>
+                    </Box>
+                  </Flex>
+                  <Text color="rgba(255,255,255,0.45)" fontSize="md" lineHeight="relaxed" mb={7} maxW="420px">
+                    Your profile is your global resume. Set it up once and let opportunities find you — or go find them.
+                  </Text>
+                  <Stack spacing={3}>
+                    {[
+                      "Upload a profile photo via Cloudinary CDN",
+                      "Add your university, major & graduation year",
+                      "Paste your crypto wallet to receive payments",
+                      "Write a bio that sells your skills",
+                    ].map((point) => (
+                      <Flex key={point} align="center" gap={3}>
+                        <Box w={5} h={5} borderRadius="full" bg="rgba(124,58,237,0.2)" border="1px solid rgba(124,58,237,0.4)"
+                          display="flex" alignItems="center" justifyContent="center" flexShrink={0}>
+                          <Text fontSize="9px" color="purple.300">✓</Text>
+                        </Box>
+                        <Text color="rgba(255,255,255,0.5)" fontSize="sm">{point}</Text>
+                      </Flex>
+                    ))}
+                  </Stack>
+                </Box>
+
+                {/* Preview card */}
+                <MotionBox flex={1} whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+                  <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)"
+                    borderRadius="2xl" p={6} shadow="0 40px 80px rgba(0,0,0,0.4)" position="relative" overflow="hidden">
+                    <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient="linear(to-r, transparent, rgba(124,58,237,0.6), transparent)" />
+                    {/* Mini profile mockup */}
+                    <Flex gap={4} align="center" mb={5}>
+                      <Box w={14} h={14} borderRadius="full" bgGradient="linear(135deg, #7c3aed, #4f46e5)"
+                        display="flex" alignItems="center" justifyContent="center" fontSize="xl" flexShrink={0}
+                        border="2px solid rgba(124,58,237,0.4)" shadow="0 0 20px rgba(124,58,237,0.3)">👤</Box>
+                      <Box>
+                        <Text fontWeight="bold" color="white" fontSize="sm">Alex Johnson</Text>
+                        <Text color="purple.400" fontSize="xs">MIT · Computer Science</Text>
+                        <Flex gap={1} mt={1}>
+                          <Box px={2} py={0.5} bg="rgba(124,58,237,0.2)" borderRadius="full">
+                            <Text fontSize="9px" color="purple.300">🎓 Student</Text>
+                          </Box>
+                          <Box px={2} py={0.5} bg="rgba(255,255,255,0.05)" borderRadius="full">
+                            <Text fontSize="9px" color="gray.500">Class of 2026</Text>
+                          </Box>
+                        </Flex>
+                      </Box>
+                    </Flex>
+                    <Box h="1px" bg="rgba(255,255,255,0.06)" mb={4} />
+                    <Stack spacing={2}>
+                      {[
+                        { label: "University", value: "MIT" },
+                        { label: "Major", value: "Computer Science" },
+                        { label: "Wallet", value: "0x71C...4Fa3" },
+                      ].map((row) => (
+                        <Flex key={row.label} justify="space-between" align="center"
+                          px={3} py={2} bg="rgba(255,255,255,0.03)" borderRadius="lg">
+                          <Text color="gray.600" fontSize="xs">{row.label}</Text>
+                          <Text color="gray.300" fontSize="xs" fontWeight="medium" fontFamily={row.label === "Wallet" ? "mono" : "inherit"}>{row.value}</Text>
+                        </Flex>
+                      ))}
+                    </Stack>
+                    <Box mt={4} px={3} py={2} bg="rgba(34,197,94,0.08)" border="1px solid rgba(34,197,94,0.2)" borderRadius="lg">
+                      <Flex align="center" gap={2}>
+                        <Box w={1.5} h={1.5} borderRadius="full" bg="green.400" />
+                        <Text fontSize="xs" color="green.400">Profile ready to receive crypto payments</Text>
+                      </Flex>
                     </Box>
                   </Box>
-                  <Stack spacing={2}>
-                    <Heading size="sm" color="white">{item.title}</Heading>
-                    <Text color="rgba(255,255,255,0.4)" fontSize="sm" lineHeight="relaxed">{item.desc}</Text>
+                </MotionBox>
+              </Flex>
+            </MotionBox>
+
+            {/* Connector */}
+            <Flex justify="center" align="center" py={2} display={{ base: "none", md: "flex" }}>
+              <Box w="1px" h={12} bgGradient="linear(to-b, rgba(124,58,237,0.4), rgba(37,99,235,0.4))" />
+            </Flex>
+
+            {/* Step 02 — reversed */}
+            <MotionBox initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
+              <Flex gap={{ base: 8, lg: 16 }} align="center" direction={{ base: "column", md: "row-reverse" }} mb={0}>
+                {/* Content */}
+                <Box flex={1} py={12}>
+                  <Flex align="center" gap={4} mb={6}>
+                    <Box w={12} h={12} borderRadius="xl" bgGradient="linear(135deg, #2563eb, #0891b2)"
+                      display="flex" alignItems="center" justifyContent="center" shadow="0 0 30px rgba(37,99,235,0.4)" flexShrink={0}>
+                      <Text fontSize="lg">🤖</Text>
+                    </Box>
+                    <Box>
+                      <Text fontSize="xs" color="blue.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>Step 02</Text>
+                      <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em" color="white">
+                        Post or discover
+                      </Heading>
+                    </Box>
+                  </Flex>
+                  <Text color="rgba(255,255,255,0.45)" fontSize="md" lineHeight="relaxed" mb={7} maxW="420px">
+                    Post a listing in 60 seconds — Claude AI rewrites it to sound like a senior recruiter wrote it. Or browse and apply in one click.
+                  </Text>
+                  <Stack spacing={3}>
+                    {[
+                      "Claude MCP enhances your title & description",
+                      "Filter by type, remote, crypto payment",
+                      "One-click apply with cover letter + portfolio",
+                      "Manage all applications in one dashboard",
+                    ].map((point) => (
+                      <Flex key={point} align="center" gap={3}>
+                        <Box w={5} h={5} borderRadius="full" bg="rgba(37,99,235,0.2)" border="1px solid rgba(37,99,235,0.4)"
+                          display="flex" alignItems="center" justifyContent="center" flexShrink={0}>
+                          <Text fontSize="9px" color="blue.300">✓</Text>
+                        </Box>
+                        <Text color="rgba(255,255,255,0.5)" fontSize="sm">{point}</Text>
+                      </Flex>
+                    ))}
                   </Stack>
-                </Flex>
-              </MotionBox>
-            ))}
-          </SimpleGrid>
-          <Flex justify="center" mt={12}>
+                </Box>
+
+                {/* Preview card */}
+                <MotionBox flex={1} whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+                  <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)"
+                    borderRadius="2xl" p={6} shadow="0 40px 80px rgba(0,0,0,0.4)" position="relative" overflow="hidden">
+                    <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient="linear(to-r, transparent, rgba(37,99,235,0.6), transparent)" />
+                    {/* Mini listing mockup */}
+                    <Flex justify="space-between" align="center" mb={4}>
+                      <Box px={2} py={1} bg="rgba(124,58,237,0.2)" borderRadius="full">
+                        <Text fontSize="10px" color="purple.300" fontWeight="bold">GIG</Text>
+                      </Box>
+                      <Flex align="center" gap={1} px={2} py={1} bg="rgba(124,58,237,0.1)" border="1px solid rgba(124,58,237,0.25)" borderRadius="full">
+                        <Text fontSize="9px">🤖</Text>
+                        <Text fontSize="9px" color="purple.300">AI Enhanced</Text>
+                      </Flex>
+                    </Flex>
+                    <Text fontWeight="bold" color="white" fontSize="md" mb={1}>Senior React Developer — Web3 DeFi</Text>
+                    <Text color="purple.300" fontSize="sm" fontWeight="bold" mb={3}>0.25 ETH · Remote · Ethereum</Text>
+                    <Text color="gray.500" fontSize="xs" lineHeight="relaxed" noOfLines={3} mb={4}>
+                      We're building a next-gen DeFi dashboard and need a React developer with Web3 experience. Must be comfortable with ethers.js, wagmi, and modern UI patterns...
+                    </Text>
+                    <Flex gap={2} flexWrap="wrap" mb={4}>
+                      {["React", "TypeScript", "ethers.js", "wagmi"].map((tag) => (
+                        <Box key={tag} px={2} py={0.5} bg="rgba(255,255,255,0.05)" borderRadius="full">
+                          <Text fontSize="9px" color="gray.400">{tag}</Text>
+                        </Box>
+                      ))}
+                    </Flex>
+                    <Box px={4} py={2.5} bgGradient="linear(to-r, rgba(124,58,237,0.3), rgba(37,99,235,0.3))"
+                      border="1px solid rgba(124,58,237,0.3)" borderRadius="xl" textAlign="center">
+                      <Text fontSize="xs" color="white" fontWeight="semibold">Apply Now →</Text>
+                    </Box>
+                  </Box>
+                </MotionBox>
+              </Flex>
+            </MotionBox>
+
+            {/* Connector */}
+            <Flex justify="center" align="center" py={2} display={{ base: "none", md: "flex" }}>
+              <Box w="1px" h={12} bgGradient="linear(to-b, rgba(37,99,235,0.4), rgba(5,150,105,0.4))" />
+            </Flex>
+
+            {/* Step 03 */}
+            <MotionBox initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}>
+              <Flex gap={{ base: 8, lg: 16 }} align="center" direction={{ base: "column", md: "row" }}>
+                {/* Content */}
+                <Box flex={1} py={12}>
+                  <Flex align="center" gap={4} mb={6}>
+                    <Box w={12} h={12} borderRadius="xl" bgGradient="linear(135deg, #059669, #0d9488)"
+                      display="flex" alignItems="center" justifyContent="center" shadow="0 0 30px rgba(5,150,105,0.4)" flexShrink={0}>
+                      <Text fontSize="lg">⚡</Text>
+                    </Box>
+                    <Box>
+                      <Text fontSize="xs" color="green.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>Step 03</Text>
+                      <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em" color="white">
+                        Get paid in crypto
+                      </Heading>
+                    </Box>
+                  </Flex>
+                  <Text color="rgba(255,255,255,0.45)" fontSize="md" lineHeight="relaxed" mb={7} maxW="420px">
+                    Accept an applicant and pay directly to their wallet. No PayPal. No wire transfer. No 3–5 business days. Instant, borderless, final.
+                  </Text>
+                  <Stack spacing={3}>
+                    {[
+                      "ETH, USDC, MATIC, BNB, SOL and more",
+                      "Sender's wallet pre-filled from their profile",
+                      "Recipient sees payment instantly on dashboard",
+                      "Full transaction history with TX hash proof",
+                    ].map((point) => (
+                      <Flex key={point} align="center" gap={3}>
+                        <Box w={5} h={5} borderRadius="full" bg="rgba(5,150,105,0.2)" border="1px solid rgba(5,150,105,0.4)"
+                          display="flex" alignItems="center" justifyContent="center" flexShrink={0}>
+                          <Text fontSize="9px" color="green.300">✓</Text>
+                        </Box>
+                        <Text color="rgba(255,255,255,0.5)" fontSize="sm">{point}</Text>
+                      </Flex>
+                    ))}
+                  </Stack>
+                </Box>
+
+                {/* Preview card */}
+                <MotionBox flex={1} whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+                  <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)"
+                    borderRadius="2xl" p={6} shadow="0 40px 80px rgba(0,0,0,0.4)" position="relative" overflow="hidden">
+                    <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient="linear(to-r, transparent, rgba(5,150,105,0.6), transparent)" />
+                    {/* Payment confirmation mockup */}
+                    <Flex align="center" gap={3} mb={5}>
+                      <Box w={10} h={10} borderRadius="xl" bg="rgba(5,150,105,0.15)" border="1px solid rgba(5,150,105,0.3)"
+                        display="flex" alignItems="center" justifyContent="center">
+                        <Text fontSize="md">⚡</Text>
+                      </Box>
+                      <Box>
+                        <Text color="white" fontWeight="bold" fontSize="sm">Payment Confirmed</Text>
+                        <Text color="green.400" fontSize="xs">Transaction successful</Text>
+                      </Box>
+                      <Box ml="auto" px={2} py={1} bg="rgba(34,197,94,0.15)" border="1px solid rgba(34,197,94,0.3)" borderRadius="full">
+                        <Text fontSize="9px" color="green.300" fontWeight="bold">✓ CONFIRMED</Text>
+                      </Box>
+                    </Flex>
+                    <Box h="1px" bg="rgba(255,255,255,0.06)" mb={4} />
+                    <Stack spacing={2} mb={4}>
+                      {[
+                        { label: "Amount", value: "0.25 ETH", highlight: true },
+                        { label: "Network", value: "Ethereum" },
+                        { label: "To wallet", value: "0x71C...4Fa3" },
+                        { label: "TX Hash", value: "0xa4f...b29c" },
+                      ].map((row) => (
+                        <Flex key={row.label} justify="space-between" align="center"
+                          px={3} py={2} bg="rgba(255,255,255,0.03)" borderRadius="lg">
+                          <Text color="gray.600" fontSize="xs">{row.label}</Text>
+                          <Text color={row.highlight ? "green.300" : "gray.300"} fontSize="xs"
+                            fontWeight={row.highlight ? "bold" : "medium"}
+                            fontFamily={row.label.includes("wallet") || row.label.includes("TX") ? "mono" : "inherit"}>
+                            {row.value}
+                          </Text>
+                        </Flex>
+                      ))}
+                    </Stack>
+                    <Box px={3} py={2.5} bg="rgba(34,197,94,0.08)" border="1px solid rgba(34,197,94,0.2)" borderRadius="xl" textAlign="center">
+                      <Text fontSize="xs" color="green.300">Funds delivered to recipient's wallet instantly</Text>
+                    </Box>
+                  </Box>
+                </MotionBox>
+              </Flex>
+            </MotionBox>
+          </Stack>
+
+          {/* Bottom CTA */}
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mt={16}>
             <Link href="/register">
-              <Button size="md" px={8}
+              <Button size="lg" px={10} py={6} fontSize="sm" fontWeight="semibold"
                 bgGradient="linear(to-r, purple.500, blue.500)" color="white"
-                _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
-                transition="all 0.2s" borderRadius="xl">
-                Get started free →
+                _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-2px)", shadow: "0 20px 40px rgba(124,58,237,0.3)" }}
+                transition="all 0.25s" borderRadius="xl">
+                Start for free — no credit card →
               </Button>
             </Link>
-          </Flex>
+          </MotionBox>
         </Container>
       </Box>
 
