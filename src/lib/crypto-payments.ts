@@ -44,6 +44,7 @@ export async function confirmPayment(paymentId: string, fromWallet: string, txHa
       fromWalletAddress: fromWallet,
       confirmedAt: new Date(),
     },
+    include: { opportunity: true, payer: true },
   });
 }
 
