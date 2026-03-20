@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Badge, Button, Container, Flex, Heading, SimpleGrid, Stack, Text, HStack, Avatar } from "@chakra-ui/react";
+import { Box, Badge, Button, Container, Flex, Heading, Input, SimpleGrid, Stack, Text, HStack, Avatar } from "@chakra-ui/react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
@@ -19,44 +19,55 @@ const features = [
   { icon: "☁️", title: "Rich Media", description: "Upload banners, logos and portfolio images via Cloudinary CDN. Fast globally, optimised automatically.", gradient: "linear(135deg, #d97706, #dc2626)" },
 ];
 
-
 const testimonials = [
   { name: "Amara Diallo", role: "CS Student · Univ. of Lagos", text: "Found a Next.js gig that paid 0.15 ETH within 24 hours of posting. The AI enhanced my listing and made it look insanely professional.", avatar: "AD", color: "#7c3aed" },
   { name: "Carlos Mendes", role: "UX Designer · São Paulo", text: "Received 200 USDC on Polygon for a branding project. No fees, instant settlement. This is what cross-border work should feel like.", avatar: "CM", color: "#2563eb" },
   { name: "Priya Nair", role: "ML Researcher · IIT Bombay", text: "Posted a research assistant role and had 8 applicants by morning. The platform just works — clean, fast, student-focused.", avatar: "PN", color: "#059669" },
 ];
 
-const floatingCards = [
-  { title: "React Developer", pay: "0.15 ETH", type: "GIG", tag: "🔥 Hot" },
-  { title: "ML Research", pay: "Negotiable", type: "RESEARCH", tag: "🎓 Academic" },
-  { title: "UX Internship", pay: "0.08 ETH", type: "INTERNSHIP", tag: "🌍 Remote" },
-];
-
-const typeColors: Record<string, string> = {
-  GIG: "#7c3aed", RESEARCH: "#2563eb", INTERNSHIP: "#059669",
-};
-
 const TICKER = ["React Developer", "ML Research Assistant", "Smart Contract Auditor", "UX Designer", "Data Analyst", "Rust Developer", "Technical Writer", "Node.js Developer"];
 
-// ── Animated counter ──────────────────────────────────────────────────────────
-function Counter({ target }: { target: string }) {
-  const [display, setDisplay] = useState("0");
-  const num = parseInt(target.replace(/\D/g, ""));
-  const suffix = target.replace(/[0-9]/g, "");
+const CATEGORIES = [
+  { type: "GIG", label: "Gigs", icon: "⚡", bg: "rgba(124,58,237,0.15)", border: "rgba(124,58,237,0.3)", text: "#a78bfa" },
+  { type: "INTERNSHIP", label: "Internships", icon: "🏢", bg: "rgba(5,150,105,0.12)", border: "rgba(5,150,105,0.3)", text: "#6ee7b7" },
+  { type: "PART_TIME", label: "Part-time", icon: "🕐", bg: "rgba(37,99,235,0.12)", border: "rgba(37,99,235,0.3)", text: "#93c5fd" },
+  { type: "FULL_TIME", label: "Full-time", icon: "💼", bg: "rgba(13,148,136,0.12)", border: "rgba(13,148,136,0.3)", text: "#5eead4" },
+  { type: "VOLUNTEER", label: "Volunteer", icon: "🤝", bg: "rgba(217,119,6,0.12)", border: "rgba(217,119,6,0.3)", text: "#fcd34d" },
+  { type: "RESEARCH", label: "Research", icon: "🔬", bg: "rgba(219,39,119,0.12)", border: "rgba(219,39,119,0.3)", text: "#f9a8d4" },
+];
+
+const FAQS = [
+  { q: "Is it free to sign up?", a: "Yes — signing up, browsing, and applying are completely free. Posting opportunities is also free." },
+  { q: "Do I need a crypto wallet to use the platform?", a: "Not to browse or apply. You only need a wallet address in your profile if you want to receive crypto payments for work you complete." },
+  { q: "Which cryptocurrencies are supported?", a: "ETH, USDC, and MATIC on Ethereum and Polygon networks. The poster specifies the chain when listing an opportunity." },
+  { q: "How does AI enhancement work?", a: "When posting, click 'Enhance with AI'. Claude rewrites your title and description to be clearer and more professional — powered by Claude MCP." },
+  { q: "Can I post without offering crypto payment?", a: "Yes. Payment type is flexible — Free, Negotiable, or Crypto. Crypto is optional." },
+  { q: "Is this platform only for students?", a: "Built with students in mind but open to anyone. Startups and independent posters can also list opportunities." },
+];
+
+const typeColor: Record<string, string> = {
+  GIG: "purple", INTERNSHIP: "blue", PART_TIME: "green",
+  FULL_TIME: "teal", VOLUNTEER: "orange", RESEARCH: "pink",
+};
+
+// ── Sub-components ─────────────────────────────────────────────────────────
+
+function Counter({ target }: { target: number }) {
+  const [display, setDisplay] = useState(0);
   useEffect(() => {
+    if (target === 0) return;
     let start = 0;
-    const step = Math.ceil(num / 40);
+    const step = Math.ceil(target / 40);
     const timer = setInterval(() => {
       start += step;
-      if (start >= num) { setDisplay(target); clearInterval(timer); }
-      else setDisplay(start + suffix);
+      if (start >= target) { setDisplay(target); clearInterval(timer); }
+      else setDisplay(start);
     }, 40);
     return () => clearInterval(timer);
-  }, [target, num, suffix]);
-  return <>{display}</>;
+  }, [target]);
+  return <>{target > 0 ? display.toLocaleString() : "—"}</>;
 }
 
-// ── Ticker ─────────────────────────────────────────────────────────────────────
 function RollingTicker() {
   const [index, setIndex] = useState(0);
   useEffect(() => {
@@ -66,20 +77,11 @@ function RollingTicker() {
   return (
     <Box overflow="hidden" h="44px" display="flex" alignItems="center">
       <AnimatePresence mode="wait">
-        <MotionBox
-          key={index}
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -30, opacity: 0 }}
-          transition={{ duration: 0.35, ease: "easeInOut" }}
-        >
-          <Text
-            fontSize={{ base: "3xl", md: "5xl", lg: "6xl" }}
-            fontWeight="black"
-            bgGradient="linear(to-r, purple.400, blue.400, cyan.300)"
-            bgClip="text"
-            lineHeight="1"
-          >
+        <MotionBox key={index}
+          initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -30, opacity: 0 }} transition={{ duration: 0.35, ease: "easeInOut" }}>
+          <Text fontSize={{ base: "3xl", md: "5xl", lg: "6xl" }} fontWeight="black"
+            bgGradient="linear(to-r, purple.400, blue.400, cyan.300)" bgClip="text" lineHeight="1">
             {TICKER[index]}
           </Text>
         </MotionBox>
@@ -88,10 +90,91 @@ function RollingTicker() {
   );
 }
 
-const typeColor: Record<string, string> = {
-  GIG: "purple", INTERNSHIP: "blue", PART_TIME: "green",
-  FULL_TIME: "teal", VOLUNTEER: "orange", RESEARCH: "pink",
-};
+function FAQItem({ question, answer, index }: { question: string; answer: string; index: number }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <MotionBox initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ delay: index * 0.06 }}>
+      <Box bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
+        borderRadius="xl" overflow="hidden" cursor="pointer" onClick={() => setOpen(!open)}
+        _hover={{ borderColor: "rgba(255,255,255,0.12)" }} transition="border-color 0.2s">
+        <Flex justify="space-between" align="center" px={6} py={4}>
+          <Text fontWeight="medium" color="white" fontSize="sm" pr={4}>{question}</Text>
+          <Text color="gray.500" fontSize="xl" lineHeight={1}
+            style={{ transform: open ? "rotate(45deg)" : "none", transition: "transform 0.2s" }}>+</Text>
+        </Flex>
+        {open && (
+          <Box px={6} pb={5}>
+            <Text color="rgba(255,255,255,0.45)" fontSize="sm" lineHeight="relaxed">{answer}</Text>
+          </Box>
+        )}
+      </Box>
+    </MotionBox>
+  );
+}
+
+function NewsletterSection() {
+  const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 600));
+    setDone(true);
+    setLoading(false);
+  }
+
+  return (
+    <Box py={20} position="relative" overflow="hidden">
+      <Box position="absolute" inset={0}
+        bgGradient="radial(ellipse at 50% 100%, rgba(124,58,237,0.07) 0%, transparent 60%)" />
+      <Container maxW="xl" position="relative" textAlign="center">
+        <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <Stack spacing={5} align="center">
+            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)"
+              letterSpacing="widest" textTransform="uppercase">Stay in the loop</Text>
+            <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em">
+              New opportunities, every week
+            </Heading>
+            <Text color="rgba(255,255,255,0.35)" fontSize="sm" maxW="sm">
+              Get a weekly digest of the best gigs, internships, and research roles — straight to your inbox.
+            </Text>
+            {done ? (
+              <Flex align="center" gap={3} px={6} py={4}
+                bg="rgba(34,197,94,0.1)" border="1px solid rgba(34,197,94,0.25)" borderRadius="xl">
+                <Text fontSize="lg">🎉</Text>
+                <Text color="green.300" fontSize="sm" fontWeight="medium">You're on the list! We'll be in touch.</Text>
+              </Flex>
+            ) : (
+              <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: "420px" }}>
+                <Flex gap={2}>
+                  <Input
+                    type="email" placeholder="your@email.com" value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
+                    color="white" _placeholder={{ color: "gray.600" }}
+                    _focus={{ borderColor: "purple.500", boxShadow: "0 0 0 1px #7c3aed" }}
+                    borderRadius="xl" fontSize="sm" required
+                  />
+                  <Button type="submit" isLoading={loading} px={6} flexShrink={0}
+                    bgGradient="linear(to-r, purple.500, blue.500)" color="white"
+                    _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
+                    transition="all 0.2s" borderRadius="xl" fontSize="sm" fontWeight="semibold">
+                    Subscribe
+                  </Button>
+                </Flex>
+              </form>
+            )}
+            <Text color="rgba(255,255,255,0.15)" fontSize="xs">No spam. Unsubscribe anytime.</Text>
+          </Stack>
+        </MotionBox>
+      </Container>
+    </Box>
+  );
+}
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
@@ -99,7 +182,10 @@ export default function HomePage() {
   const { scrollYProgress } = useScroll({ target: heroRef });
   const yParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-  const [liveData, setLiveData] = useState<{ opportunities: any[]; users: any[]; totalOpportunities: number; totalUsers: number; totalPayments: number }>({ opportunities: [], users: [], totalOpportunities: 0, totalUsers: 0, totalPayments: 0 });
+  const [liveData, setLiveData] = useState<{
+    opportunities: any[]; users: any[];
+    totalOpportunities: number; totalUsers: number; totalPayments: number;
+  }>({ opportunities: [], users: [], totalOpportunities: 0, totalUsers: 0, totalPayments: 0 });
 
   useEffect(() => {
     fetch("/api/public/stats").then(r => r.json()).then(setLiveData).catch(() => {});
@@ -110,34 +196,27 @@ export default function HomePage() {
 
       {/* ── Navbar ──────────────────────────────────────────────────── */}
       <MotionBox
-        initial={{ y: -70, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        initial={{ y: -70, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.55, ease: "easeOut" }}
         position="fixed" top={0} left={0} right={0} zIndex={100}
         bg="rgba(5,5,16,0.75)" backdropFilter="blur(24px) saturate(180%)"
-        borderBottom="1px solid rgba(255,255,255,0.06)"
-      >
+        borderBottom="1px solid rgba(255,255,255,0.06)">
         <Flex maxW="7xl" mx="auto" px={6} py={4} justify="space-between" align="center">
           <HStack gap={2.5}>
             <Box w={8} h={8} borderRadius="lg" bgGradient="linear(135deg, #7c3aed, #2563eb)"
-              display="flex" alignItems="center" justifyContent="center" fontSize="sm" shadow="0 0 20px rgba(124,58,237,0.5)">
-              🎓
-            </Box>
+              display="flex" alignItems="center" justifyContent="center" fontSize="sm"
+              shadow="0 0 20px rgba(124,58,237,0.5)">🎓</Box>
             <Heading size="sm" letterSpacing="tight"
               bgGradient="linear(to-r, white, rgba(255,255,255,0.7))" bgClip="text">
               OpportunityBoard
             </Heading>
           </HStack>
-
           <HStack gap={7} display={{ base: "none", md: "flex" }}>
-            {["Browse", "How it works", "Pricing"].map((item) => (
+            {["Browse", "How it works", "FAQ"].map((item) => (
               <Text key={item} fontSize="sm" color="rgba(255,255,255,0.45)" cursor="pointer"
-                _hover={{ color: "white" }} transition="color 0.2s" fontWeight="medium">
-                {item}
-              </Text>
+                _hover={{ color: "white" }} transition="color 0.2s" fontWeight="medium">{item}</Text>
             ))}
           </HStack>
-
           <HStack gap={3}>
             <Link href="/login">
               <Button variant="ghost" size="sm" color="rgba(255,255,255,0.5)"
@@ -146,8 +225,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm" px={5}
-                bg="white" color="#050510"
+              <Button size="sm" px={5} bg="white" color="#050510"
                 _hover={{ bg: "rgba(255,255,255,0.88)", transform: "translateY(-1px)", shadow: "0 8px 30px rgba(255,255,255,0.15)" }}
                 transition="all 0.2s" borderRadius="lg" fontWeight="semibold">
                 Get started
@@ -159,16 +237,11 @@ export default function HomePage() {
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
       <Box ref={heroRef} minH="100vh" position="relative" display="flex" alignItems="center" pt={20} overflow="hidden">
-
         {/* Background orbs */}
         <Box position="absolute" top="8%" left="-5%" w="600px" h="600px" borderRadius="full"
           bg="rgba(124,58,237,0.12)" filter="blur(120px)" pointerEvents="none" />
         <Box position="absolute" bottom="10%" right="-5%" w="500px" h="500px" borderRadius="full"
           bg="rgba(37,99,235,0.1)" filter="blur(100px)" pointerEvents="none" />
-        <Box position="absolute" top="50%" left="50%" transform="translate(-50%,-50%)" w="800px" h="800px"
-          borderRadius="full" bg="rgba(124,58,237,0.04)" filter="blur(80px)" pointerEvents="none" />
-
-        {/* Grid pattern overlay */}
         <Box position="absolute" inset={0} opacity={0.03} pointerEvents="none"
           backgroundImage="linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)"
           backgroundSize="60px 60px" />
@@ -243,33 +316,28 @@ export default function HomePage() {
             <Stack gap={3}>
               <MotionHeading
                 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }}
-                fontSize={{ base: "4xl", md: "6xl" }} fontWeight="black" lineHeight="1.05" letterSpacing="-0.03em"
-                color="white"
-              >
+                fontSize={{ base: "4xl", md: "6xl" }} fontWeight="black" lineHeight="1.05" letterSpacing="-0.03em" color="white">
                 Find your next
               </MotionHeading>
               <RollingTicker />
               <MotionHeading
                 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
                 fontSize={{ base: "4xl", md: "6xl" }} fontWeight="black" lineHeight="1.05" letterSpacing="-0.03em"
-                color="rgba(255,255,255,0.35)"
-              >
+                color="rgba(255,255,255,0.35)">
                 Get paid in crypto.
               </MotionHeading>
             </Stack>
 
             <MotionText
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
-              fontSize={{ base: "md", md: "lg" }} color="rgba(255,255,255,0.45)" maxW="xl" lineHeight="relaxed"
-            >
+              fontSize={{ base: "md", md: "lg" }} color="rgba(255,255,255,0.45)" maxW="xl" lineHeight="relaxed">
               The global student opportunity platform. Post gigs, discover internships,
               and receive cross-border crypto payments — no bank required.
             </MotionText>
 
             <MotionFlex
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.35 }}
-              gap={3} flexWrap="wrap" justify="center"
-            >
+              gap={3} flexWrap="wrap" justify="center">
               <Link href="/register">
                 <Button size="lg" px={8} py={6} fontSize="sm" fontWeight="semibold"
                   bg="white" color="#050510"
@@ -292,12 +360,9 @@ export default function HomePage() {
             {/* Animated user social proof */}
             <MotionBox initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.7 }}>
               <Flex direction="column" align="center" gap={3}>
-                {/* Glowing avatar stack */}
                 <Flex align="center" justify="center" position="relative">
-                  {/* Glow ring */}
                   <Box position="absolute" w="180px" h="48px" borderRadius="full"
                     bg="rgba(124,58,237,0.18)" filter="blur(18px)" />
-                  {/* Overlapping avatars */}
                   <Flex position="relative">
                     {(liveData.users.length > 0 ? liveData.users.slice(0, 6) : Array(6).fill(null)).map((u, i) => (
                       <MotionBox key={i}
@@ -306,22 +371,15 @@ export default function HomePage() {
                         transition={{ delay: 0.6 + i * 0.08, type: "spring", stiffness: 300, damping: 20 }}
                         style={{ marginLeft: i === 0 ? 0 : -12, zIndex: 10 - i }}
                         whileHover={{ scale: 1.2, zIndex: 20 }}>
-                        <Avatar
-                          size="md"
-                          name={u?.name || "?"}
-                          src={u?.image || undefined}
+                        <Avatar size="md" name={u?.name || "?"} src={u?.image || undefined}
                           bg={["purple.600","blue.600","pink.600","teal.600","orange.600","indigo.600"][i % 6]}
-                          color="white"
-                          border="2.5px solid #050510"
-                          boxShadow="0 0 0 1px rgba(124,58,237,0.4)"
-                        />
+                          color="white" border="2.5px solid #050510"
+                          boxShadow="0 0 0 1px rgba(124,58,237,0.4)" />
                       </MotionBox>
                     ))}
-                    {/* +N bubble */}
                     {liveData.totalUsers > 6 && (
                       <MotionBox
-                        initial={{ opacity: 0, scale: 0.4 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 1.15, type: "spring", stiffness: 300 }}
                         style={{ marginLeft: -12, zIndex: 1 }}>
                         <Box w="44px" h="44px" borderRadius="full"
@@ -336,8 +394,6 @@ export default function HomePage() {
                     )}
                   </Flex>
                 </Flex>
-
-                {/* Count + live dot */}
                 <Flex align="center" gap={2}>
                   <Box w={1.5} h={1.5} borderRadius="full" bg="green.400"
                     style={{ animation: "pulse 2s infinite" }} />
@@ -367,7 +423,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
                 <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" color="white">
-                  {s.value > 0 ? s.value.toLocaleString() : "—"}
+                  <Counter target={s.value} />
                 </Text>
                 <Text color="rgba(255,255,255,0.3)" fontSize="sm" mt={1} fontWeight="medium">{s.label}</Text>
               </MotionBox>
@@ -376,8 +432,61 @@ export default function HomePage() {
         </Container>
       </Box>
 
-      {/* ── Features ────────────────────────────────────────────────── */}
+      {/* ── How it works ────────────────────────────────────────────── */}
       <Box py={28}>
+        <Container maxW="5xl">
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={16}>
+            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
+              How it works
+            </Text>
+            <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em">
+              Up and running in minutes
+            </Heading>
+          </MotionBox>
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={10} position="relative">
+            {[
+              { step: "01", title: "Create your profile", desc: "Sign up, add your university, major, and crypto wallet address to receive payments.", icon: "👤", color: "rgba(124,58,237,0.15)", border: "rgba(124,58,237,0.3)" },
+              { step: "02", title: "Post or apply", desc: "Post an opportunity with one-click AI enhancement, or browse and apply to gigs, internships, and research roles.", icon: "📋", color: "rgba(37,99,235,0.12)", border: "rgba(37,99,235,0.3)" },
+              { step: "03", title: "Get paid in crypto", desc: "Accept an applicant and send ETH, USDC, or MATIC directly to their wallet — instant, borderless, no fees.", icon: "⚡", color: "rgba(5,150,105,0.12)", border: "rgba(5,150,105,0.3)" },
+            ].map((item, i) => (
+              <MotionBox key={item.step}
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.15 }}>
+                <Flex direction="column" align="center" textAlign="center" gap={5}>
+                  <Box position="relative">
+                    <Box w={20} h={20} borderRadius="2xl" bg={item.color} border={`1px solid ${item.border}`}
+                      display="flex" alignItems="center" justifyContent="center" fontSize="2xl">
+                      {item.icon}
+                    </Box>
+                    <Box position="absolute" top={-2} right={-2} w={7} h={7} borderRadius="full"
+                      bg="rgba(124,58,237,0.9)" border="2px solid #050510"
+                      display="flex" alignItems="center" justifyContent="center">
+                      <Text fontSize="10px" fontWeight="black" color="white">{item.step}</Text>
+                    </Box>
+                  </Box>
+                  <Stack spacing={2}>
+                    <Heading size="sm" color="white">{item.title}</Heading>
+                    <Text color="rgba(255,255,255,0.4)" fontSize="sm" lineHeight="relaxed">{item.desc}</Text>
+                  </Stack>
+                </Flex>
+              </MotionBox>
+            ))}
+          </SimpleGrid>
+          <Flex justify="center" mt={12}>
+            <Link href="/register">
+              <Button size="md" px={8}
+                bgGradient="linear(to-r, purple.500, blue.500)" color="white"
+                _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
+                transition="all 0.2s" borderRadius="xl">
+                Get started free →
+              </Button>
+            </Link>
+          </Flex>
+        </Container>
+      </Box>
+
+      {/* ── Features ────────────────────────────────────────────────── */}
+      <Box py={28} bg="rgba(255,255,255,0.01)" borderY="1px solid rgba(255,255,255,0.04)">
         <Container maxW="6xl">
           <Stack gap={20}>
             <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center">
@@ -391,7 +500,6 @@ export default function HomePage() {
                 Modern tooling, AI-powered, and built with the global student in mind.
               </Text>
             </MotionBox>
-
             <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={5}>
               {features.map((f, i) => (
                 <MotionBox key={f.title}
@@ -402,8 +510,8 @@ export default function HomePage() {
                   borderRadius="2xl" p={6} cursor="default" position="relative" overflow="hidden"
                   _hover={{ borderColor: "rgba(255,255,255,0.14)", bg: "rgba(255,255,255,0.04)" }}>
                   <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient={f.gradient} opacity={0.6} />
-                  <Box w={10} h={10} borderRadius="xl" bgGradient={f.gradient} display="flex"
-                    alignItems="center" justifyContent="center" fontSize="lg" mb={4} shadow="lg">
+                  <Box w={10} h={10} borderRadius="xl" bgGradient={f.gradient}
+                    display="flex" alignItems="center" justifyContent="center" fontSize="lg" mb={4} shadow="lg">
                     {f.icon}
                   </Box>
                   <Heading size="sm" mb={2} color="white" letterSpacing="-0.01em">{f.title}</Heading>
@@ -415,9 +523,41 @@ export default function HomePage() {
         </Container>
       </Box>
 
+      {/* ── Browse by category ───────────────────────────────────────── */}
+      <Box py={20}>
+        <Container maxW="4xl">
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={12}>
+            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
+              Browse by category
+            </Text>
+            <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em">
+              Find exactly what you're looking for
+            </Heading>
+          </MotionBox>
+          <Flex justify="center" flexWrap="wrap" gap={3}>
+            {CATEGORIES.map((cat, i) => (
+              <MotionBox key={cat.type}
+                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.07 }}
+                whileHover={{ scale: 1.05 }}>
+                <Link href={`/opportunities?type=${cat.type}`}>
+                  <Flex align="center" gap={3} px={6} py={3}
+                    bg={cat.bg} border={`1px solid ${cat.border}`}
+                    borderRadius="xl" cursor="pointer" transition="all 0.2s"
+                    _hover={{ opacity: 0.85 }}>
+                    <Text fontSize="xl">{cat.icon}</Text>
+                    <Text fontWeight="semibold" fontSize="sm" color={cat.text}>{cat.label}</Text>
+                  </Flex>
+                </Link>
+              </MotionBox>
+            ))}
+          </Flex>
+        </Container>
+      </Box>
+
       {/* ── Live on the Platform ─────────────────────────────────── */}
       {(liveData.opportunities.length > 0 || liveData.users.length > 0) && (
-        <Box py={24} bg="#050510">
+        <Box py={24} bg="rgba(255,255,255,0.01)" borderY="1px solid rgba(255,255,255,0.04)">
           <Container maxW="6xl">
             <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={14}>
               <Flex align="center" justify="center" gap={2} mb={4}>
@@ -435,12 +575,10 @@ export default function HomePage() {
               </Text>
             </MotionBox>
 
-            {/* Recent users */}
             {liveData.users.length > 0 && (
               <Box mb={14}>
-                <Text color="rgba(255,255,255,0.3)" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="widest" mb={5} textAlign="center">
-                  Recently Joined
-                </Text>
+                <Text color="rgba(255,255,255,0.3)" fontSize="xs" fontWeight="bold" textTransform="uppercase"
+                  letterSpacing="widest" mb={5} textAlign="center">Recently Joined</Text>
                 <Flex justify="center" flexWrap="wrap" gap={3}>
                   {liveData.users.map((u) => (
                     <Link href={`/profile/${u.id}`} key={u.id}>
@@ -461,7 +599,6 @@ export default function HomePage() {
               </Box>
             )}
 
-            {/* Live listings */}
             {liveData.opportunities.length > 0 && (
               <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={5}>
                 {liveData.opportunities.map((opp, i) => (
@@ -474,16 +611,12 @@ export default function HomePage() {
                         _hover={{ bg: "rgba(255,255,255,0.06)", borderColor: "rgba(139,92,246,0.4)", transform: "translateY(-2px)" }}
                         transition="all 0.2s">
                         <Flex justify="space-between" align="flex-start" mb={3}>
-                          <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">
-                            {opp.type}
-                          </Badge>
+                          <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">{opp.type}</Badge>
                           {opp.paymentType === "CRYPTO" && (
                             <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">Crypto</Badge>
                           )}
                         </Flex>
-                        <Text fontWeight="semibold" color="white" fontSize="sm" noOfLines={2} mb={2}>
-                          {opp.title}
-                        </Text>
+                        <Text fontWeight="semibold" color="white" fontSize="sm" noOfLines={2} mb={2}>{opp.title}</Text>
                         {opp.compensationAmount && (
                           <Text color="purple.300" fontSize="sm" fontWeight="bold" mb={3}>
                             {opp.compensationAmount} {opp.compensationCurrency}
@@ -497,9 +630,7 @@ export default function HomePage() {
                               <Text color="gray.600" fontSize="xs" noOfLines={1}>{opp.author.university}</Text>
                             )}
                           </Box>
-                          <Text color="gray.700" fontSize="xs" ml="auto">
-                            {opp.isRemote ? "Remote" : opp.location}
-                          </Text>
+                          <Text color="gray.700" fontSize="xs" ml="auto">{opp.isRemote ? "Remote" : opp.location}</Text>
                         </Flex>
                       </Box>
                     </Link>
@@ -520,6 +651,62 @@ export default function HomePage() {
           </Container>
         </Box>
       )}
+
+      {/* ── Tech stack trust strip ───────────────────────────────────── */}
+      <Box py={14} borderY="1px solid rgba(255,255,255,0.04)">
+        <Container maxW="5xl">
+          <Text textAlign="center" fontSize="xs" color="rgba(255,255,255,0.18)" fontWeight="medium"
+            letterSpacing="widest" textTransform="uppercase" mb={10}>Built with</Text>
+          <Flex justify="center" align="center" flexWrap="wrap" gap={{ base: 8, md: 14 }}>
+            {[
+              { name: "Next.js 14", desc: "App framework" },
+              { name: "Claude AI", desc: "MCP + AI enhance" },
+              { name: "Cloudinary", desc: "Image CDN" },
+              { name: "Ethereum", desc: "Crypto payments" },
+              { name: "Polygon", desc: "Low-fee chain" },
+              { name: "Neon DB", desc: "Serverless Postgres" },
+            ].map((tech) => (
+              <MotionBox key={tech.name}
+                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+                viewport={{ once: true }} whileHover={{ y: -2 }}>
+                <Flex direction="column" align="center" gap={1}>
+                  <Text fontWeight="bold" fontSize="sm" color="rgba(255,255,255,0.45)">{tech.name}</Text>
+                  <Text fontSize="10px" color="rgba(255,255,255,0.2)">{tech.desc}</Text>
+                </Flex>
+              </MotionBox>
+            ))}
+          </Flex>
+        </Container>
+      </Box>
+
+      {/* ── Supported crypto ─────────────────────────────────────────── */}
+      <Box py={14} bg="rgba(255,255,255,0.008)">
+        <Container maxW="3xl" textAlign="center">
+          <Text fontSize="xs" color="rgba(255,255,255,0.2)" fontWeight="medium" letterSpacing="widest"
+            textTransform="uppercase" mb={7}>Accepted cryptocurrencies</Text>
+          <Flex justify="center" flexWrap="wrap" gap={3}>
+            {[
+              { symbol: "ETH", name: "Ethereum", color: "#627EEA" },
+              { symbol: "USDC", name: "USD Coin", color: "#2775CA" },
+              { symbol: "MATIC", name: "Polygon", color: "#8247E5" },
+              { symbol: "BNB", name: "BNB Chain", color: "#F3BA2F" },
+            ].map((coin) => (
+              <MotionBox key={coin.symbol}
+                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }} whileHover={{ scale: 1.05 }}>
+                <Flex align="center" gap={2} px={5} py={2.5}
+                  bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.07)"
+                  borderRadius="full" transition="all 0.2s"
+                  _hover={{ borderColor: "rgba(255,255,255,0.15)", bg: "rgba(255,255,255,0.07)" }}>
+                  <Box w={2.5} h={2.5} borderRadius="full" bg={coin.color} flexShrink={0} />
+                  <Text fontWeight="bold" fontSize="sm" color="white">{coin.symbol}</Text>
+                  <Text fontSize="xs" color="rgba(255,255,255,0.3)">{coin.name}</Text>
+                </Flex>
+              </MotionBox>
+            ))}
+          </Flex>
+        </Container>
+      </Box>
 
       {/* ── Testimonials ────────────────────────────────────────────── */}
       <Box py={24} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
@@ -544,10 +731,9 @@ export default function HomePage() {
                   &ldquo;{t.text}&rdquo;
                 </Text>
                 <HStack gap={3}>
-                  <Box w={9} h={9} borderRadius="full" bg={t.color} display="flex"
-                    alignItems="center" justifyContent="center" fontSize="xs" fontWeight="bold" flexShrink={0}>
-                    {t.avatar}
-                  </Box>
+                  <Box w={9} h={9} borderRadius="full" bg={t.color}
+                    display="flex" alignItems="center" justifyContent="center"
+                    fontSize="xs" fontWeight="bold" flexShrink={0}>{t.avatar}</Box>
                   <Stack gap={0}>
                     <Text fontWeight="semibold" fontSize="sm" color="white">{t.name}</Text>
                     <Text color="rgba(255,255,255,0.3)" fontSize="xs">{t.role}</Text>
@@ -559,6 +745,30 @@ export default function HomePage() {
         </Container>
       </Box>
 
+      {/* ── FAQ ─────────────────────────────────────────────────────── */}
+      <Box py={24}>
+        <Container maxW="3xl">
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={14}>
+            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
+              FAQ
+            </Text>
+            <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em">
+              Common questions
+            </Heading>
+          </MotionBox>
+          <Stack spacing={3}>
+            {FAQS.map((item, i) => (
+              <FAQItem key={i} question={item.q} answer={item.a} index={i} />
+            ))}
+          </Stack>
+        </Container>
+      </Box>
+
+      {/* ── Newsletter ───────────────────────────────────────────────── */}
+      <Box borderY="1px solid rgba(255,255,255,0.05)" bg="rgba(255,255,255,0.01)">
+        <NewsletterSection />
+      </Box>
+
       {/* ── CTA ─────────────────────────────────────────────────────── */}
       <Box py={32} position="relative" overflow="hidden">
         <Box position="absolute" inset={0}
@@ -567,7 +777,6 @@ export default function HomePage() {
           bg="rgba(124,58,237,0.06)" filter="blur(80px)" />
         <Box position="absolute" bottom="20%" right="20%" w="250px" h="250px" borderRadius="full"
           bg="rgba(37,99,235,0.06)" filter="blur(60px)" />
-
         <Container maxW="2xl" position="relative" textAlign="center">
           <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <Stack gap={7} align="center">
@@ -580,7 +789,7 @@ export default function HomePage() {
                 <Box as="span" color="rgba(255,255,255,0.3)">is one click away.</Box>
               </Heading>
               <Text color="rgba(255,255,255,0.4)" fontSize="lg" maxW="md">
-                Join thousands of students already earning and growing on OpportunityBoard.
+                Join students already earning and growing on OpportunityBoard.
               </Text>
               <Link href="/register">
                 <Button size="lg" px={10} py={6} fontSize="sm" fontWeight="semibold"
