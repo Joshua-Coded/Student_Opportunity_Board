@@ -208,48 +208,85 @@ function NewsletterSection() {
   }
 
   return (
-    <Box py={20} position="relative" overflow="hidden">
-      <Box position="absolute" inset={0}
-        bgGradient="radial(ellipse at 50% 100%, rgba(124,58,237,0.07) 0%, transparent 60%)" />
-      <Container maxW="xl" position="relative" textAlign="center">
+    <Box py={24} position="relative" overflow="hidden">
+      <Box position="absolute" inset={0} bgGradient="linear(135deg, rgba(124,58,237,0.08) 0%, rgba(37,99,235,0.06) 100%)" />
+      <Box position="absolute" top="-40px" left="-40px" w="300px" h="300px" borderRadius="full"
+        bg="rgba(124,58,237,0.08)" filter="blur(80px)" />
+      <Box position="absolute" bottom="-40px" right="-40px" w="300px" h="300px" borderRadius="full"
+        bg="rgba(37,99,235,0.08)" filter="blur(80px)" />
+      <Container maxW="5xl" position="relative">
         <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <Stack spacing={5} align="center">
-            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)"
-              letterSpacing="widest" textTransform="uppercase">Stay in the loop</Text>
-            <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em">
-              New opportunities, every week
-            </Heading>
-            <Text color="rgba(255,255,255,0.35)" fontSize="sm" maxW="sm">
-              Get a weekly digest of the best gigs, internships, and research roles — straight to your inbox.
-            </Text>
-            {done ? (
-              <Flex align="center" gap={3} px={6} py={4}
-                bg="rgba(34,197,94,0.1)" border="1px solid rgba(34,197,94,0.25)" borderRadius="xl">
-                <Text fontSize="lg">🎉</Text>
-                <Text color="green.300" fontSize="sm" fontWeight="medium">You're on the list! We'll be in touch.</Text>
+          <Flex direction={{ base: "column", md: "row" }} align="center" gap={12}>
+            {/* Left copy */}
+            <Box flex={1}>
+              <Flex align="center" gap={2} mb={4}>
+                <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+                <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
+                  Newsletter
+                </Text>
               </Flex>
-            ) : (
-              <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: "420px" }}>
-                <Flex gap={2}>
-                  <Input
-                    type="email" placeholder="your@email.com" value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
-                    color="white" _placeholder={{ color: "gray.600" }}
-                    _focus={{ borderColor: "purple.500", boxShadow: "0 0 0 1px #7c3aed" }}
-                    borderRadius="xl" fontSize="sm" required
-                  />
-                  <Button type="submit" isLoading={loading} px={6} flexShrink={0}
-                    bgGradient="linear(to-r, purple.500, blue.500)" color="white"
-                    _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
-                    transition="all 0.2s" borderRadius="xl" fontSize="sm" fontWeight="semibold">
-                    Subscribe
-                  </Button>
-                </Flex>
-              </form>
-            )}
-            <Text color="rgba(255,255,255,0.15)" fontSize="xs">No spam. Unsubscribe anytime.</Text>
-          </Stack>
+              <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
+                The best opportunities,{" "}
+                <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">
+                  weekly.
+                </Box>
+              </Heading>
+              <Text color="rgba(255,255,255,0.4)" fontSize="md" lineHeight="relaxed" maxW="380px">
+                A curated digest of the top gigs, internships, and research roles — handpicked every week, straight to your inbox.
+              </Text>
+              <Stack spacing={2} mt={6}>
+                {["Top 10 listings of the week", "New crypto-paying gigs first", "No spam, unsubscribe anytime"].map((p) => (
+                  <Flex key={p} align="center" gap={2}>
+                    <Text color="purple.400" fontSize="xs">✓</Text>
+                    <Text color="rgba(255,255,255,0.4)" fontSize="sm">{p}</Text>
+                  </Flex>
+                ))}
+              </Stack>
+            </Box>
+
+            {/* Right form */}
+            <Box flex={1} w="full">
+              <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)"
+                borderRadius="2xl" p={8} position="relative" overflow="hidden">
+                <Box position="absolute" top={0} left={0} right={0} h="1px"
+                  bgGradient="linear(to-r, transparent, rgba(124,58,237,0.6), transparent)" />
+                {done ? (
+                  <Flex direction="column" align="center" gap={4} py={6} textAlign="center">
+                    <Text fontSize="4xl">🎉</Text>
+                    <Heading size="md" color="white">You're in!</Heading>
+                    <Text color="rgba(255,255,255,0.4)" fontSize="sm">
+                      First digest lands in your inbox this week. Keep an eye out.
+                    </Text>
+                  </Flex>
+                ) : (
+                  <form onSubmit={handleSubmit}>
+                    <Stack spacing={4}>
+                      <Box>
+                        <Text color="gray.400" fontSize="xs" fontWeight="medium" mb={2}>Your email address</Text>
+                        <Input
+                          type="email" placeholder="you@university.edu" value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
+                          color="white" _placeholder={{ color: "gray.600" }}
+                          _focus={{ borderColor: "purple.500", boxShadow: "0 0 0 1px #7c3aed" }}
+                          borderRadius="xl" fontSize="sm" size="lg" required
+                        />
+                      </Box>
+                      <Button type="submit" isLoading={loading} size="lg" w="full"
+                        bgGradient="linear(to-r, purple.500, blue.500)" color="white"
+                        _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)", shadow: "0 10px 30px rgba(124,58,237,0.3)" }}
+                        transition="all 0.2s" borderRadius="xl" fontWeight="semibold">
+                        Subscribe — it's free
+                      </Button>
+                      <Text color="rgba(255,255,255,0.2)" fontSize="xs" textAlign="center">
+                        Join students already subscribed · No spam ever
+                      </Text>
+                    </Stack>
+                  </form>
+                )}
+              </Box>
+            </Box>
+          </Flex>
         </MotionBox>
       </Container>
     </Box>
@@ -491,21 +528,41 @@ export default function HomePage() {
       </Box>
 
       {/* ── Stats bar ───────────────────────────────────────────────── */}
-      <Box py={14} borderY="1px solid rgba(255,255,255,0.05)" bg="rgba(255,255,255,0.015)">
-        <Container maxW="3xl">
-          <SimpleGrid columns={{ base: 2, md: 3 }} gap={6} textAlign="center">
+      <Box py={20} position="relative" overflow="hidden">
+        <Box position="absolute" inset={0} bgGradient="radial(ellipse at 50% 50%, rgba(124,58,237,0.05) 0%, transparent 70%)" />
+        <Container maxW="5xl" position="relative">
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
             {[
-              { value: liveData.totalUsers, label: "Students" },
-              { value: liveData.totalOpportunities, label: "Active Opportunities" },
-              { value: liveData.totalPayments, label: "Payments Made" },
+              { value: liveData.totalUsers, label: "Students worldwide", desc: "From 40+ countries, all disciplines", icon: "🎓", gradient: "linear(135deg, #7c3aed, #4f46e5)", glow: "rgba(124,58,237,0.3)" },
+              { value: liveData.totalOpportunities, label: "Active listings", desc: "Gigs, internships, research & more", icon: "📋", gradient: "linear(135deg, #2563eb, #0891b2)", glow: "rgba(37,99,235,0.3)" },
+              { value: liveData.totalPayments, label: "Payments made", desc: "Crypto sent directly wallet-to-wallet", icon: "⚡", gradient: "linear(135deg, #059669, #0d9488)", glow: "rgba(5,150,105,0.3)" },
             ].map((s, i) => (
               <MotionBox key={s.label}
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
-                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" color="white">
-                  <Counter target={s.value} />
-                </Text>
-                <Text color="rgba(255,255,255,0.3)" fontSize="sm" mt={1} fontWeight="medium">{s.label}</Text>
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.12, duration: 0.6 }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}>
+                <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)"
+                  borderRadius="2xl" p={8} position="relative" overflow="hidden" h="full"
+                  _hover={{ borderColor: "rgba(255,255,255,0.12)", bg: "rgba(255,255,255,0.05)" }}
+                  transition="all 0.3s">
+                  <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient={s.gradient} opacity={0.7} />
+                  <Box position="absolute" bottom={0} right={0} w="120px" h="120px" borderRadius="full"
+                    bgGradient={s.gradient} opacity={0.04} filter="blur(20px)" />
+                  <Flex align="center" gap={3} mb={5}>
+                    <Box w={11} h={11} borderRadius="xl" bgGradient={s.gradient}
+                      display="flex" alignItems="center" justifyContent="center" fontSize="xl"
+                      shadow={`0 0 20px ${s.glow}`}>
+                      {s.icon}
+                    </Box>
+                    <Box h="1px" flex={1} bgGradient={`linear(to-r, ${s.glow.replace("0.3", "0.3")}, transparent)`} />
+                  </Flex>
+                  <Text fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black" color="white" lineHeight={1} mb={2}
+                    bgGradient={s.gradient} bgClip="text">
+                    <Counter target={s.value} />
+                  </Text>
+                  <Text color="white" fontSize="md" fontWeight="semibold" mb={1}>{s.label}</Text>
+                  <Text color="rgba(255,255,255,0.3)" fontSize="sm">{s.desc}</Text>
+                </Box>
               </MotionBox>
             ))}
           </SimpleGrid>
@@ -811,72 +868,135 @@ export default function HomePage() {
       </Box>
 
       {/* ── Features ────────────────────────────────────────────────── */}
-      <Box py={28} bg="rgba(255,255,255,0.01)" borderY="1px solid rgba(255,255,255,0.04)">
-        <Container maxW="6xl">
-          <Stack gap={20}>
-            <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center">
-              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
+      <Box py={32} position="relative" overflow="hidden">
+        <Box position="absolute" inset={0} opacity={0.02}
+          backgroundImage="linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)"
+          backgroundSize="80px 80px" />
+        <Container maxW="6xl" position="relative">
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={20}>
+            <Flex align="center" justify="center" gap={2} mb={5}>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
                 Platform Features
               </Text>
-              <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em" mb={4}>
-                Everything you need in one place
-              </Heading>
-              <Text color="rgba(255,255,255,0.4)" fontSize="lg" maxW="xl" mx="auto">
-                Modern tooling, AI-powered, and built with the global student in mind.
-              </Text>
-            </MotionBox>
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={5}>
-              {features.map((f, i) => (
-                <MotionBox key={f.title}
-                  initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                  whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                  bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
-                  borderRadius="2xl" p={6} cursor="default" position="relative" overflow="hidden"
-                  _hover={{ borderColor: "rgba(255,255,255,0.14)", bg: "rgba(255,255,255,0.04)" }}>
-                  <Box position="absolute" top={0} left={0} right={0} h="1px" bgGradient={f.gradient} opacity={0.6} />
-                  <Box w={10} h={10} borderRadius="xl" bgGradient={f.gradient}
-                    display="flex" alignItems="center" justifyContent="center" fontSize="lg" mb={4} shadow="lg">
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+            </Flex>
+            <Heading fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
+              Built{" "}
+              <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">different.</Box>
+            </Heading>
+            <Text color="rgba(255,255,255,0.35)" fontSize="lg" maxW="xl" mx="auto">
+              Every tool you need — AI-powered, crypto-native, student-first.
+            </Text>
+          </MotionBox>
+
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
+            {[
+              {
+                icon: "🎯", title: "Post & Discover", gradient: "linear(135deg, #7c3aed, #4f46e5)", glow: "rgba(124,58,237,0.25)",
+                description: "Browse gigs, internships, research roles and part-time work posted by students and startups worldwide.",
+                points: ["Advanced type & remote filters", "Real-time listing updates", "Apply in under 60 seconds"],
+              },
+              {
+                icon: "⚡", title: "Crypto Payments", gradient: "linear(135deg, #2563eb, #0891b2)", glow: "rgba(37,99,235,0.25)",
+                description: "Send and receive ETH, USDC, MATIC and 15+ more cross-border — no bank, no fees, instant settlement.",
+                points: ["18 cryptocurrencies supported", "Wallet pre-filled from profile", "Full transaction history + TX hash"],
+              },
+              {
+                icon: "🤖", title: "Claude AI Enhance", gradient: "linear(135deg, #059669, #0d9488)", glow: "rgba(5,150,105,0.25)",
+                description: "One click rewrites your listing with Claude MCP — sharper title, cleaner description, better tags. No writing required.",
+                points: ["Claude Sonnet rewrites your copy", "Smarter keywords for discovery", "Powered by Model Context Protocol"],
+              },
+              {
+                icon: "☁️", title: "Rich Media & Profiles", gradient: "linear(135deg, #d97706, #dc2626)", glow: "rgba(217,119,6,0.25)",
+                description: "Upload avatars, banners and portfolio images via Cloudinary CDN. Fast globally, auto-optimised.",
+                points: ["Cloudinary CDN delivery", "Public profile pages", "Portfolio link on every application"],
+              },
+            ].map((f, i) => (
+              <MotionBox key={f.title}
+                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
+                borderRadius="2xl" p={8} position="relative" overflow="hidden"
+                _hover={{ borderColor: "rgba(255,255,255,0.13)", bg: "rgba(255,255,255,0.04)", boxShadow: `0 20px 60px ${f.glow}` }}
+                transition="all 0.3s">
+                <Box position="absolute" top={0} left={0} right={0} h="2px" bgGradient={f.gradient} />
+                <Box position="absolute" bottom={-10} right={-10} w="140px" h="140px" borderRadius="full"
+                  bgGradient={f.gradient} opacity={0.05} filter="blur(20px)" />
+                <Flex align="flex-start" gap={5} mb={5}>
+                  <Box w={14} h={14} borderRadius="2xl" bgGradient={f.gradient}
+                    display="flex" alignItems="center" justifyContent="center" fontSize="2xl"
+                    shadow={`0 0 30px ${f.glow}`} flexShrink={0}>
                     {f.icon}
                   </Box>
-                  <Heading size="sm" mb={2} color="white" letterSpacing="-0.01em">{f.title}</Heading>
-                  <Text color="rgba(255,255,255,0.4)" fontSize="sm" lineHeight="relaxed">{f.description}</Text>
-                </MotionBox>
-              ))}
-            </SimpleGrid>
-          </Stack>
+                  <Box>
+                    <Heading size="md" color="white" letterSpacing="-0.02em" mb={2}>{f.title}</Heading>
+                    <Text color="rgba(255,255,255,0.4)" fontSize="sm" lineHeight="relaxed">{f.description}</Text>
+                  </Box>
+                </Flex>
+                <Box h="1px" bg="rgba(255,255,255,0.06)" mb={5} />
+                <Stack spacing={2}>
+                  {f.points.map((p) => (
+                    <Flex key={p} align="center" gap={3}>
+                      <Box w={1.5} h={1.5} borderRadius="full" bgGradient={f.gradient} flexShrink={0} />
+                      <Text color="rgba(255,255,255,0.45)" fontSize="sm">{p}</Text>
+                    </Flex>
+                  ))}
+                </Stack>
+              </MotionBox>
+            ))}
+          </SimpleGrid>
         </Container>
       </Box>
 
       {/* ── Browse by category ───────────────────────────────────────── */}
-      <Box py={20}>
-        <Container maxW="4xl">
-          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={12}>
-            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
-              Browse by category
-            </Text>
-            <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em">
-              Find exactly what you're looking for
+      <Box py={28} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
+        <Container maxW="6xl">
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={16}>
+            <Flex align="center" justify="center" gap={2} mb={5}>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
+                Browse by category
+              </Text>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+            </Flex>
+            <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em" mb={3}>
+              What are you looking for?
             </Heading>
+            <Text color="rgba(255,255,255,0.35)" fontSize="md">
+              Every category. Every skill. One platform.
+            </Text>
           </MotionBox>
-          <Flex justify="center" flexWrap="wrap" gap={3}>
-            {CATEGORIES.map((cat, i) => (
+          <SimpleGrid columns={{ base: 2, md: 3, lg: 6 }} gap={4}>
+            {[
+              { type: "GIG", label: "Gigs", icon: "⚡", desc: "Short-term work", bg: "rgba(124,58,237,0.1)", border: "rgba(124,58,237,0.25)", text: "#a78bfa", glow: "rgba(124,58,237,0.2)" },
+              { type: "INTERNSHIP", label: "Internships", icon: "🏢", desc: "Structured programs", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.25)", text: "#6ee7b7", glow: "rgba(5,150,105,0.2)" },
+              { type: "PART_TIME", label: "Part-time", icon: "🕐", desc: "Flexible hours", bg: "rgba(37,99,235,0.08)", border: "rgba(37,99,235,0.25)", text: "#93c5fd", glow: "rgba(37,99,235,0.2)" },
+              { type: "FULL_TIME", label: "Full-time", icon: "💼", desc: "Career roles", bg: "rgba(13,148,136,0.08)", border: "rgba(13,148,136,0.25)", text: "#5eead4", glow: "rgba(13,148,136,0.2)" },
+              { type: "VOLUNTEER", label: "Volunteer", icon: "🤝", desc: "Give back", bg: "rgba(217,119,6,0.08)", border: "rgba(217,119,6,0.25)", text: "#fcd34d", glow: "rgba(217,119,6,0.2)" },
+              { type: "RESEARCH", label: "Research", icon: "🔬", desc: "Academic work", bg: "rgba(219,39,119,0.08)", border: "rgba(219,39,119,0.25)", text: "#f9a8d4", glow: "rgba(219,39,119,0.2)" },
+            ].map((cat, i) => (
               <MotionBox key={cat.type}
-                initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.07 }}
-                whileHover={{ scale: 1.05 }}>
+                whileHover={{ y: -6, boxShadow: `0 20px 40px ${cat.glow}`, transition: { duration: 0.2 } }}>
                 <Link href={`/opportunities?type=${cat.type}`}>
-                  <Flex align="center" gap={3} px={6} py={3}
-                    bg={cat.bg} border={`1px solid ${cat.border}`}
-                    borderRadius="xl" cursor="pointer" transition="all 0.2s"
-                    _hover={{ opacity: 0.85 }}>
-                    <Text fontSize="xl">{cat.icon}</Text>
-                    <Text fontWeight="semibold" fontSize="sm" color={cat.text}>{cat.label}</Text>
+                  <Flex direction="column" align="center" textAlign="center" gap={3}
+                    px={4} py={7} bg={cat.bg} border={`1px solid ${cat.border}`}
+                    borderRadius="2xl" cursor="pointer" transition="all 0.2s" h="full"
+                    _hover={{ bg: cat.bg.replace("0.08", "0.15").replace("0.1", "0.18"), borderColor: cat.text + "66" }}>
+                    <Text fontSize="2xl">{cat.icon}</Text>
+                    <Box>
+                      <Text fontWeight="bold" fontSize="sm" color={cat.text} mb={1}>{cat.label}</Text>
+                      <Text fontSize="xs" color="rgba(255,255,255,0.3)">{cat.desc}</Text>
+                    </Box>
+                    <Text fontSize="10px" color={cat.text} opacity={0.7}>Explore →</Text>
                   </Flex>
                 </Link>
               </MotionBox>
             ))}
-          </Flex>
+          </SimpleGrid>
         </Container>
       </Box>
 
@@ -981,36 +1101,60 @@ export default function HomePage() {
       <CryptoMarquee />
 
       {/* ── Testimonials ────────────────────────────────────────────── */}
-      <Box py={24} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
-        <Container maxW="6xl">
-          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            textAlign="center" mb={14}>
-            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
-              Student Stories
-            </Text>
-            <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em">
-              Loved by students everywhere
+      <Box py={32} position="relative" overflow="hidden">
+        <Box position="absolute" inset={0} bgGradient="radial(ellipse at 30% 50%, rgba(124,58,237,0.05) 0%, transparent 50%)" />
+        <Box position="absolute" inset={0} bgGradient="radial(ellipse at 70% 50%, rgba(37,99,235,0.04) 0%, transparent 50%)" />
+        <Container maxW="6xl" position="relative">
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={20}>
+            <Flex align="center" justify="center" gap={2} mb={5}>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
+                Student Stories
+              </Text>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+            </Flex>
+            <Heading fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
+              Real people.{" "}
+              <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">Real results.</Box>
             </Heading>
+            <Text color="rgba(255,255,255,0.35)" fontSize="lg" maxW="lg" mx="auto">
+              Students from Lagos to Mumbai are already earning in crypto.
+            </Text>
           </MotionBox>
+
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
             {testimonials.map((t, i) => (
               <MotionBox key={t.name}
                 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.12 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 bg="rgba(255,255,255,0.025)" border="1px solid rgba(255,255,255,0.07)"
-                borderRadius="2xl" p={7} position="relative">
-                <Text color="rgba(255,255,255,0.55)" fontSize="sm" lineHeight="relaxed" mb={7}>
+                borderRadius="2xl" p={8} position="relative" overflow="hidden"
+                _hover={{ borderColor: t.color + "55", boxShadow: `0 20px 60px ${t.color}22` }}
+                transition="all 0.3s">
+                <Box position="absolute" top={0} left={0} right={0} h="2px" bg={t.color} opacity={0.6} />
+                <Box position="absolute" top={4} right={5}>
+                  <Text fontSize="5xl" color={t.color} opacity={0.12} lineHeight={1} fontFamily="Georgia, serif">&ldquo;</Text>
+                </Box>
+                {/* Stars */}
+                <Flex gap={0.5} mb={5}>
+                  {Array(5).fill(null).map((_, si) => (
+                    <Text key={si} fontSize="xs" color="#F59E0B">★</Text>
+                  ))}
+                </Flex>
+                <Text color="rgba(255,255,255,0.6)" fontSize="sm" lineHeight="relaxed" mb={8} fontStyle="italic">
                   &ldquo;{t.text}&rdquo;
                 </Text>
-                <HStack gap={3}>
-                  <Box w={9} h={9} borderRadius="full" bg={t.color}
+                <Flex align="center" gap={3}>
+                  <Box w={11} h={11} borderRadius="full" bg={t.color}
                     display="flex" alignItems="center" justifyContent="center"
-                    fontSize="xs" fontWeight="bold" flexShrink={0}>{t.avatar}</Box>
-                  <Stack gap={0}>
-                    <Text fontWeight="semibold" fontSize="sm" color="white">{t.name}</Text>
+                    fontSize="sm" fontWeight="bold" flexShrink={0}
+                    shadow={`0 0 16px ${t.color}66`}>{t.avatar}</Box>
+                  <Box>
+                    <Text fontWeight="bold" fontSize="sm" color="white">{t.name}</Text>
                     <Text color="rgba(255,255,255,0.3)" fontSize="xs">{t.role}</Text>
-                  </Stack>
-                </HStack>
+                  </Box>
+                </Flex>
               </MotionBox>
             ))}
           </SimpleGrid>
@@ -1018,21 +1162,45 @@ export default function HomePage() {
       </Box>
 
       {/* ── FAQ ─────────────────────────────────────────────────────── */}
-      <Box py={24}>
-        <Container maxW="3xl">
-          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={14}>
-            <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase" mb={4}>
-              FAQ
-            </Text>
-            <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.02em">
-              Common questions
-            </Heading>
-          </MotionBox>
-          <Stack spacing={3}>
-            {FAQS.map((item, i) => (
-              <FAQItem key={i} question={item.q} answer={item.a} index={i} />
-            ))}
-          </Stack>
+      <Box py={32} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
+        <Container maxW="5xl">
+          <Flex gap={16} direction={{ base: "column", lg: "row" }} align="flex-start">
+            {/* Left: sticky header */}
+            <MotionBox initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+              flex="0 0 280px" position={{ base: "static", lg: "sticky" }} top="120px">
+              <Flex align="center" gap={2} mb={5}>
+                <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+                <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
+                  FAQ
+                </Text>
+              </Flex>
+              <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
+                Got{" "}
+                <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">
+                  questions?
+                </Box>
+              </Heading>
+              <Text color="rgba(255,255,255,0.35)" fontSize="md" lineHeight="relaxed" mb={8}>
+                Everything you need to know about getting started, payments, and how the platform works.
+              </Text>
+              <Link href="/register">
+                <Button size="md" px={6} bgGradient="linear(to-r, purple.500, blue.500)" color="white"
+                  _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
+                  transition="all 0.2s" borderRadius="xl">
+                  Get started free →
+                </Button>
+              </Link>
+            </MotionBox>
+
+            {/* Right: FAQ items */}
+            <Box flex={1}>
+              <Stack spacing={3}>
+                {FAQS.map((item, i) => (
+                  <FAQItem key={i} question={item.q} answer={item.a} index={i} />
+                ))}
+              </Stack>
+            </Box>
+          </Flex>
         </Container>
       </Box>
 
@@ -1042,58 +1210,143 @@ export default function HomePage() {
       </Box>
 
       {/* ── CTA ─────────────────────────────────────────────────────── */}
-      <Box py={32} position="relative" overflow="hidden">
-        <Box position="absolute" inset={0}
-          bgGradient="radial(ellipse at 50% 50%, rgba(124,58,237,0.1) 0%, transparent 65%)" />
-        <Box position="absolute" top="20%" left="20%" w="300px" h="300px" borderRadius="full"
-          bg="rgba(124,58,237,0.06)" filter="blur(80px)" />
-        <Box position="absolute" bottom="20%" right="20%" w="250px" h="250px" borderRadius="full"
-          bg="rgba(37,99,235,0.06)" filter="blur(60px)" />
-        <Container maxW="2xl" position="relative" textAlign="center">
-          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <Stack gap={7} align="center">
-              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
-                Get started today
-              </Text>
-              <Heading fontSize={{ base: "4xl", md: "6xl" }} fontWeight="black" lineHeight="1.05" letterSpacing="-0.03em">
-                Your next opportunity
+      <Box py={40} position="relative" overflow="hidden">
+        {/* Grid background */}
+        <Box position="absolute" inset={0} opacity={0.025}
+          backgroundImage="linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)"
+          backgroundSize="60px 60px" />
+        {/* Glow orbs */}
+        <Box position="absolute" top="10%" left="10%" w="500px" h="500px" borderRadius="full"
+          bg="rgba(124,58,237,0.08)" filter="blur(100px)" />
+        <Box position="absolute" bottom="10%" right="10%" w="400px" h="400px" borderRadius="full"
+          bg="rgba(37,99,235,0.07)" filter="blur(80px)" />
+        <Box position="absolute" top="50%" left="50%" transform="translate(-50%,-50%)" w="600px" h="200px"
+          borderRadius="full" bg="rgba(124,58,237,0.05)" filter="blur(60px)" />
+
+        <Container maxW="3xl" position="relative" textAlign="center">
+          <MotionBox initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+            <Stack gap={8} align="center">
+              <Flex align="center" gap={2} bg="rgba(124,58,237,0.1)" border="1px solid rgba(124,58,237,0.25)"
+                borderRadius="full" px={4} py={2}>
+                <Box w={1.5} h={1.5} borderRadius="full" bg="#a78bfa" style={{ animation: "pulse 2s infinite" }} />
+                <Text fontSize="xs" color="rgba(167,139,250,0.9)" fontWeight="medium" letterSpacing="wide">
+                  Join students already earning on the platform
+                </Text>
+              </Flex>
+
+              <Heading fontSize={{ base: "5xl", md: "7xl" }} fontWeight="black" lineHeight="1" letterSpacing="-0.04em">
+                Your next
                 <br />
-                <Box as="span" color="rgba(255,255,255,0.3)">is one click away.</Box>
+                <Box as="span" bgGradient="linear(to-r, purple.400, blue.400, cyan.300)" bgClip="text">
+                  opportunity
+                </Box>
+                <br />
+                <Box as="span" color="rgba(255,255,255,0.2)">awaits.</Box>
               </Heading>
-              <Text color="rgba(255,255,255,0.4)" fontSize="lg" maxW="md">
-                Join students already earning and growing on OpportunityBoard.
+
+              <Text color="rgba(255,255,255,0.4)" fontSize="xl" maxW="lg" lineHeight="relaxed">
+                Post your first listing or apply to a gig — either way, you're one step closer to your next paycheck in crypto.
               </Text>
-              <Link href="/register">
-                <Button size="lg" px={10} py={6} fontSize="sm" fontWeight="semibold"
-                  bg="white" color="#050510"
-                  _hover={{ bg: "rgba(255,255,255,0.9)", transform: "translateY(-3px)", shadow: "0 24px 60px rgba(255,255,255,0.15)" }}
-                  transition="all 0.25s" borderRadius="xl">
-                  Create your free account →
-                </Button>
-              </Link>
-              <Text color="rgba(255,255,255,0.2)" fontSize="xs">
-                No credit card required · Free forever for students
-              </Text>
+
+              <Flex gap={4} flexWrap="wrap" justify="center">
+                <Link href="/register">
+                  <Button size="lg" px={10} py={7} fontSize="sm" fontWeight="semibold"
+                    bg="white" color="#050510"
+                    _hover={{ bg: "rgba(255,255,255,0.9)", transform: "translateY(-3px)", shadow: "0 30px 60px rgba(255,255,255,0.15)" }}
+                    transition="all 0.25s" borderRadius="xl">
+                    Start for free →
+                  </Button>
+                </Link>
+                <Link href="/opportunities">
+                  <Button size="lg" px={10} py={7} fontSize="sm" fontWeight="medium"
+                    bg="rgba(255,255,255,0.06)" color="rgba(255,255,255,0.7)"
+                    border="1px solid rgba(255,255,255,0.1)"
+                    _hover={{ bg: "rgba(255,255,255,0.1)", color: "white", transform: "translateY(-3px)" }}
+                    transition="all 0.25s" borderRadius="xl">
+                    Browse opportunities
+                  </Button>
+                </Link>
+              </Flex>
+
+              <Flex align="center" gap={6} flexWrap="wrap" justify="center">
+                {["No credit card", "Free forever", "Crypto-ready"].map((t) => (
+                  <Flex key={t} align="center" gap={1.5}>
+                    <Text color="green.400" fontSize="xs">✓</Text>
+                    <Text color="rgba(255,255,255,0.25)" fontSize="xs">{t}</Text>
+                  </Flex>
+                ))}
+              </Flex>
             </Stack>
           </MotionBox>
         </Container>
       </Box>
 
       {/* ── Footer ──────────────────────────────────────────────────── */}
-      <Box borderTop="1px solid rgba(255,255,255,0.05)" py={8}>
+      <Box borderTop="1px solid rgba(255,255,255,0.06)" pt={16} pb={8} bg="rgba(5,5,16,0.98)">
         <Container maxW="6xl">
+          <SimpleGrid columns={{ base: 1, md: 4 }} gap={10} mb={16}>
+            {/* Brand */}
+            <Box gridColumn={{ base: "1", md: "1 / 3" }}>
+              <HStack gap={2.5} mb={4}>
+                <Box w={8} h={8} borderRadius="lg" bgGradient="linear(135deg, #7c3aed, #2563eb)"
+                  display="flex" alignItems="center" justifyContent="center" fontSize="sm"
+                  shadow="0 0 20px rgba(124,58,237,0.4)">🎓</Box>
+                <Heading size="sm" bgGradient="linear(to-r, white, rgba(255,255,255,0.7))" bgClip="text">
+                  OpportunityBoard
+                </Heading>
+              </HStack>
+              <Text color="rgba(255,255,255,0.3)" fontSize="sm" lineHeight="relaxed" maxW="280px" mb={5}>
+                The global student opportunity platform. Post gigs, find work, and get paid in crypto — no bank required.
+              </Text>
+              <Flex gap={2} flexWrap="wrap">
+                {["🌍 Remote-first", "⚡ Crypto-native", "🤖 AI-powered"].map((badge) => (
+                  <Box key={badge} px={3} py={1} bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.07)" borderRadius="full">
+                    <Text fontSize="10px" color="rgba(255,255,255,0.35)">{badge}</Text>
+                  </Box>
+                ))}
+              </Flex>
+            </Box>
+
+            {/* Platform */}
+            <Box>
+              <Text fontWeight="semibold" color="rgba(255,255,255,0.5)" fontSize="xs" letterSpacing="widest"
+                textTransform="uppercase" mb={5}>Platform</Text>
+              <Stack spacing={3}>
+                {[
+                  { label: "Browse Opportunities", href: "/opportunities" },
+                  { label: "Post a Listing", href: "/opportunities/new" },
+                  { label: "Dashboard", href: "/dashboard" },
+                  { label: "Sign Up Free", href: "/register" },
+                ].map((l) => (
+                  <Link href={l.href} key={l.label}>
+                    <Text color="rgba(255,255,255,0.3)" fontSize="sm" cursor="pointer"
+                      _hover={{ color: "rgba(255,255,255,0.7)" }} transition="color 0.2s">{l.label}</Text>
+                  </Link>
+                ))}
+              </Stack>
+            </Box>
+
+            {/* Legal */}
+            <Box>
+              <Text fontWeight="semibold" color="rgba(255,255,255,0.5)" fontSize="xs" letterSpacing="widest"
+                textTransform="uppercase" mb={5}>Company</Text>
+              <Stack spacing={3}>
+                {["Privacy Policy", "Terms of Service", "Contact Us", "GitHub"].map((item) => (
+                  <Text key={item} color="rgba(255,255,255,0.3)" fontSize="sm" cursor="pointer"
+                    _hover={{ color: "rgba(255,255,255,0.7)" }} transition="color 0.2s">{item}</Text>
+                ))}
+              </Stack>
+            </Box>
+          </SimpleGrid>
+
+          <Box h="1px" bg="rgba(255,255,255,0.05)" mb={8} />
           <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
-            <HStack gap={2}>
-              <Box w={5} h={5} borderRadius="md" bgGradient="linear(135deg, #7c3aed, #2563eb)"
-                display="flex" alignItems="center" justifyContent="center" fontSize="10px">🎓</Box>
-              <Text color="rgba(255,255,255,0.2)" fontSize="sm">OpportunityBoard © 2025</Text>
-            </HStack>
-            <HStack gap={6}>
-              {["Privacy", "Terms", "Contact", "GitHub"].map((item) => (
-                <Text key={item} color="rgba(255,255,255,0.2)" fontSize="sm" cursor="pointer"
-                  _hover={{ color: "rgba(255,255,255,0.5)" }} transition="color 0.2s">{item}</Text>
-              ))}
-            </HStack>
+            <Text color="rgba(255,255,255,0.15)" fontSize="xs">
+              © 2025 OpportunityBoard. Built for students, by students.
+            </Text>
+            <Text color="rgba(255,255,255,0.15)" fontSize="xs">
+              Powered by Claude MCP · Cloudinary · Ethereum
+            </Text>
           </Flex>
         </Container>
       </Box>
