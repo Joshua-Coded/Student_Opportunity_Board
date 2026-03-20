@@ -94,7 +94,7 @@ export default function OpportunityDetailPage() {
   return (
     <Box minH="100vh" bg="#050510" color="white">
       <Box bg="rgba(5,5,16,0.85)" backdropFilter="blur(20px)"
-        borderBottom="1px solid rgba(255,255,255,0.07)" px={6} py={4}
+        borderBottom="1px solid rgba(255,255,255,0.07)" px={{ base: 4, md: 6 }} py={4}
         position="sticky" top={0} zIndex={50}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
@@ -102,10 +102,10 @@ export default function OpportunityDetailPage() {
         </Flex>
       </Box>
 
-      <Container maxW="4xl" py={10}>
+      <Container maxW="4xl" py={{ base: 6, md: 10 }} px={{ base: 4, md: 6 }}>
         <Stack spacing={5}>
           {/* Header */}
-          <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)" borderRadius="2xl" p={8}>
+          <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)" borderRadius="2xl" p={{ base: 5, md: 8 }}>
             <Stack spacing={5}>
               <Flex justify="space-between" align="flex-start" flexWrap="wrap" gap={3}>
                 <Flex gap={2} flexWrap="wrap">
@@ -122,7 +122,7 @@ export default function OpportunityDetailPage() {
                   </Flex>
                 )}
               </Flex>
-              <Heading size="xl" color="white">{opp.title}</Heading>
+              <Heading size={{ base: "lg", md: "xl" }} color="white">{opp.title}</Heading>
               {opp.compensationAmount && (
                 <Flex align="baseline" gap={3} flexWrap="wrap">
                   <Text color="purple.300" fontSize="xl" fontWeight="bold">
@@ -156,7 +156,7 @@ export default function OpportunityDetailPage() {
           )}
 
           {/* Description */}
-          <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)" borderRadius="2xl" p={8}>
+          <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)" borderRadius="2xl" p={{ base: 5, md: 8 }}>
             <Text color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb={4}>Description</Text>
             <Text color="gray.300" lineHeight="tall" whiteSpace="pre-wrap" fontSize="sm">{opp.description}</Text>
             {opp.aiSummary && (
