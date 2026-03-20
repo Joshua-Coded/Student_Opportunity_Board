@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import CryptoPaymentModal from "@/components/payments/CryptoPaymentModal";
+import GigPaymentButton from "@/components/GigPaymentButton";
 import MobileNav from "@/components/MobileNav";
 
 const navItems = [
@@ -34,7 +34,7 @@ export default function ApplicationsPage() {
   const [sent, setSent] = useState<any[]>([]);
   const [received, setReceived] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [payTarget, setPayTarget] = useState<{ app: any } | null>(null);
+  const [paidApps, setPaidApps] = useState<Set<string>>(new Set());
 
   useEffect(() => { if (status === "unauthenticated") router.push("/login"); }, [status, router]);
 
@@ -244,13 +244,20 @@ export default function ApplicationsPage() {
                               </>
                             )}
                             {app.status === "ACCEPTED" && app.opportunity?.paymentType === "CRYPTO" && (
-                              <Button size="xs"
-                                bg="rgba(139,92,246,0.15)" color="purple.300"
-                                border="1px solid rgba(139,92,246,0.3)"
-                                _hover={{ bg: "rgba(139,92,246,0.25)" }} borderRadius="lg"
-                                onClick={() => setPayTarget({ app })}>
-                                ⚡ Pay with Crypto
-                              </Button>
+                              paidApps.has(app.id) ? (
+                                <Badge colorScheme="green" borderRadius="full" px={3} py={1} fontSize="xs">✓ Paid</Badge>
+                              ) : (
+                                <GigPaymentButton
+                                  opportunityId={app.opportunity.id}
+                                  applicantId={app.applicant?.id}
+                                  applicantName={app.applicant?.name || "Applicant"}
+                                  applicantAvatar={app.applicant?.image}
+                                  amountEth={app.opportunity?.compensationAmount?.toString() || "0.01"}
+                                  currency={app.opportunity?.compensationCurrency || "ETH"}
+                                  gigTitle={app.opportunity?.title || "Gig"}
+                                  onSuccess={() => setPaidApps((prev) => new Set(Array.from(prev).concat(app.id)))}
+                                />
+                              )
                             )}
                           </Flex>
                         </Stack>
@@ -284,14 +291,6 @@ export default function ApplicationsPage() {
       </Flex>
     </Box>
 
-    {payTarget && (
-      <CryptoPaymentModal
-        opportunity={payTarget.app.opportunity}
-        applicantId={payTarget.app.applicant?.id}
-        applicantName={payTarget.app.applicant?.name || "Applicant"}
-        onClose={() => setPayTarget(null)}
-      />
-    )}
     <MobileNav />
     </>
   );

@@ -77,7 +77,10 @@ export default function CryptoPaymentModal({ opportunity, applicantId, applicant
     });
     const data = await res.json();
     setLoading(false);
-    if (!res.ok) { setError(data.error || "Failed"); return; }
+    if (!res.ok) {
+      const msg = typeof data.error === "string" ? data.error : "Payment verification failed.";
+      setError(msg); return;
+    }
     setPayment((p: any) => ({ ...p, ...data })); setStep("done");
   }
 

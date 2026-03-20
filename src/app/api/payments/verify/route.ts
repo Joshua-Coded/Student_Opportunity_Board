@@ -7,7 +7,7 @@ import { z } from "zod";
 const verifySchema = z.object({
   paymentId: z.string(),
   fromWalletAddress: z.string().min(10, "Invalid wallet address"),
-  txHash: z.string().min(10, "Invalid transaction hash"),
+  txHash: z.string().min(10, "Invalid transaction hash").optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Payment already confirmed" }, { status: 409 });
     }
 
-    const confirmed = await confirmPayment(paymentId, fromWalletAddress, txHash);
+    const confirmed = await confirmPayment(paymentId, fromWalletAddress, txHash ?? "");
 
     return NextResponse.json({
       paymentId: confirmed.id,
