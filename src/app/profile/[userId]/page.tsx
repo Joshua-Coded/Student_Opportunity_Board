@@ -50,7 +50,7 @@ export default function PublicProfilePage() {
           <Box bgGradient="linear(135deg, rgba(139,92,246,0.12), rgba(59,130,246,0.08))"
             border="1px solid rgba(139,92,246,0.2)" borderRadius="2xl" p={8}>
             <Flex gap={6} align="center" flexWrap="wrap">
-              <Avatar size="2xl" name={user.name || "?"} bg="purple.600" color="white" />
+              <Avatar size="2xl" name={user.name || "?"} src={user.image || undefined} bg="purple.600" color="white" />
               <Stack spacing={2} flex={1}>
                 <Heading size="xl" color="white">{user.name || "Anonymous Student"}</Heading>
                 {user.university && <Text color="purple.300" fontWeight="medium">{user.university}</Text>}
