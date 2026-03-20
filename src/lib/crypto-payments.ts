@@ -1,5 +1,4 @@
 import { prisma } from "./prisma";
-import crypto from "crypto";
 
 export function getReceivingWallet(chain: string): string {
   if (chain === "polygon") {
@@ -36,19 +35,12 @@ export async function initiatePayment({
   });
 }
 
-// Simulates blockchain confirmation — replace with real RPC/webhook in production
-export async function confirmPayment(paymentId: string, fromWallet: string) {
-  const fakeTxHash = "0x" + crypto.randomBytes(32).toString("hex");
-  const fakeBlockNumber = BigInt(
-    Math.floor(Math.random() * 1_000_000) + 19_000_000
-  );
-
+export async function confirmPayment(paymentId: string, fromWallet: string, txHash: string) {
   return prisma.payment.update({
     where: { id: paymentId },
     data: {
       status: "CONFIRMED",
-      txHash: fakeTxHash,
-      blockNumber: fakeBlockNumber,
+      txHash,
       fromWalletAddress: fromWallet,
       confirmedAt: new Date(),
     },

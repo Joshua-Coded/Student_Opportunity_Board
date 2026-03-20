@@ -102,9 +102,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(applications);
     }
 
-    // received — applications on my opportunities
+    // received — applications on my opportunities (optionally filtered by opportunityId and status)
+    const opportunityId = searchParams.get("opportunityId") ?? undefined;
+    const status = searchParams.get("status") ?? undefined;
+
     const applications = await prisma.application.findMany({
-      where: { opportunity: { authorId: session.user.id } },
+      where: {
+        opportunity: { authorId: session.user.id },
+        ...(opportunityId ? { opportunityId } : {}),
+        ...(status ? { status: status as any } : {}),
+      },
       include: {
         applicant: { select: { id: true, name: true, email: true, university: true, major: true, bio: true, image: true, walletAddress: true } },
         opportunity: { select: { id: true, title: true, type: true, paymentType: true, compensationAmount: true, compensationCurrency: true } },

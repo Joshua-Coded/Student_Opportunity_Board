@@ -1,5 +1,6 @@
 .env.local
 .env
+wallet-mcp-server/.env
 node_modules/
 .next/
 out/

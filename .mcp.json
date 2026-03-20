@@ -1,5 +1,16 @@
 {
   "mcpServers": {
+    "wallet": {
+      "command": "node",
+      "args": ["wallet-mcp-server/dist/index.js"],
+      "cwd": "/Users/alana/Desktop/Student_Opportunity_Board",
+      "env": {
+        "NETWORK": "sepolia",
+        "RPC_URL": "https://eth-sepolia.g.alchemy.com/v2/fJ8QpNHpso79z1xgPtVo0",
+        "ETHERSCAN_API_KEY": "${ETHERSCAN_API_KEY}",
+        "SENDER_PRIVATE_KEY": "${SENDER_PRIVATE_KEY}"
+      }
+    },
     "cloudinary": {
       "command": "npx",
       "args": ["-y", "cloudinary-mcp-server"],

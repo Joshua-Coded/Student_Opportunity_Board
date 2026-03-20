@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import ApplyModal from "@/components/applications/ApplyModal";
+import GigPaymentButton from "@/components/GigPaymentButton";
 
 const typeColor: Record<string, string> = {
   GIG: "purple", INTERNSHIP: "blue", PART_TIME: "green",
@@ -24,6 +25,8 @@ export default function OpportunityDetailPage() {
   const [applied, setApplied] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [cryptoPrice, setCryptoPrice] = useState<number | null>(null);
+  const [acceptedApplicants, setAcceptedApplicants] = useState<any[]>([]);
+  const [paidApplicants, setPaidApplicants] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch(`/api/opportunities/${id}`).then((r) => r.json()).then((data) => { setOpp(data); setLoading(false); });
@@ -46,6 +49,18 @@ export default function OpportunityDetailPage() {
       if (Array.isArray(apps)) setApplied(apps.some((a) => a.opportunityId === id));
     });
   }, [session, id]);
+
+  // Fetch accepted applicants when owner views a CRYPTO gig
+  useEffect(() => {
+    if (!opp || !session?.user?.id) return;
+    if (session.user.id !== opp.author?.id) return;
+    if (opp.paymentType !== "CRYPTO") return;
+    fetch(`/api/applications?mode=received&opportunityId=${id}&status=ACCEPTED`)
+      .then((r) => r.json())
+      .then((apps: any[]) => {
+        if (Array.isArray(apps)) setAcceptedApplicants(apps);
+      });
+  }, [opp, session, id]);
 
   async function handleDelete() {
     if (!confirm("Delete this opportunity?")) return;
@@ -175,6 +190,50 @@ export default function OpportunityDetailPage() {
                   </Flex>
                 </Stack>
               )}
+            </Box>
+          )}
+
+          {/* Pay Accepted Applicants — visible to owner on CRYPTO gigs */}
+          {isOwner && opp.paymentType === "CRYPTO" && acceptedApplicants.length > 0 && (
+            <Box bg="rgba(139,92,246,0.06)" border="1px solid rgba(139,92,246,0.25)" borderRadius="2xl" p={6}>
+              <Text color="purple.300" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb={4}>
+                💸 Pay Accepted Applicants
+              </Text>
+              <Stack spacing={3}>
+                {acceptedApplicants.map((app: any) => (
+                  <Flex key={app.id} justify="space-between" align="center" bg="rgba(255,255,255,0.03)" p={3} borderRadius="xl">
+                    <Flex gap={3} align="center">
+                      <Avatar size="sm" name={app.applicant?.name || "?"} src={app.applicant?.image} bg="purple.600" color="white" />
+                      <Stack spacing={0}>
+                        <Text color="white" fontSize="sm" fontWeight="semibold">{app.applicant?.name}</Text>
+                        <Text color="gray.500" fontSize="xs">
+                          {app.applicant?.walletAddress
+                            ? `${app.applicant.walletAddress.slice(0, 6)}...${app.applicant.walletAddress.slice(-4)}`
+                            : "No wallet address set"}
+                        </Text>
+                      </Stack>
+                    </Flex>
+                    {paidApplicants.has(app.applicant?.id) ? (
+                      <Badge colorScheme="green" borderRadius="full" px={3} py={1}>✓ Paid</Badge>
+                    ) : app.applicant?.walletAddress ? (
+                      <GigPaymentButton
+                        opportunityId={id as string}
+                        applicantId={app.applicant.id}
+                        applicantName={app.applicant.name || "Applicant"}
+                        applicantAvatar={app.applicant.image}
+                        amountEth={opp.compensationAmount?.toString() || "0.01"}
+                        currency={opp.compensationCurrency || "ETH"}
+                        gigTitle={opp.title}
+                        onSuccess={(txHash) => {
+                          setPaidApplicants((prev) => new Set(Array.from(prev).concat(app.applicant.id)));
+                        }}
+                      />
+                    ) : (
+                      <Badge colorScheme="gray" borderRadius="full" px={3} py={1} fontSize="xs">No wallet</Badge>
+                    )}
+                  </Flex>
+                ))}
+              </Stack>
             </Box>
           )}
 
