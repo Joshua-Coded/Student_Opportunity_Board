@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UploadImage from "@/components/UploadImage";
 import MobileNav from "@/components/MobileNav";
+import { connectWallet, switchToSepolia, isMetaMaskInstalled } from "@/lib/web3";
 
 const navItems = [
   { label: "Overview", href: "/dashboard", icon: "🏠" },
@@ -27,6 +28,7 @@ export default function ProfilePage() {
   const [form, setForm] = useState({ name: "", bio: "", university: "", major: "", graduationYear: "", walletAddress: "", image: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [connectingWallet, setConnectingWallet] = useState(false);
 
   useEffect(() => { if (status === "unauthenticated") router.push("/login"); }, [status, router]);
 
@@ -43,6 +45,24 @@ export default function ProfilePage() {
       setLoading(false);
     });
   }, [status]);
+
+  async function connectMetaMask() {
+    if (!isMetaMaskInstalled()) {
+      toast({ title: "MetaMask not installed", description: "Install MetaMask to auto-fill your wallet address.", status: "warning", duration: 4000 });
+      return;
+    }
+    setConnectingWallet(true);
+    try {
+      const account = await connectWallet();
+      await switchToSepolia();
+      set("walletAddress", account);
+      toast({ title: "Wallet connected!", description: account, status: "success", duration: 3000 });
+    } catch {
+      toast({ title: "Could not connect wallet", status: "error", duration: 3000 });
+    } finally {
+      setConnectingWallet(false);
+    }
+  }
 
   function set(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -194,9 +214,18 @@ export default function ProfilePage() {
                     </FormControl>
                     <FormControl>
                       <FormLabel color="gray.400" fontSize="sm">Crypto Wallet Address</FormLabel>
-                      <Input {...inputStyle} value={form.walletAddress} onChange={(e) => set("walletAddress", e.target.value)}
-                        placeholder="0x..." fontFamily="mono" fontSize="sm" />
-                      <Text color="gray.600" fontSize="xs" mt={1}>Used to receive crypto payments</Text>
+                      <Flex gap={2}>
+                        <Input {...inputStyle} value={form.walletAddress} onChange={(e) => set("walletAddress", e.target.value)}
+                          placeholder="0x..." fontFamily="mono" fontSize="sm" flex={1} />
+                        <Button onClick={connectMetaMask} isLoading={connectingWallet} size="md"
+                          bg="rgba(139,92,246,0.15)" color="purple.300" border="1px solid rgba(139,92,246,0.3)"
+                          _hover={{ bg: "rgba(139,92,246,0.25)" }} borderRadius="xl" flexShrink={0} fontSize="sm">
+                          🦊 MetaMask
+                        </Button>
+                      </Flex>
+                      <Text color="gray.600" fontSize="xs" mt={1}>
+                        {form.walletAddress ? "✓ Wallet set — you can receive crypto payments" : "Connect MetaMask or paste your address to receive payments"}
+                      </Text>
                     </FormControl>
                     <Button type="submit" isLoading={saving} w="full"
                       bgGradient="linear(to-r, purple.500, blue.500)" color="white"
