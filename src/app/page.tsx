@@ -295,15 +295,63 @@ export default function HomePage() {
               </Link>
             </MotionFlex>
 
-            <MotionBox initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-              <Flex gap={2} flexWrap="wrap" justify="center">
-                {["GIG", "INTERNSHIP", "RESEARCH", "PART-TIME", "VOLUNTEER", "FULL-TIME"].map((t) => (
-                  <Badge key={t} px={3} py={1} borderRadius="full" fontSize="10px" fontWeight="medium"
-                    bg="rgba(255,255,255,0.05)" color="rgba(255,255,255,0.3)"
-                    border="1px solid rgba(255,255,255,0.07)" letterSpacing="wider">
-                    {t}
-                  </Badge>
-                ))}
+            {/* Animated user social proof */}
+            <MotionBox initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.7 }}>
+              <Flex direction="column" align="center" gap={3}>
+                {/* Glowing avatar stack */}
+                <Flex align="center" justify="center" position="relative">
+                  {/* Glow ring */}
+                  <Box position="absolute" w="180px" h="48px" borderRadius="full"
+                    bg="rgba(124,58,237,0.18)" filter="blur(18px)" />
+                  {/* Overlapping avatars */}
+                  <Flex position="relative">
+                    {(liveData.users.length > 0 ? liveData.users.slice(0, 6) : Array(6).fill(null)).map((u, i) => (
+                      <MotionBox key={i}
+                        initial={{ opacity: 0, scale: 0.4, x: -10 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        transition={{ delay: 0.6 + i * 0.08, type: "spring", stiffness: 300, damping: 20 }}
+                        style={{ marginLeft: i === 0 ? 0 : -12, zIndex: 10 - i }}
+                        whileHover={{ scale: 1.2, zIndex: 20 }}>
+                        <Avatar
+                          size="md"
+                          name={u?.name || "?"}
+                          src={u?.image || undefined}
+                          bg={["purple.600","blue.600","pink.600","teal.600","orange.600","indigo.600"][i % 6]}
+                          color="white"
+                          border="2.5px solid #050510"
+                          boxShadow="0 0 0 1px rgba(124,58,237,0.4)"
+                        />
+                      </MotionBox>
+                    ))}
+                    {/* +N bubble */}
+                    <MotionBox
+                      initial={{ opacity: 0, scale: 0.4 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 1.15, type: "spring", stiffness: 300 }}
+                      style={{ marginLeft: -12, zIndex: 1 }}>
+                      <Box w="44px" h="44px" borderRadius="full"
+                        bg="rgba(124,58,237,0.25)" border="2.5px solid #050510"
+                        boxShadow="0 0 0 1px rgba(124,58,237,0.4)"
+                        display="flex" alignItems="center" justifyContent="center">
+                        <Text fontSize="10px" fontWeight="bold" color="purple.300">
+                          {liveData.users.length > 0 ? `+${Math.max(0, liveData.users.length - 6)}` : "+"}
+                        </Text>
+                      </Box>
+                    </MotionBox>
+                  </Flex>
+                </Flex>
+
+                {/* Count + live dot */}
+                <Flex align="center" gap={2}>
+                  <Box w={1.5} h={1.5} borderRadius="full" bg="green.400"
+                    style={{ animation: "pulse 2s infinite" }} />
+                  <Text fontSize="sm" color="rgba(255,255,255,0.45)">
+                    <Text as="span" color="white" fontWeight="bold">
+                      {liveData.users.length > 0 ? `${liveData.users.length}+` : "—"}
+                    </Text>
+                    {" "}students already on the platform
+                  </Text>
+                </Flex>
               </Flex>
             </MotionBox>
           </Stack>
