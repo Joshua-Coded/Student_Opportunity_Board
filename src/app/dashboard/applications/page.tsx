@@ -10,14 +10,8 @@ import Link from "next/link";
 import GigPaymentButton from "@/components/GigPaymentButton";
 import RateStudentButton from "@/components/RateStudentButton";
 import MobileNav from "@/components/MobileNav";
-
-const navItems = [
-  { label: "Overview", href: "/dashboard", icon: "🏠" },
-  { label: "Browse", href: "/opportunities", icon: "🔍" },
-  { label: "Post New", href: "/opportunities/new", icon: "➕" },
-  { label: "Applications", href: "/dashboard/applications", icon: "📨" },
-  { label: "Profile", href: "/dashboard/profile", icon: "👤" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const statusScheme: Record<string, string> = {
   PENDING: "yellow", REVIEWED: "blue", ACCEPTED: "green", REJECTED: "red",
@@ -31,12 +25,21 @@ const typeColor: Record<string, string> = {
 export default function ApplicationsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
   const [tab, setTab] = useState<"sent" | "received">("sent");
   const [sent, setSent] = useState<any[]>([]);
   const [received, setReceived] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [paidApps, setPaidApps] = useState<Set<string>>(new Set());
   const [ratedApps, setRatedApps] = useState<Set<string>>(new Set());
+
+  const navItems = [
+    { label: t.dashboard.overview, href: "/dashboard" },
+    { label: t.dashboard.browse, href: "/opportunities" },
+    { label: t.dashboard.postNew, href: "/opportunities/new" },
+    { label: t.dashboard.applications, href: "/dashboard/applications" },
+    { label: t.dashboard.profile, href: "/dashboard/profile" },
+  ];
 
   useEffect(() => { if (status === "unauthenticated") router.push("/login"); }, [status, router]);
 
@@ -67,7 +70,7 @@ export default function ApplicationsPage() {
   }
 
   if (status === "loading" || loading) {
-    return <Box minH="100vh" bg="#050510" display="flex" alignItems="center" justifyContent="center"><Text color="gray.500">Loading...</Text></Box>;
+    return <Box minH="100vh" bg="#050510" display="flex" alignItems="center" justifyContent="center"><Text color="gray.500">{t.common.loading}</Text></Box>;
   }
 
   return (
@@ -83,12 +86,11 @@ export default function ApplicationsPage() {
             <Link href="/"><Heading size="sm" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer" px={3}>OpportunityBoard</Heading></Link>
             <Stack spacing={1}>
               {navItems.map((item) => (
-                <Link href={item.href} key={item.label}>
+                <Link href={item.href} key={item.href}>
                   <Flex align="center" gap={3} px={3} py={2} borderRadius="lg" cursor="pointer"
                     transition="all 0.15s" _hover={{ bg: "rgba(255,255,255,0.06)" }}
                     bg={item.href === "/dashboard/applications" ? "rgba(139,92,246,0.1)" : "transparent"}
                     borderLeft="2px solid" borderColor={item.href === "/dashboard/applications" ? "purple.500" : "transparent"}>
-                    <Text>{item.icon}</Text>
                     <Text fontSize="sm" color={item.href === "/dashboard/applications" ? "purple.300" : "gray.400"}
                       fontWeight={item.href === "/dashboard/applications" ? "medium" : "normal"}>{item.label}</Text>
                   </Flex>
@@ -97,10 +99,11 @@ export default function ApplicationsPage() {
             </Stack>
           </Stack>
           <Box px={3}>
-            <Flex align="center" gap={3}>
+            <Flex align="center" gap={3} mb={3}>
               <Avatar size="sm" name={session?.user?.name || "U"} src={session?.user?.image || undefined} bg="purple.600" color="white" />
               <Text fontSize="xs" color="gray.500" isTruncated>{session?.user?.name}</Text>
             </Flex>
+            <LanguageToggle />
           </Box>
         </Box>
 
@@ -108,7 +111,7 @@ export default function ApplicationsPage() {
         <Box flex={1} overflowY="auto">
           <Box borderBottom="1px solid rgba(255,255,255,0.06)" px={8} py={4}
             bg="rgba(5,5,16,0.8)" backdropFilter="blur(20px)" position="sticky" top={0} zIndex={10}>
-            <Heading size="md">Applications</Heading>
+            <Heading size="md">{t.applications.title}</Heading>
           </Box>
 
           <Container maxW="4xl" py={8} px={{ base: 4, md: 8 }} pb={{ base: 24, md: 8 }}>
@@ -116,12 +119,12 @@ export default function ApplicationsPage() {
               {/* Tabs */}
               <Flex gap={2} bg="rgba(255,255,255,0.03)" p={1} borderRadius="xl"
                 border="1px solid rgba(255,255,255,0.07)" w="fit-content">
-                {(["sent", "received"] as const).map((t) => (
-                  <Button key={t} size="sm" onClick={() => setTab(t)}
-                    bg={tab === t ? "rgba(139,92,246,0.2)" : "transparent"}
-                    color={tab === t ? "purple.300" : "gray.500"}
+                {(["sent", "received"] as const).map((tabKey) => (
+                  <Button key={tabKey} size="sm" onClick={() => setTab(tabKey)}
+                    bg={tab === tabKey ? "rgba(139,92,246,0.2)" : "transparent"}
+                    color={tab === tabKey ? "purple.300" : "gray.500"}
                     borderRadius="lg" px={5} _hover={{ color: "white" }} transition="all 0.15s">
-                    {t === "sent" ? `📨 Sent (${sent.length})` : `📥 Received (${received.length})`}
+                    {tabKey === "sent" ? `${t.applications.sent} (${sent.length})` : `${t.applications.received} (${received.length})`}
                   </Button>
                 ))}
               </Flex>
@@ -133,8 +136,8 @@ export default function ApplicationsPage() {
                     <Box bg="rgba(255,255,255,0.02)" border="1px dashed rgba(255,255,255,0.08)"
                       borderRadius="2xl" p={12} textAlign="center">
                       <Text fontSize="3xl" mb={3}>📨</Text>
-                      <Text color="gray.500" fontSize="sm" mb={4}>No applications sent yet</Text>
-                      <Link href="/opportunities"><Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)" color="white" borderRadius="lg">Browse Opportunities</Button></Link>
+                      <Text color="gray.500" fontSize="sm" mb={4}>{t.applications.noSent}</Text>
+                      <Link href="/opportunities"><Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)" color="white" borderRadius="lg">{t.applications.browseOpportunities}</Button></Link>
                     </Box>
                   ) : sent.map((app) => (
                     <Box key={app.id} bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)" borderRadius="xl" p={5}>
@@ -152,18 +155,18 @@ export default function ApplicationsPage() {
                               <Flex align="center" gap={2} mt={1} w="fit-content">
                                 <Avatar size="xs" name={app.opportunity.author.name || "?"} src={app.opportunity.author.image || undefined} bg="purple.700" />
                                 <Text color="gray.500" fontSize="xs" _hover={{ color: "purple.300" }}>
-                                  Posted by {app.opportunity.author.name}
+                                  {t.applications.postedBy} {app.opportunity.author.name}
                                   {app.opportunity.author.university ? ` · ${app.opportunity.author.university}` : ""}
                                 </Text>
                               </Flex>
                             </Link>
                           )}
-                          <Text color="gray.700" fontSize="xs">Applied {new Date(app.createdAt).toLocaleDateString()}</Text>
+                          <Text color="gray.700" fontSize="xs">{t.applications.applied} {new Date(app.createdAt).toLocaleDateString()}</Text>
                         </Stack>
                         {app.status === "PENDING" && (
                           <Button size="xs" variant="outline" borderColor="rgba(239,68,68,0.3)"
                             color="red.400" _hover={{ bg: "rgba(239,68,68,0.1)" }} borderRadius="lg"
-                            onClick={() => withdraw(app.id)}>Withdraw</Button>
+                            onClick={() => withdraw(app.id)}>{t.applications.withdraw}</Button>
                         )}
                       </Flex>
                       {app.coverLetter && (
@@ -183,8 +186,8 @@ export default function ApplicationsPage() {
                     <Box bg="rgba(255,255,255,0.02)" border="1px dashed rgba(255,255,255,0.08)"
                       borderRadius="2xl" p={12} textAlign="center">
                       <Text fontSize="3xl" mb={3}>📥</Text>
-                      <Text color="gray.500" fontSize="sm" mb={4}>No applications received yet</Text>
-                      <Link href="/opportunities/new"><Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)" color="white" borderRadius="lg">Post Opportunity</Button></Link>
+                      <Text color="gray.500" fontSize="sm" mb={4}>{t.applications.noReceived}</Text>
+                      <Link href="/opportunities/new"><Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)" color="white" borderRadius="lg">{t.applications.postOpportunity}</Button></Link>
                     </Box>
                   ) : received.map((app) => (
                     <Box key={app.id}
@@ -192,7 +195,6 @@ export default function ApplicationsPage() {
                       border={`1px solid ${app.status === "ACCEPTED" ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.07)"}`}
                       borderRadius="xl" p={6}>
 
-                      {/* Applicant profile row */}
                       <Flex justify="space-between" align="flex-start" flexWrap="wrap" gap={4}>
                         <Flex gap={4} align="flex-start" flex={1}>
                           <Link href={`/profile/${app.applicant?.id}`}>
@@ -224,7 +226,7 @@ export default function ApplicationsPage() {
                                   📋 {app.opportunity?.title}
                                 </Text>
                               </Link>
-                              <Text color="gray.700" fontSize="xs">Applied {new Date(app.createdAt).toLocaleDateString()}</Text>
+                              <Text color="gray.700" fontSize="xs">{t.applications.applied} {new Date(app.createdAt).toLocaleDateString()}</Text>
                             </Flex>
                           </Stack>
                         </Flex>
@@ -239,16 +241,16 @@ export default function ApplicationsPage() {
                               <>
                                 <Button size="xs" onClick={() => updateStatus(app.id, "ACCEPTED")}
                                   bg="rgba(34,197,94,0.15)" color="green.300" border="1px solid rgba(34,197,94,0.25)"
-                                  _hover={{ bg: "rgba(34,197,94,0.25)" }} borderRadius="lg">Accept ✓</Button>
+                                  _hover={{ bg: "rgba(34,197,94,0.25)" }} borderRadius="lg">{t.applications.accept}</Button>
                                 <Button size="xs" onClick={() => updateStatus(app.id, "REJECTED")}
                                   bg="rgba(239,68,68,0.1)" color="red.400" border="1px solid rgba(239,68,68,0.2)"
-                                  _hover={{ bg: "rgba(239,68,68,0.2)" }} borderRadius="lg">Reject ✗</Button>
+                                  _hover={{ bg: "rgba(239,68,68,0.2)" }} borderRadius="lg">{t.applications.reject}</Button>
                               </>
                             )}
                             {app.status === "ACCEPTED" && app.opportunity?.paymentType === "CRYPTO" && (
                               paidApps.has(app.id) ? (
                                 <Flex gap={2} align="center">
-                                  <Badge colorScheme="green" borderRadius="full" px={3} py={1} fontSize="xs">✓ Paid</Badge>
+                                  <Badge colorScheme="green" borderRadius="full" px={3} py={1} fontSize="xs">{t.applications.paid}</Badge>
                                   {!ratedApps.has(app.id) && (
                                     <RateStudentButton
                                       rateeId={app.applicant?.id}
@@ -259,7 +261,7 @@ export default function ApplicationsPage() {
                                     />
                                   )}
                                   {ratedApps.has(app.id) && (
-                                    <Badge colorScheme="yellow" borderRadius="full" px={3} py={1} fontSize="xs">⭐ Rated</Badge>
+                                    <Badge colorScheme="yellow" borderRadius="full" px={3} py={1} fontSize="xs">{t.applications.rated}</Badge>
                                   )}
                                 </Flex>
                               ) : (
@@ -282,7 +284,7 @@ export default function ApplicationsPage() {
                       {/* Cover Letter */}
                       {app.coverLetter && (
                         <Box mt={4} pt={4} borderTop="1px solid rgba(255,255,255,0.06)">
-                          <Text color="gray.500" fontSize="xs" fontWeight="semibold" mb={2}>📄 Cover Letter</Text>
+                          <Text color="gray.500" fontSize="xs" fontWeight="semibold" mb={2}>{t.applications.coverLetter}</Text>
                           <Text color="gray.400" fontSize="sm" lineHeight="relaxed">{app.coverLetter}</Text>
                         </Box>
                       )}
