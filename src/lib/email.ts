@@ -80,6 +80,29 @@ export async function sendPaymentReceivedEmail({
   });
 }
 
+// Sent on registration to verify email address
+export async function sendVerificationEmail({
+  to, name, token,
+}: {
+  to: string; name: string; token: string;
+}) {
+  const verifyUrl = `${APP_URL}/verify-email?token=${token}`;
+  const content = `
+    <h2 style="color:#fff;margin:0 0 8px;">👋 Welcome to OpportunityBoard!</h2>
+    <p style="color:#9ca3af;font-size:14px;margin:0 0 24px;">Hi ${name}, please verify your email address to activate your account.</p>
+    <a href="${verifyUrl}" style="display:inline-block;background:linear-gradient(to right,#7c3aed,#2563eb);color:#fff;font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;text-decoration:none;">
+      Verify Email →
+    </a>
+    <p style="color:#6b7280;font-size:12px;margin-top:24px;">This link expires in 24 hours. If you didn't create an account, you can safely ignore this email.</p>`;
+
+  await transporter.sendMail({
+    from: `"OpportunityBoard" <${FROM}>`,
+    to,
+    subject: "Verify your OpportunityBoard email",
+    html: baseTemplate(content),
+  });
+}
+
 // Sent when user requests password reset
 export async function sendPasswordResetEmail({
   to, name, token,
