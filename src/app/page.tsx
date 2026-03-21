@@ -4,6 +4,8 @@ import { Box, Badge, Button, Container, Flex, Heading, Input, SimpleGrid, Stack,
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const MotionBox = motion(Box);
 const MotionFlex = motion(Flex);
@@ -295,6 +297,7 @@ function NewsletterSection() {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
+  const { t } = useLanguage();
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef });
   const yParallax = useTransform(scrollYProgress, [0, 1], [0, -60]);
@@ -329,23 +332,24 @@ export default function HomePage() {
             </Heading>
           </HStack>
           <HStack gap={7} display={{ base: "none", md: "flex" }}>
-            {["Browse", "How it works", "FAQ"].map((item) => (
+            {[t.nav.browse, t.nav.howItWorks, t.nav.faq].map((item) => (
               <Text key={item} fontSize="sm" color="rgba(255,255,255,0.45)" cursor="pointer"
                 _hover={{ color: "white" }} transition="color 0.2s" fontWeight="medium">{item}</Text>
             ))}
           </HStack>
           <HStack gap={3}>
+            <LanguageToggle />
             <Link href="/login">
               <Button variant="ghost" size="sm" color="rgba(255,255,255,0.5)"
                 _hover={{ color: "white", bg: "rgba(255,255,255,0.06)" }} borderRadius="lg" fontWeight="medium">
-                Log in
+                {t.nav.login}
               </Button>
             </Link>
             <Link href="/register">
               <Button size="sm" px={5} bg="white" color="#050510"
                 _hover={{ bg: "rgba(255,255,255,0.88)", transform: "translateY(-1px)", shadow: "0 8px 30px rgba(255,255,255,0.15)" }}
                 transition="all 0.2s" borderRadius="lg" fontWeight="semibold">
-                Get started
+                {t.nav.signup}
               </Button>
             </Link>
           </HStack>
