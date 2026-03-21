@@ -24,6 +24,7 @@ export default function OpportunityDetailPage() {
   const [applyOpen, setApplyOpen] = useState(false);
   const [applied, setApplied] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [filling, setFilling] = useState(false);
   const [cryptoPrice, setCryptoPrice] = useState<number | null>(null);
   const [acceptedApplicants, setAcceptedApplicants] = useState<any[]>([]);
   const [paidApplicants, setPaidApplicants] = useState<Set<string>>(new Set());
@@ -67,6 +68,18 @@ export default function OpportunityDetailPage() {
     setDeleting(true);
     await fetch(`/api/opportunities/${id}`, { method: "DELETE" });
     router.push("/dashboard");
+  }
+
+  async function handleMarkFilled() {
+    if (!confirm("Mark this opportunity as filled? It will no longer accept applications.")) return;
+    setFilling(true);
+    await fetch(`/api/opportunities/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "CLOSED" }),
+    });
+    setOpp((prev: any) => ({ ...prev, status: "CLOSED" }));
+    setFilling(false);
   }
 
   if (loading) {
@@ -114,10 +127,18 @@ export default function OpportunityDetailPage() {
                   {opp.paymentType === "CRYPTO" && <Badge colorScheme="purple" borderRadius="full" px={3} py={1}>⚡ Crypto</Badge>}
                 </Flex>
                 {isOwner && (
-                  <Flex gap={2}>
+                  <Flex gap={2} flexWrap="wrap">
                     <Link href={`/opportunities/${id}/edit`}>
                       <Button size="sm" variant="outline" borderColor="rgba(255,255,255,0.1)" color="gray.400" borderRadius="lg">Edit</Button>
                     </Link>
+                    {opp.status === "ACTIVE" && (
+                      <Button size="sm" onClick={handleMarkFilled} isLoading={filling}
+                        bg="rgba(34,197,94,0.1)" color="green.300"
+                        border="1px solid rgba(34,197,94,0.25)"
+                        _hover={{ bg: "rgba(34,197,94,0.2)" }} borderRadius="lg">
+                        ✓ Mark as Filled
+                      </Button>
+                    )}
                     <Button size="sm" colorScheme="red" variant="outline" onClick={handleDelete} isLoading={deleting} borderRadius="lg">Delete</Button>
                   </Flex>
                 )}
