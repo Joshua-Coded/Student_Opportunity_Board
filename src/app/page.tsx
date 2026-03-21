@@ -39,7 +39,7 @@ const CATEGORIES = [
 const FAQS = [
   { q: "Is it free to sign up?", a: "Yes — signing up, browsing, and applying are completely free. Posting opportunities is also free." },
   { q: "Do I need a crypto wallet to use the platform?", a: "Not to browse or apply. You only need a wallet address in your profile if you want to receive crypto payments for work you complete." },
-  { q: "Which cryptocurrencies are supported?", a: "BTC, ETH, USDC, USDT, MATIC, BNB, SOL, AVAX, ADA, DOT, and more. We support all major chains — the poster specifies the currency when listing." },
+  { q: "Which cryptocurrencies are supported?", a: "ETH, USDC, USDT, MATIC, BNB, AVAX, DAI, ARB, and any other EVM-compatible token. Since payments go through MetaMask, all Ethereum-compatible chains are supported — the poster specifies the currency when listing." },
   { q: "How does AI enhancement work?", a: "When posting, click 'Enhance with AI'. Claude rewrites your title and description to be clearer and more professional — powered by Claude MCP." },
   { q: "Can I post without offering crypto payment?", a: "Yes. Payment type is flexible — Free, Negotiable, or Crypto. Crypto is optional." },
   { q: "Is this platform only for students?", a: "Built with students in mind but open to anyone. Startups and independent posters can also list opportunities." },
@@ -586,13 +586,13 @@ export default function HomePage() {
               <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
             </Flex>
             <Heading fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
-              From zero to paid in{" "}
+              From sign-up to{" "}
               <Box as="span" bgGradient="linear(to-r, purple.400, blue.400, cyan.300)" bgClip="text">
-                three steps
+                first paycheck
               </Box>
             </Heading>
             <Text color="rgba(255,255,255,0.35)" fontSize="lg" maxW="lg" mx="auto">
-              No agency. No bank. No middleman. Just students and opportunities.
+              No agency. No bank. No middleman. Just students and opportunities — and it takes less than 5 minutes to start.
             </Text>
           </MotionBox>
 
@@ -620,10 +620,10 @@ export default function HomePage() {
                   </Text>
                   <Stack spacing={3}>
                     {[
-                      "Upload a profile photo via Cloudinary CDN",
+                      "Sign up & verify your email in one click",
                       "Add your university, major & graduation year",
-                      "Paste your crypto wallet to receive payments",
-                      "Write a bio that sells your skills",
+                      "Connect MetaMask or paste any EVM wallet address",
+                      "Write a bio — AI helps you polish it",
                     ].map((point) => (
                       <Flex key={point} align="center" gap={3}>
                         <Box w={5} h={5} borderRadius="full" bg="rgba(124,58,237,0.2)" border="1px solid rgba(124,58,237,0.4)"
@@ -711,10 +711,10 @@ export default function HomePage() {
                   </Text>
                   <Stack spacing={3}>
                     {[
-                      "Claude MCP enhances your title & description",
-                      "Filter by type, remote, crypto payment",
-                      "One-click apply with cover letter + portfolio",
-                      "Manage all applications in one dashboard",
+                      "Claude AI rewrites your listing to sound professional",
+                      "Filter by type, university, remote, or crypto pay",
+                      "Apply with cover letter + portfolio link",
+                      "Manage all sent & received applications in one place",
                     ].map((point) => (
                       <Flex key={point} align="center" gap={3}>
                         <Box w={5} h={5} borderRadius="full" bg="rgba(37,99,235,0.2)" border="1px solid rgba(37,99,235,0.4)"
@@ -790,10 +790,10 @@ export default function HomePage() {
                   </Text>
                   <Stack spacing={3}>
                     {[
-                      "ETH, USDC, MATIC, BNB, SOL and more",
-                      "Sender's wallet pre-filled from their profile",
-                      "Recipient sees payment instantly on dashboard",
-                      "Full transaction history with TX hash proof",
+                      "ETH, USDC, USDT, MATIC, BNB, AVAX, ARB and more",
+                      "One click — MetaMask opens and handles everything",
+                      "Student gets email notification the moment funds arrive",
+                      "Rate the student after payment — builds their reputation",
                     ].map((point) => (
                       <Flex key={point} align="center" gap={3}>
                         <Box w={5} h={5} borderRadius="full" bg="rgba(5,150,105,0.2)" border="1px solid rgba(5,150,105,0.4)"
@@ -863,6 +863,115 @@ export default function HomePage() {
                 Start for free — no credit card →
               </Button>
             </Link>
+          </MotionBox>
+        </Container>
+      </Box>
+
+      {/* ── Crypto Onboarding Guide ─────────────────────────────────── */}
+      <Box py={24} position="relative" overflow="hidden">
+        <Box position="absolute" inset={0} bgGradient="radial(ellipse at 50% 50%, rgba(124,58,237,0.06) 0%, transparent 70%)" />
+        <Container maxW="5xl" position="relative">
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={14}>
+            <Flex align="center" justify="center" gap={2} mb={5}>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">New to crypto?</Text>
+              <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
+            </Flex>
+            <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
+              No blockchain experience?{" "}
+              <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">No problem.</Box>
+            </Heading>
+            <Text color="rgba(255,255,255,0.4)" fontSize="lg" maxW="xl" mx="auto">
+              You don&apos;t need to understand blockchain to get paid on OpportunityBoard. Here&apos;s everything you need in plain English.
+            </Text>
+          </MotionBox>
+
+          {/* Guide cards */}
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5} mb={12}>
+            {[
+              {
+                emoji: "🦊",
+                title: "What is MetaMask?",
+                color: "rgba(234,179,8,0.15)",
+                border: "rgba(234,179,8,0.25)",
+                body: "MetaMask is a free browser extension that acts like a digital wallet. Think of it like a bank account — except you control it completely, no bank involved. Install it once and you're ready to receive payments from anywhere in the world.",
+                cta: "Download MetaMask",
+                ctaUrl: "https://metamask.io/download/",
+                ctaColor: "yellow",
+              },
+              {
+                emoji: "💳",
+                title: "What is a wallet address?",
+                color: "rgba(139,92,246,0.15)",
+                border: "rgba(139,92,246,0.25)",
+                body: "Your wallet address is like your bank account number — you share it so people can send you money. It looks like: 0x71C7...4Fa3. It's public and safe to share. Once you add it to your profile, posters can pay you directly.",
+                cta: null,
+                ctaUrl: null,
+                ctaColor: "purple",
+              },
+              {
+                emoji: "⚡",
+                title: "How do I receive a payment?",
+                color: "rgba(34,197,94,0.12)",
+                border: "rgba(34,197,94,0.25)",
+                body: "Once a poster accepts your application and marks it as paid, the crypto goes straight to your wallet — no waiting, no bank fees. You'll get an email notification instantly with a link to verify the transaction on the blockchain.",
+                cta: null,
+                ctaUrl: null,
+                ctaColor: "green",
+              },
+              {
+                emoji: "🔁",
+                title: "How do I turn crypto into cash?",
+                color: "rgba(59,130,246,0.12)",
+                border: "rgba(59,130,246,0.25)",
+                body: "Use any crypto exchange like Binance, Coinbase, or Bybit. Connect your MetaMask wallet, send your crypto to the exchange, and withdraw to your bank account. The whole process takes less than 10 minutes.",
+                cta: null,
+                ctaUrl: null,
+                ctaColor: "blue",
+              },
+            ].map((card) => (
+              <MotionBox key={card.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <Box h="full" bg={card.color} border={`1px solid ${card.border}`} borderRadius="2xl" p={6}>
+                  <Text fontSize="2xl" mb={3}>{card.emoji}</Text>
+                  <Heading size="sm" color="white" mb={3}>{card.title}</Heading>
+                  <Text color="rgba(255,255,255,0.5)" fontSize="sm" lineHeight="relaxed" mb={card.cta ? 4 : 0}>{card.body}</Text>
+                  {card.cta && card.ctaUrl && (
+                    <a href={card.ctaUrl} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" colorScheme={card.ctaColor} variant="outline" borderRadius="lg" mt={2}>
+                        {card.cta} ↗
+                      </Button>
+                    </a>
+                  )}
+                </Box>
+              </MotionBox>
+            ))}
+          </SimpleGrid>
+
+          {/* Step-by-step wallet setup */}
+          <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <Box bg="rgba(255,255,255,0.02)" border="1px solid rgba(255,255,255,0.07)" borderRadius="2xl" p={{ base: 6, md: 10 }}>
+              <Heading size="md" color="white" mb={2} textAlign="center">Set up your wallet in 3 minutes</Heading>
+              <Text color="gray.500" fontSize="sm" textAlign="center" mb={8}>Follow these steps once and you&apos;re ready to get paid forever.</Text>
+              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+                {[
+                  { step: "1", title: "Install MetaMask", desc: "Go to metamask.io/download and add the browser extension. Works on Chrome, Firefox, Brave, and Edge.", icon: "🦊" },
+                  { step: "2", title: "Create your wallet", desc: "Open MetaMask, click 'Create a new wallet', set a password and save your Secret Recovery Phrase somewhere safe — never share it.", icon: "🔐" },
+                  { step: "3", title: "Add to your profile", desc: "Go to Dashboard → Profile → click 🦊 MetaMask button. Your wallet address fills in automatically. Hit Save.", icon: "✅" },
+                ].map((s) => (
+                  <Flex key={s.step} gap={4} align="flex-start">
+                    <Box w={9} h={9} borderRadius="xl" bgGradient="linear(135deg, #7c3aed, #2563eb)"
+                      display="flex" alignItems="center" justifyContent="center" flexShrink={0} shadow="0 0 20px rgba(124,58,237,0.3)">
+                      <Text fontSize="xs" fontWeight="black" color="white">{s.step}</Text>
+                    </Box>
+                    <Box>
+                      <Text fontSize="xl" mb={1}>{s.icon}</Text>
+                      <Text fontWeight="semibold" color="white" fontSize="sm" mb={1}>{s.title}</Text>
+                      <Text color="gray.500" fontSize="xs" lineHeight="relaxed">{s.desc}</Text>
+                    </Box>
+                  </Flex>
+                ))}
+              </SimpleGrid>
+            </Box>
           </MotionBox>
         </Container>
       </Box>
