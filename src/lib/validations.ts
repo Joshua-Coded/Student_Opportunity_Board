@@ -36,7 +36,7 @@ export const profileSchema = z.object({
   university: z.string().optional(),
   major: z.string().optional(),
   graduationYear: z.number().int().min(2020).max(2035).optional(),
-  walletAddress: z.string().optional(),
+  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid EVM wallet address (0x...)").optional().or(z.literal("")),
   image: z.string().url().optional().or(z.literal("")),
 });
 
