@@ -13,10 +13,18 @@ const typeColor: Record<string, string> = {
 export default function PublicProfilePage() {
   const { userId } = useParams();
   const [user, setUser] = useState<any>(null);
+  const [ratings, setRatings] = useState<{ ratings: any[]; average: number | null; count: number }>({ ratings: [], average: null, count: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/profile/${userId}`).then((r) => r.json()).then((data) => { setUser(data); setLoading(false); });
+    Promise.all([
+      fetch(`/api/profile/${userId}`).then((r) => r.json()),
+      fetch(`/api/ratings?userId=${userId}`).then((r) => r.json()),
+    ]).then(([userData, ratingsData]) => {
+      setUser(userData);
+      setRatings(ratingsData);
+      setLoading(false);
+    });
   }, [userId]);
 
   if (loading) return (
@@ -60,6 +68,11 @@ export default function PublicProfilePage() {
                   <Badge colorScheme="gray" borderRadius="full" px={3} py={1} fontSize="xs">
                     {user._count?.opportunities || 0} listing{user._count?.opportunities !== 1 ? "s" : ""}
                   </Badge>
+                  {ratings.count > 0 && (
+                    <Badge colorScheme="yellow" borderRadius="full" px={3} py={1} fontSize="xs">
+                      ⭐ {ratings.average?.toFixed(1)} ({ratings.count} review{ratings.count !== 1 ? "s" : ""})
+                    </Badge>
+                  )}
                   <Badge colorScheme="gray" borderRadius="full" px={3} py={1} fontSize="xs">
                     Joined {new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                   </Badge>
@@ -72,6 +85,41 @@ export default function PublicProfilePage() {
               </Box>
             )}
           </Box>
+
+          {ratings.count > 0 && (
+            <Stack spacing={4}>
+              <Heading size="sm" color="gray.400" textTransform="uppercase" letterSpacing="wider">
+                Reviews ({ratings.count})
+              </Heading>
+              <Stack spacing={3}>
+                {ratings.ratings.map((r: any) => (
+                  <Box key={r.id} bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)"
+                    borderRadius="xl" p={5}>
+                    <Flex justify="space-between" align="flex-start" flexWrap="wrap" gap={2}>
+                      <Flex align="center" gap={3}>
+                        <Avatar size="sm" name={r.rater?.name || "?"} src={r.rater?.image || undefined} bg="purple.700" />
+                        <Stack spacing={0}>
+                          <Text color="white" fontSize="sm" fontWeight="semibold">{r.rater?.name}</Text>
+                          <Text color="gray.600" fontSize="xs">{r.opportunity?.title}</Text>
+                        </Stack>
+                      </Flex>
+                      <Flex align="center" gap={1}>
+                        {[1,2,3,4,5].map((s) => (
+                          <Text key={s} fontSize="sm" opacity={s <= r.stars ? 1 : 0.2}>⭐</Text>
+                        ))}
+                      </Flex>
+                    </Flex>
+                    {r.comment && (
+                      <Text color="gray.400" fontSize="sm" mt={3} lineHeight="relaxed">{r.comment}</Text>
+                    )}
+                    <Text color="gray.700" fontSize="xs" mt={2}>
+                      {new Date(r.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                    </Text>
+                  </Box>
+                ))}
+              </Stack>
+            </Stack>
+          )}
 
           {user.opportunities?.length > 0 && (
             <Stack spacing={4}>
