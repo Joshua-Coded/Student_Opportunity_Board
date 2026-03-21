@@ -34,7 +34,7 @@ export default function RegisterPage() {
       setErrors(data.error || {});
       return;
     }
-    toast({ title: "Account created! Please sign in.", status: "success", duration: 3000 });
+    toast({ title: "Account created! Check your email to verify.", status: "success", duration: 5000 });
     router.push("/login");
   }
 
