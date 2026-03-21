@@ -2,7 +2,7 @@
 
 import {
   Badge, Box, Button, Container, Flex, Heading,
-  Input, SimpleGrid, Stack, Text,
+  Input, Select, SimpleGrid, Stack, Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -25,14 +25,18 @@ export default function OpportunitiesPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [prices, setPrices] = useState<Record<string, number>>({});
+  const [university, setUniversity] = useState("");
+  const [universities, setUniversities] = useState<string[]>([]);
 
-  // Fetch ETH + MATIC prices once on mount
+  // Fetch prices and universities once on mount
   useEffect(() => {
     Promise.all([
       fetch("/api/crypto/price?symbol=ETH").then((r) => r.json()),
       fetch("/api/crypto/price?symbol=MATIC").then((r) => r.json()),
-    ]).then(([eth, matic]) => {
+      fetch("/api/universities").then((r) => r.json()),
+    ]).then(([eth, matic, unis]) => {
       setPrices({ ETH: eth.usd || 0, MATIC: matic.usd || 0, USDC: 1 });
+      if (Array.isArray(unis)) setUniversities(unis);
     }).catch(() => {});
   }, []);
 
@@ -41,12 +45,13 @@ export default function OpportunitiesPage() {
     if (search) params.set("search", search);
     if (type !== "ALL") params.set("type", type);
     if (payment !== "ALL") params.set("paymentType", payment);
+    if (university) params.set("university", university);
     setLoading(true);
     fetch(`/api/opportunities?${params}`)
       .then((r) => r.json())
       .then((data) => { setOpportunities(data.opportunities || []); setTotalPages(data.pages || 1); })
       .finally(() => setLoading(false));
-  }, [search, type, payment, page]);
+  }, [search, type, payment, university, page]);
 
   return (
     <Box minH="100vh" bg="#050510" color="white">
@@ -100,11 +105,25 @@ export default function OpportunitiesPage() {
 
           {/* Filters */}
           <Stack spacing={3}>
-            <Input placeholder="Search opportunities..." value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
-              color="white" _placeholder={{ color: "gray.600" }}
-              _focus={{ borderColor: "purple.500" }} borderRadius="xl" maxW={{ base: "full", md: "360px" }} />
+            <Flex gap={3} flexWrap="wrap">
+              <Input placeholder="Search opportunities..." value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
+                color="white" _placeholder={{ color: "gray.600" }}
+                _focus={{ borderColor: "purple.500" }} borderRadius="xl" maxW={{ base: "full", md: "320px" }} />
+              {universities.length > 0 && (
+                <Select value={university} onChange={(e) => { setUniversity(e.target.value); setPage(1); }}
+                  bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
+                  color={university ? "white" : "gray.600"} borderRadius="xl"
+                  _focus={{ borderColor: "purple.500" }} maxW={{ base: "full", md: "260px" }}
+                  sx={{ option: { bg: "#0d0d1a", color: "white" } }}>
+                  <option value="">All Universities</option>
+                  {universities.map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </Select>
+              )}
+            </Flex>
             <Flex gap={2} flexWrap="wrap">
               {TYPES.map((t) => (
                 <Button key={t} size="sm" onClick={() => { setType(t); setPage(1); }}
