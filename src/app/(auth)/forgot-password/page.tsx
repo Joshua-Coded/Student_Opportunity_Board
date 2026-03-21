@@ -5,9 +5,11 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ForgotPasswordPage() {
   const toast = useToast();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -37,9 +39,9 @@ export default function ForgotPasswordPage() {
                 <Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)"
                   bgClip="text" cursor="pointer">OpportunityBoard</Heading>
               </Link>
-              <Heading size="lg" color="white" mt={2}>Forgot password?</Heading>
+              <Heading size="lg" color="white" mt={2}>{t.auth.forgotPasswordTitle}</Heading>
               <Text color="gray.500" fontSize="sm">
-                {sent ? "Check your email for a reset link." : "Enter your email and we'll send you a reset link."}
+                {sent ? t.auth.resetLinkSent : t.auth.forgotPasswordDesc}
               </Text>
             </Stack>
 
@@ -47,7 +49,7 @@ export default function ForgotPasswordPage() {
               <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                   <FormControl>
-                    <FormLabel color="gray.400" fontSize="sm">Email</FormLabel>
+                    <FormLabel color="gray.400" fontSize="sm">{t.auth.email}</FormLabel>
                     <Input value={email} onChange={(e) => setEmail(e.target.value)}
                       type="email" placeholder="you@university.edu" required
                       bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
@@ -59,7 +61,7 @@ export default function ForgotPasswordPage() {
                     bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                     _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                     transition="all 0.2s" borderRadius="xl" py={6}>
-                    Send reset link
+                    {t.auth.sendResetLink}
                   </Button>
                 </Stack>
               </form>
@@ -67,15 +69,15 @@ export default function ForgotPasswordPage() {
               <Box bg="rgba(34,197,94,0.08)" border="1px solid rgba(34,197,94,0.2)"
                 borderRadius="xl" p={4} textAlign="center">
                 <Text fontSize="2xl" mb={2}>📬</Text>
-                <Text color="green.300" fontWeight="semibold" fontSize="sm">Reset link sent!</Text>
-                <Text color="gray.500" fontSize="xs" mt={1}>Check your inbox and follow the link. It expires in 1 hour.</Text>
+                <Text color="green.300" fontWeight="semibold" fontSize="sm">{t.auth.resetLinkSent}</Text>
+                <Text color="gray.500" fontSize="xs" mt={1}>{t.auth.checkInbox}</Text>
               </Box>
             )}
 
             <Flex justify="center">
               <Link href="/login">
                 <Text color="purple.400" fontSize="sm" _hover={{ color: "purple.300" }} cursor="pointer">
-                  ← Back to sign in
+                  {t.auth.backToSignIn}
                 </Text>
               </Link>
             </Flex>

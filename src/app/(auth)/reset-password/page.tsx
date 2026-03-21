@@ -6,10 +6,12 @@ import {
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const token = searchParams.get("token") || "";
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -55,7 +57,7 @@ export default function ResetPasswordPage() {
                 <Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)"
                   bgClip="text" cursor="pointer">OpportunityBoard</Heading>
               </Link>
-              <Heading size="lg" color="white" mt={2}>Set new password</Heading>
+              <Heading size="lg" color="white" mt={2}>{t.auth.setNewPassword}</Heading>
               <Text color="gray.500" fontSize="sm">Choose a strong password for your account.</Text>
             </Stack>
 
@@ -69,19 +71,19 @@ export default function ResetPasswordPage() {
               <Box bg="rgba(34,197,94,0.08)" border="1px solid rgba(34,197,94,0.2)"
                 borderRadius="xl" p={4} textAlign="center">
                 <Text fontSize="2xl" mb={2}>✅</Text>
-                <Text color="green.300" fontWeight="semibold" fontSize="sm">Password updated!</Text>
-                <Text color="gray.500" fontSize="xs" mt={1}>Redirecting you to sign in...</Text>
+                <Text color="green.300" fontWeight="semibold" fontSize="sm">{t.auth.passwordUpdated}</Text>
+                <Text color="gray.500" fontSize="xs" mt={1}>{t.auth.redirecting}</Text>
               </Box>
             ) : (
               <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                   <FormControl>
-                    <FormLabel color="gray.400" fontSize="sm">New Password</FormLabel>
+                    <FormLabel color="gray.400" fontSize="sm">{t.auth.newPassword}</FormLabel>
                     <Input {...inputStyle} type="password" placeholder="Min. 8 characters"
                       value={password} onChange={(e) => setPassword(e.target.value)} required />
                   </FormControl>
                   <FormControl>
-                    <FormLabel color="gray.400" fontSize="sm">Confirm Password</FormLabel>
+                    <FormLabel color="gray.400" fontSize="sm">{t.auth.confirmPassword}</FormLabel>
                     <Input {...inputStyle} type="password" placeholder="Repeat your password"
                       value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
                   </FormControl>
@@ -94,7 +96,7 @@ export default function ResetPasswordPage() {
                     bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                     _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                     transition="all 0.2s" borderRadius="xl" py={6}>
-                    Update password
+                    {t.auth.updatePassword}
                   </Button>
                 </Stack>
               </form>
@@ -103,7 +105,7 @@ export default function ResetPasswordPage() {
             <Box textAlign="center">
               <Link href="/login">
                 <Text color="purple.400" fontSize="sm" _hover={{ color: "purple.300" }} cursor="pointer">
-                  ← Back to sign in
+                  {t.auth.backToSignIn}
                 </Text>
               </Link>
             </Box>
