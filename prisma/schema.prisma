@@ -20,6 +20,7 @@ model User {
   graduationYear Int?
   walletAddress  String?
   emailVerified  Boolean       @default(false)
+  isAdmin        Boolean       @default(false)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   opportunities  Opportunity[]
