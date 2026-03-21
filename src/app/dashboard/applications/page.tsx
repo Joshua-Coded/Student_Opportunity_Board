@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import GigPaymentButton from "@/components/GigPaymentButton";
+import RateStudentButton from "@/components/RateStudentButton";
 import MobileNav from "@/components/MobileNav";
 
 const navItems = [
@@ -35,6 +36,7 @@ export default function ApplicationsPage() {
   const [received, setReceived] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [paidApps, setPaidApps] = useState<Set<string>>(new Set());
+  const [ratedApps, setRatedApps] = useState<Set<string>>(new Set());
 
   useEffect(() => { if (status === "unauthenticated") router.push("/login"); }, [status, router]);
 
@@ -245,7 +247,21 @@ export default function ApplicationsPage() {
                             )}
                             {app.status === "ACCEPTED" && app.opportunity?.paymentType === "CRYPTO" && (
                               paidApps.has(app.id) ? (
-                                <Badge colorScheme="green" borderRadius="full" px={3} py={1} fontSize="xs">✓ Paid</Badge>
+                                <Flex gap={2} align="center">
+                                  <Badge colorScheme="green" borderRadius="full" px={3} py={1} fontSize="xs">✓ Paid</Badge>
+                                  {!ratedApps.has(app.id) && (
+                                    <RateStudentButton
+                                      rateeId={app.applicant?.id}
+                                      rateeName={app.applicant?.name || "Student"}
+                                      opportunityId={app.opportunity.id}
+                                      gigTitle={app.opportunity?.title || "Gig"}
+                                      onSuccess={() => setRatedApps((prev) => new Set(Array.from(prev).concat(app.id)))}
+                                    />
+                                  )}
+                                  {ratedApps.has(app.id) && (
+                                    <Badge colorScheme="yellow" borderRadius="full" px={3} py={1} fontSize="xs">⭐ Rated</Badge>
+                                  )}
+                                </Flex>
                               ) : (
                                 <GigPaymentButton
                                   opportunityId={app.opportunity.id}
