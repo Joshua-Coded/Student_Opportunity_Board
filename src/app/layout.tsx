@@ -2,6 +2,7 @@
 
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { SessionProvider } from "next-auth/react";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import "./globals.css";
 
 const theme = extendTheme({
@@ -49,7 +50,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionProvider>
           <ChakraProvider theme={theme}>
-            {children}
+            <LanguageProvider>
+              {children}
+            </LanguageProvider>
           </ChakraProvider>
         </SessionProvider>
       </body>
