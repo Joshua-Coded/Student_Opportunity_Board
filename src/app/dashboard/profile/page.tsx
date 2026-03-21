@@ -29,6 +29,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [connectingWallet, setConnectingWallet] = useState(false);
+  const [walletError, setWalletError] = useState("");
 
   useEffect(() => { if (status === "unauthenticated") router.push("/login"); }, [status, router]);
 
@@ -81,11 +82,14 @@ export default function ProfilePage() {
     setSaving(false);
     if (res.ok) {
       const updated = await res.json();
-      // Refresh the session so sidebar/header avatars update immediately
+      setWalletError("");
       await updateSession({ image: updated.image || null });
       toast({ title: "Profile saved!", status: "success", duration: 2000 });
     } else {
-      toast({ title: "Failed to save", status: "error", duration: 2000 });
+      const data = await res.json();
+      const walletMsg = data.error?.walletAddress?.[0];
+      if (walletMsg) setWalletError(walletMsg);
+      else toast({ title: "Failed to save", status: "error", duration: 2000 });
     }
   }
 
@@ -223,9 +227,13 @@ export default function ProfilePage() {
                           🦊 MetaMask
                         </Button>
                       </Flex>
-                      <Text color="gray.600" fontSize="xs" mt={1}>
-                        {form.walletAddress ? "✓ Wallet set — you can receive crypto payments" : "Connect MetaMask or paste your address to receive payments"}
-                      </Text>
+                      {walletError ? (
+                        <Text color="red.400" fontSize="xs" mt={1}>⚠ {walletError}</Text>
+                      ) : (
+                        <Text color="gray.600" fontSize="xs" mt={1}>
+                          {form.walletAddress ? "✓ Wallet set — you can receive crypto payments" : "Connect MetaMask or paste your address to receive payments"}
+                        </Text>
+                      )}
                     </FormControl>
                     <Button type="submit" isLoading={saving} w="full"
                       bgGradient="linear(to-r, purple.500, blue.500)" color="white"
