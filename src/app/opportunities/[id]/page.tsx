@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import ApplyModal from "@/components/applications/ApplyModal";
 import GigPaymentButton from "@/components/GigPaymentButton";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const typeColor: Record<string, string> = {
   GIG: "purple", INTERNSHIP: "blue", PART_TIME: "green",
@@ -19,6 +20,7 @@ export default function OpportunityDetailPage() {
   const { id } = useParams();
   const { data: session } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
   const [opp, setOpp] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [applyOpen, setApplyOpen] = useState(false);
@@ -33,11 +35,10 @@ export default function OpportunityDetailPage() {
     fetch(`/api/opportunities/${id}`).then((r) => r.json()).then((data) => { setOpp(data); setLoading(false); });
   }, [id]);
 
-  // Fetch live price once we know the currency
   useEffect(() => {
     if (!opp?.compensationAmount || !opp?.compensationCurrency || opp.paymentType !== "CRYPTO") return;
     const symbol = opp.compensationCurrency;
-    if (symbol === "USDC") { setCryptoPrice(1); return; } // USDC is always ~$1
+    if (symbol === "USDC") { setCryptoPrice(1); return; }
     fetch(`/api/crypto/price?symbol=${symbol}`)
       .then((r) => r.json())
       .then((d) => { if (d.usd) setCryptoPrice(d.usd); })
@@ -51,7 +52,6 @@ export default function OpportunityDetailPage() {
     });
   }, [session, id]);
 
-  // Fetch accepted applicants when owner views a CRYPTO gig
   useEffect(() => {
     if (!opp || !session?.user?.id) return;
     if (session.user.id !== opp.author?.id) return;
@@ -85,7 +85,7 @@ export default function OpportunityDetailPage() {
   if (loading) {
     return (
       <Box minH="100vh" bg="#050510" display="flex" alignItems="center" justifyContent="center">
-        <Text color="gray.500">Loading...</Text>
+        <Text color="gray.500">{t.common.loading}</Text>
       </Box>
     );
   }
@@ -96,7 +96,7 @@ export default function OpportunityDetailPage() {
         <Stack align="center" spacing={4}>
           <Text fontSize="4xl">😕</Text>
           <Heading color="gray.400" size="md">Opportunity not found</Heading>
-          <Link href="/opportunities"><Button variant="outline" color="gray.400" borderRadius="xl">Back to Browse</Button></Link>
+          <Link href="/opportunities"><Button variant="outline" color="gray.400" borderRadius="xl">{t.common.backToBrowse}</Button></Link>
         </Stack>
       </Box>
     );
@@ -111,7 +111,7 @@ export default function OpportunityDetailPage() {
         position="sticky" top={0} zIndex={50}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
-          <Link href="/opportunities"><Button variant="ghost" size="sm" color="gray.400">← Browse</Button></Link>
+          <Link href="/opportunities"><Button variant="ghost" size="sm" color="gray.400">{t.common.backToBrowse}</Button></Link>
         </Flex>
       </Box>
 
@@ -124,22 +124,22 @@ export default function OpportunityDetailPage() {
                 <Flex gap={2} flexWrap="wrap">
                   <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={3} py={1}>{opp.type}</Badge>
                   <Badge colorScheme={opp.status === "ACTIVE" ? "green" : "gray"} borderRadius="full" px={3} py={1}>{opp.status}</Badge>
-                  {opp.paymentType === "CRYPTO" && <Badge colorScheme="purple" borderRadius="full" px={3} py={1}>⚡ Crypto</Badge>}
+                  {opp.paymentType === "CRYPTO" && <Badge colorScheme="purple" borderRadius="full" px={3} py={1}>⚡ {t.common.crypto}</Badge>}
                 </Flex>
                 {isOwner && (
                   <Flex gap={2} flexWrap="wrap">
                     <Link href={`/opportunities/${id}/edit`}>
-                      <Button size="sm" variant="outline" borderColor="rgba(255,255,255,0.1)" color="gray.400" borderRadius="lg">Edit</Button>
+                      <Button size="sm" variant="outline" borderColor="rgba(255,255,255,0.1)" color="gray.400" borderRadius="lg">{t.opportunity.edit}</Button>
                     </Link>
                     {opp.status === "ACTIVE" && (
                       <Button size="sm" onClick={handleMarkFilled} isLoading={filling}
                         bg="rgba(34,197,94,0.1)" color="green.300"
                         border="1px solid rgba(34,197,94,0.25)"
                         _hover={{ bg: "rgba(34,197,94,0.2)" }} borderRadius="lg">
-                        ✓ Mark as Filled
+                        {t.opportunity.markFilled}
                       </Button>
                     )}
-                    <Button size="sm" colorScheme="red" variant="outline" onClick={handleDelete} isLoading={deleting} borderRadius="lg">Delete</Button>
+                    <Button size="sm" colorScheme="red" variant="outline" onClick={handleDelete} isLoading={deleting} borderRadius="lg">{t.opportunity.delete}</Button>
                   </Flex>
                 )}
               </Flex>
@@ -160,10 +160,10 @@ export default function OpportunityDetailPage() {
                 </Flex>
               )}
               <Flex gap={5} flexWrap="wrap">
-                <Text color="gray.400" fontSize="sm">{opp.isRemote ? "🌍 Remote" : `📍 ${opp.location}`}</Text>
+                <Text color="gray.400" fontSize="sm">{opp.isRemote ? t.opportunity.remote : `📍 ${opp.location}`}</Text>
                 <Text color="gray.400" fontSize="sm">📅 {new Date(opp.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</Text>
                 {opp._count?.applications > 0 && (
-                  <Text color="gray.400" fontSize="sm">👥 {opp._count.applications} applicant{opp._count.applications !== 1 ? "s" : ""}</Text>
+                  <Text color="gray.400" fontSize="sm">👥 {opp._count.applications} {t.opportunity.applicants}</Text>
                 )}
               </Flex>
             </Stack>
@@ -178,7 +178,7 @@ export default function OpportunityDetailPage() {
 
           {/* Description */}
           <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)" borderRadius="2xl" p={{ base: 5, md: 8 }}>
-            <Text color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb={4}>Description</Text>
+            <Text color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb={4}>{t.opportunity.description}</Text>
             <Text color="gray.300" lineHeight="tall" whiteSpace="pre-wrap" fontSize="sm">{opp.description}</Text>
             {opp.aiSummary && (
               <Box mt={6} bg="rgba(139,92,246,0.08)" border="1px solid rgba(139,92,246,0.2)" borderRadius="xl" p={4}>
@@ -193,7 +193,7 @@ export default function OpportunityDetailPage() {
             <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.08)" borderRadius="2xl" p={6}>
               {opp.skills?.length > 0 && (
                 <Stack spacing={3} mb={opp.tags?.length > 0 ? 5 : 0}>
-                  <Text color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider">Skills Required</Text>
+                  <Text color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider">{t.opportunity.skillsRequired}</Text>
                   <Flex gap={2} flexWrap="wrap">
                     {opp.skills.map((s: string) => (
                       <Badge key={s} colorScheme="blue" borderRadius="full" px={3} py={1} fontSize="xs">{s}</Badge>
@@ -203,10 +203,10 @@ export default function OpportunityDetailPage() {
               )}
               {opp.tags?.length > 0 && (
                 <Stack spacing={3}>
-                  <Text color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider">Tags</Text>
+                  <Text color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider">{t.opportunity.tags}</Text>
                   <Flex gap={2} flexWrap="wrap">
-                    {opp.tags.map((t: string) => (
-                      <Badge key={t} variant="outline" colorScheme="gray" borderRadius="full" px={3} py={1} fontSize="xs">#{t}</Badge>
+                    {opp.tags.map((tag: string) => (
+                      <Badge key={tag} variant="outline" colorScheme="gray" borderRadius="full" px={3} py={1} fontSize="xs">#{tag}</Badge>
                     ))}
                   </Flex>
                 </Stack>
@@ -214,11 +214,11 @@ export default function OpportunityDetailPage() {
             </Box>
           )}
 
-          {/* Pay Accepted Applicants — visible to owner on CRYPTO gigs */}
+          {/* Pay Accepted Applicants */}
           {isOwner && opp.paymentType === "CRYPTO" && acceptedApplicants.length > 0 && (
             <Box bg="rgba(139,92,246,0.06)" border="1px solid rgba(139,92,246,0.25)" borderRadius="2xl" p={6}>
               <Text color="purple.300" fontSize="xs" fontWeight="bold" textTransform="uppercase" letterSpacing="wider" mb={4}>
-                💸 Pay Accepted Applicants
+                {t.opportunity.payAccepted}
               </Text>
               <Stack spacing={3}>
                 {acceptedApplicants.map((app: any) => (
@@ -230,12 +230,12 @@ export default function OpportunityDetailPage() {
                         <Text color="gray.500" fontSize="xs">
                           {app.applicant?.walletAddress
                             ? `${app.applicant.walletAddress.slice(0, 6)}...${app.applicant.walletAddress.slice(-4)}`
-                            : "No wallet address set"}
+                            : t.common.noWalletSet}
                         </Text>
                       </Stack>
                     </Flex>
                     {paidApplicants.has(app.applicant?.id) ? (
-                      <Badge colorScheme="green" borderRadius="full" px={3} py={1}>✓ Paid</Badge>
+                      <Badge colorScheme="green" borderRadius="full" px={3} py={1}>{t.opportunity.applied}</Badge>
                     ) : app.applicant?.walletAddress ? (
                       <GigPaymentButton
                         opportunityId={id as string}
@@ -245,12 +245,12 @@ export default function OpportunityDetailPage() {
                         amountEth={opp.compensationAmount?.toString() || "0.01"}
                         currency={opp.compensationCurrency || "ETH"}
                         gigTitle={opp.title}
-                        onSuccess={(txHash) => {
+                        onSuccess={() => {
                           setPaidApplicants((prev) => new Set(Array.from(prev).concat(app.applicant.id)));
                         }}
                       />
                     ) : (
-                      <Badge colorScheme="gray" borderRadius="full" px={3} py={1} fontSize="xs">No wallet</Badge>
+                      <Badge colorScheme="gray" borderRadius="full" px={3} py={1} fontSize="xs">{t.opportunity.noWallet}</Badge>
                     )}
                   </Flex>
                 ))}
@@ -275,7 +275,7 @@ export default function OpportunityDetailPage() {
                 <Link href="/login">
                   <Button bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                     _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)" }} borderRadius="xl" px={8}>
-                    Sign in to apply
+                    {t.opportunity.signInToApply}
                   </Button>
                 </Link>
               )}
@@ -285,14 +285,14 @@ export default function OpportunityDetailPage() {
                   {applied ? (
                     <Button isDisabled bg="rgba(34,197,94,0.1)" color="green.300"
                       border="1px solid rgba(34,197,94,0.25)" borderRadius="xl" px={8} _disabled={{ opacity: 1 }}>
-                      ✓ Applied
+                      {t.opportunity.applied}
                     </Button>
                   ) : (
                     <Button onClick={() => setApplyOpen(true)}
                       bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                       _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                       transition="all 0.2s" borderRadius="xl" px={8}>
-                      Apply Now →
+                      {t.opportunity.applyNow}
                     </Button>
                   )}
                 </Flex>
@@ -302,7 +302,7 @@ export default function OpportunityDetailPage() {
                 <Link href="/dashboard/applications">
                   <Button variant="outline" borderColor="rgba(255,255,255,0.1)" color="gray.400"
                     _hover={{ bg: "rgba(255,255,255,0.05)" }} borderRadius="xl">
-                    View Applications
+                    {t.opportunity.viewApplications}
                   </Button>
                 </Link>
               )}
