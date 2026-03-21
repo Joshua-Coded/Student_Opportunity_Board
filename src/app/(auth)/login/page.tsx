@@ -57,7 +57,12 @@ export default function LoginPage() {
                     borderRadius="xl" />
                 </FormControl>
                 <FormControl>
-                  <FormLabel color="gray.400" fontSize="sm">Password</FormLabel>
+                  <Flex justify="space-between" align="center">
+                    <FormLabel color="gray.400" fontSize="sm" mb={0}>Password</FormLabel>
+                    <Link href="/forgot-password">
+                      <Text color="purple.400" fontSize="xs" _hover={{ color: "purple.300" }} cursor="pointer">Forgot password?</Text>
+                    </Link>
+                  </Flex>
                   <Input value={password} onChange={(e) => setPassword(e.target.value)}
                     type="password" placeholder="••••••••" required
                     bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
