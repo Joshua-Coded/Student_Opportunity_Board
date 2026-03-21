@@ -11,26 +11,30 @@ export async function GET(req: NextRequest) {
     const paymentType = searchParams.get("paymentType");
     const remote = searchParams.get("remote");
     const search = searchParams.get("search");
+    const university = searchParams.get("university");
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
     const limit = 12;
 
+    const where: any = {
+      status: "ACTIVE",
+      ...(type ? { type: type as any } : {}),
+      ...(paymentType ? { paymentType: paymentType as any } : {}),
+      ...(remote === "true" ? { isRemote: true } : {}),
+      ...(university ? { author: { university: { equals: university, mode: "insensitive" } } } : {}),
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" } },
+              { description: { contains: search, mode: "insensitive" } },
+              { skills: { has: search } },
+              { tags: { has: search } },
+            ],
+          }
+        : {}),
+    };
+
     const opportunities = await prisma.opportunity.findMany({
-      where: {
-        status: "ACTIVE",
-        ...(type ? { type: type as any } : {}),
-        ...(paymentType ? { paymentType: paymentType as any } : {}),
-        ...(remote === "true" ? { isRemote: true } : {}),
-        ...(search
-          ? {
-              OR: [
-                { title: { contains: search, mode: "insensitive" } },
-                { description: { contains: search, mode: "insensitive" } },
-                { skills: { has: search } },
-                { tags: { has: search } },
-              ],
-            }
-          : {}),
-      },
+      where,
       include: {
         author: { select: { id: true, name: true, image: true, university: true } },
         _count: { select: { payments: true, applications: true } },
@@ -40,9 +44,7 @@ export async function GET(req: NextRequest) {
       take: limit,
     });
 
-    const total = await prisma.opportunity.count({
-      where: { status: "ACTIVE" },
-    });
+    const total = await prisma.opportunity.count({ where });
 
     return NextResponse.json({ opportunities, total, page, pages: Math.ceil(total / limit) });
   } catch {
