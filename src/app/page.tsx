@@ -137,13 +137,14 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
 }
 
 function CryptoMarquee() {
+  const { t } = useLanguage();
   const doubled = [...CRYPTOS, ...CRYPTOS];
   return (
     <Box py={14} overflow="hidden" borderY="1px solid rgba(255,255,255,0.05)">
       <Container maxW="5xl">
         <Text textAlign="center" fontSize="xs" color="rgba(255,255,255,0.2)" fontWeight="medium"
           letterSpacing="widest" textTransform="uppercase" mb={8}>
-          Supported cryptocurrencies
+          {t.landing.crypto.sectionLabel}
         </Text>
       </Container>
       <Box position="relative" overflow="hidden">
@@ -332,10 +333,20 @@ export default function HomePage() {
             </Heading>
           </HStack>
           <HStack gap={7} display={{ base: "none", md: "flex" }}>
-            {[t.nav.browse, t.nav.howItWorks, t.nav.faq].map((item) => (
-              <Text key={item} fontSize="sm" color="rgba(255,255,255,0.45)" cursor="pointer"
-                _hover={{ color: "white" }} transition="color 0.2s" fontWeight="medium">{item}</Text>
-            ))}
+            <Link href="/opportunities">
+              <Text fontSize="sm" color="rgba(255,255,255,0.45)" cursor="pointer"
+                _hover={{ color: "white" }} transition="color 0.2s" fontWeight="medium">{t.nav.browse}</Text>
+            </Link>
+            <Text fontSize="sm" color="rgba(255,255,255,0.45)" cursor="pointer"
+              _hover={{ color: "white" }} transition="color 0.2s" fontWeight="medium"
+              onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })}>
+              {t.nav.howItWorks}
+            </Text>
+            <Text fontSize="sm" color="rgba(255,255,255,0.45)" cursor="pointer"
+              _hover={{ color: "white" }} transition="color 0.2s" fontWeight="medium"
+              onClick={() => document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" })}>
+              {t.nav.faq}
+            </Text>
           </HStack>
           <HStack gap={3}>
             <LanguageToggle />
@@ -429,7 +440,7 @@ export default function HomePage() {
                 <Box w={1.5} h={1.5} borderRadius="full" bg="#a78bfa"
                   style={{ animation: "pulse 2s infinite" }} />
                 <Text fontSize="xs" color="rgba(167,139,250,0.9)" fontWeight="medium" letterSpacing="wide">
-                  Powered by Claude MCP · Built for students
+                  {t.landing.hero.tagline}
                 </Text>
               </Flex>
             </MotionBox>
@@ -438,22 +449,21 @@ export default function HomePage() {
               <MotionHeading
                 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }}
                 fontSize={{ base: "4xl", md: "6xl" }} fontWeight="black" lineHeight="1.05" letterSpacing="-0.03em" color="white">
-                Find your next
+                {t.landing.hero.heading1}
               </MotionHeading>
               <RollingTicker />
               <MotionHeading
                 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
                 fontSize={{ base: "4xl", md: "6xl" }} fontWeight="black" lineHeight="1.05" letterSpacing="-0.03em"
                 color="rgba(255,255,255,0.35)">
-                Get paid in crypto.
+                {t.landing.hero.heading2}
               </MotionHeading>
             </Stack>
 
             <MotionText
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
               fontSize={{ base: "md", md: "lg" }} color="rgba(255,255,255,0.45)" maxW="xl" lineHeight="relaxed">
-              The global student opportunity platform. Post gigs, discover internships,
-              and receive cross-border crypto payments — no bank required.
+              {t.landing.hero.desc}
             </MotionText>
 
             <MotionFlex
@@ -464,7 +474,7 @@ export default function HomePage() {
                   bg="white" color="#050510"
                   _hover={{ bg: "rgba(255,255,255,0.9)", transform: "translateY(-2px)", shadow: "0 20px 60px rgba(255,255,255,0.15)" }}
                   transition="all 0.25s" borderRadius="xl">
-                  Start for free →
+                  {t.landing.hero.startFree}
                 </Button>
               </Link>
               <Link href="/opportunities">
@@ -473,7 +483,7 @@ export default function HomePage() {
                   border="1px solid rgba(255,255,255,0.1)"
                   _hover={{ bg: "rgba(255,255,255,0.1)", color: "white", transform: "translateY(-2px)" }}
                   transition="all 0.25s" borderRadius="xl">
-                  Browse opportunities
+                  {t.landing.hero.browseOpps}
                 </Button>
               </Link>
             </MotionFlex>
@@ -522,7 +532,7 @@ export default function HomePage() {
                     <Text as="span" color="white" fontWeight="bold">
                       {liveData.totalUsers > 0 ? liveData.totalUsers.toLocaleString() : "—"}
                     </Text>
-                    {" "}students already on the platform
+                    {" "}{t.landing.hero.socialProof}
                   </Text>
                 </Flex>
               </Flex>
@@ -537,9 +547,9 @@ export default function HomePage() {
         <Container maxW="5xl" position="relative">
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
             {[
-              { value: liveData.totalUsers, label: "Students worldwide", desc: "From 40+ countries, all disciplines", icon: "🎓", gradient: "linear(135deg, #7c3aed, #4f46e5)", glow: "rgba(124,58,237,0.3)" },
-              { value: liveData.totalOpportunities, label: "Active listings", desc: "Gigs, internships, research & more", icon: "📋", gradient: "linear(135deg, #2563eb, #0891b2)", glow: "rgba(37,99,235,0.3)" },
-              { value: liveData.totalPayments, label: "Payments made", desc: "Crypto sent directly wallet-to-wallet", icon: "⚡", gradient: "linear(135deg, #059669, #0d9488)", glow: "rgba(5,150,105,0.3)" },
+              { value: liveData.totalUsers, label: t.landing.stats.studentsLabel, desc: t.landing.stats.studentsDesc, icon: "🎓", gradient: "linear(135deg, #7c3aed, #4f46e5)", glow: "rgba(124,58,237,0.3)" },
+              { value: liveData.totalOpportunities, label: t.landing.stats.listingsLabel, desc: t.landing.stats.listingsDesc, icon: "📋", gradient: "linear(135deg, #2563eb, #0891b2)", glow: "rgba(37,99,235,0.3)" },
+              { value: liveData.totalPayments, label: t.landing.stats.paymentsLabel, desc: t.landing.stats.paymentsDesc, icon: "⚡", gradient: "linear(135deg, #059669, #0d9488)", glow: "rgba(5,150,105,0.3)" },
             ].map((s, i) => (
               <MotionBox key={s.label}
                 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
@@ -574,7 +584,7 @@ export default function HomePage() {
       </Box>
 
       {/* ── How it works ────────────────────────────────────────────── */}
-      <Box py={32} position="relative" overflow="hidden">
+      <Box id="how-it-works" py={32} position="relative" overflow="hidden">
         {/* Background */}
         <Box position="absolute" inset={0} bgGradient="radial(ellipse at 20% 50%, rgba(124,58,237,0.06) 0%, transparent 60%)" />
         <Box position="absolute" inset={0} bgGradient="radial(ellipse at 80% 50%, rgba(37,99,235,0.05) 0%, transparent 60%)" />
@@ -585,18 +595,15 @@ export default function HomePage() {
             <Flex align="center" justify="center" gap={2} mb={5}>
               <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
               <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
-                How it works
+                {t.landing.hiw.sectionLabel}
               </Text>
               <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
             </Flex>
             <Heading fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
-              From sign-up to{" "}
-              <Box as="span" bgGradient="linear(to-r, purple.400, blue.400, cyan.300)" bgClip="text">
-                first paycheck
-              </Box>
+              {t.landing.hiw.heading}
             </Heading>
             <Text color="rgba(255,255,255,0.35)" fontSize="lg" maxW="lg" mx="auto">
-              No agency. No bank. No middleman. Just students and opportunities — and it takes less than 5 minutes to start.
+              {t.landing.hiw.subheading}
             </Text>
           </MotionBox>
 
@@ -613,14 +620,14 @@ export default function HomePage() {
                       <Text fontSize="lg">👤</Text>
                     </Box>
                     <Box>
-                      <Text fontSize="xs" color="purple.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>Step 01</Text>
+                      <Text fontSize="xs" color="purple.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>{t.landing.hiw.step1Label}</Text>
                       <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em" color="white">
-                        Build your identity
+                        {t.landing.hiw.step1Title}
                       </Heading>
                     </Box>
                   </Flex>
                   <Text color="rgba(255,255,255,0.45)" fontSize="md" lineHeight="relaxed" mb={7} maxW="420px">
-                    Your profile is your global resume. Set it up once and let opportunities find you — or go find them.
+                    {t.landing.hiw.step1Desc}
                   </Text>
                   <Stack spacing={3}>
                     {[
@@ -704,14 +711,14 @@ export default function HomePage() {
                       <Text fontSize="lg">🤖</Text>
                     </Box>
                     <Box>
-                      <Text fontSize="xs" color="blue.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>Step 02</Text>
+                      <Text fontSize="xs" color="blue.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>{t.landing.hiw.step2Label}</Text>
                       <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em" color="white">
-                        Post or discover
+                        {t.landing.hiw.step2Title}
                       </Heading>
                     </Box>
                   </Flex>
                   <Text color="rgba(255,255,255,0.45)" fontSize="md" lineHeight="relaxed" mb={7} maxW="420px">
-                    Post a listing in 60 seconds — Claude AI rewrites it to sound like a senior recruiter wrote it. Or browse and apply in one click.
+                    {t.landing.hiw.step2Desc}
                   </Text>
                   <Stack spacing={3}>
                     {[
@@ -783,14 +790,14 @@ export default function HomePage() {
                       <Text fontSize="lg">⚡</Text>
                     </Box>
                     <Box>
-                      <Text fontSize="xs" color="green.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>Step 03</Text>
+                      <Text fontSize="xs" color="green.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase" mb={1}>{t.landing.hiw.step3Label}</Text>
                       <Heading fontSize={{ base: "2xl", md: "3xl" }} fontWeight="black" letterSpacing="-0.02em" color="white">
-                        Get paid in crypto
+                        {t.landing.hiw.step3Title}
                       </Heading>
                     </Box>
                   </Flex>
                   <Text color="rgba(255,255,255,0.45)" fontSize="md" lineHeight="relaxed" mb={7} maxW="420px">
-                    Accept an applicant and pay directly to their wallet. No PayPal. No wire transfer. No 3–5 business days. Instant, borderless, final.
+                    {t.landing.hiw.step3Desc}
                   </Text>
                   <Stack spacing={3}>
                     {[
@@ -864,7 +871,7 @@ export default function HomePage() {
                 bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                 _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-2px)", shadow: "0 20px 40px rgba(124,58,237,0.3)" }}
                 transition="all 0.25s" borderRadius="xl">
-                Start for free — no credit card →
+                {t.landing.hiw.bottomCta}
               </Button>
             </Link>
           </MotionBox>
@@ -878,15 +885,14 @@ export default function HomePage() {
           <MotionBox initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} textAlign="center" mb={14}>
             <Flex align="center" justify="center" gap={2} mb={5}>
               <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
-              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">New to crypto?</Text>
+              <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">{t.landing.onboarding.sectionLabel}</Text>
               <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
             </Flex>
             <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
-              No blockchain experience?{" "}
-              <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">No problem.</Box>
+              {t.landing.onboarding.heading}
             </Heading>
             <Text color="rgba(255,255,255,0.4)" fontSize="lg" maxW="xl" mx="auto">
-              You don&apos;t need to understand blockchain to get paid on OpportunityBoard. Here&apos;s everything you need in plain English.
+              {t.landing.onboarding.subheading}
             </Text>
           </MotionBox>
 
@@ -990,16 +996,15 @@ export default function HomePage() {
             <Flex align="center" justify="center" gap={2} mb={5}>
               <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
               <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
-                Platform Features
+                {t.landing.features.sectionLabel}
               </Text>
               <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
             </Flex>
             <Heading fontSize={{ base: "4xl", md: "5xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
-              Built{" "}
-              <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">different.</Box>
+              {t.landing.features.heading}
             </Heading>
             <Text color="rgba(255,255,255,0.35)" fontSize="lg" maxW="xl" mx="auto">
-              Every tool you need — AI-powered, crypto-native, student-first.
+              {t.landing.features.subheading}
             </Text>
           </MotionBox>
 
@@ -1275,7 +1280,7 @@ export default function HomePage() {
       </Box>
 
       {/* ── FAQ ─────────────────────────────────────────────────────── */}
-      <Box py={32} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
+      <Box id="faq" py={32} bg="rgba(255,255,255,0.012)" borderY="1px solid rgba(255,255,255,0.05)">
         <Container maxW="5xl">
           <Flex gap={16} direction={{ base: "column", lg: "row" }} align="flex-start">
             {/* Left: sticky header */}
@@ -1284,23 +1289,20 @@ export default function HomePage() {
               <Flex align="center" gap={2} mb={5}>
                 <Box w={8} h="1px" bg="rgba(167,139,250,0.4)" />
                 <Text fontSize="xs" fontWeight="bold" color="rgba(167,139,250,0.8)" letterSpacing="widest" textTransform="uppercase">
-                  FAQ
+                  {t.landing.faq.sectionLabel}
                 </Text>
               </Flex>
               <Heading fontSize={{ base: "3xl", md: "4xl" }} fontWeight="black" letterSpacing="-0.03em" mb={4}>
-                Got{" "}
-                <Box as="span" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text">
-                  questions?
-                </Box>
+                {t.landing.faq.heading}
               </Heading>
               <Text color="rgba(255,255,255,0.35)" fontSize="md" lineHeight="relaxed" mb={8}>
-                Everything you need to know about getting started, payments, and how the platform works.
+                {t.landing.faq.subheading}
               </Text>
               <Link href="/register">
                 <Button size="md" px={6} bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                   _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                   transition="all 0.2s" borderRadius="xl">
-                  Get started free →
+                  {t.landing.faq.cta}
                 </Button>
               </Link>
             </MotionBox>
@@ -1308,7 +1310,7 @@ export default function HomePage() {
             {/* Right: FAQ items */}
             <Box flex={1}>
               <Stack spacing={3}>
-                {FAQS.map((item, i) => (
+                {(t.landing.faq.items as unknown as { q: string; a: string }[]).map((item, i) => (
                   <FAQItem key={i} question={item.q} answer={item.a} index={i} />
                 ))}
               </Stack>
@@ -1343,18 +1345,18 @@ export default function HomePage() {
                 borderRadius="full" px={4} py={2}>
                 <Box w={1.5} h={1.5} borderRadius="full" bg="#a78bfa" style={{ animation: "pulse 2s infinite" }} />
                 <Text fontSize="xs" color="rgba(167,139,250,0.9)" fontWeight="medium" letterSpacing="wide">
-                  Join students already earning on the platform
+                  {t.landing.cta.badge}
                 </Text>
               </Flex>
 
               <Heading fontSize={{ base: "5xl", md: "7xl" }} fontWeight="black" lineHeight="1" letterSpacing="-0.04em">
-                Your next
+                {t.landing.cta.heading1}
                 <br />
                 <Box as="span" bgGradient="linear(to-r, purple.400, blue.400, cyan.300)" bgClip="text">
-                  opportunity
+                  {t.landing.cta.heading2}
                 </Box>
                 <br />
-                <Box as="span" color="rgba(255,255,255,0.2)">awaits.</Box>
+                <Box as="span" color="rgba(255,255,255,0.2)">{t.landing.cta.heading3}</Box>
               </Heading>
 
               <Text color="rgba(255,255,255,0.4)" fontSize="xl" maxW="lg" lineHeight="relaxed">
@@ -1367,7 +1369,7 @@ export default function HomePage() {
                     bg="white" color="#050510"
                     _hover={{ bg: "rgba(255,255,255,0.9)", transform: "translateY(-3px)", shadow: "0 30px 60px rgba(255,255,255,0.15)" }}
                     transition="all 0.25s" borderRadius="xl">
-                    Start for free →
+                    {t.landing.cta.startFree}
                   </Button>
                 </Link>
                 <Link href="/opportunities">
@@ -1376,7 +1378,7 @@ export default function HomePage() {
                     border="1px solid rgba(255,255,255,0.1)"
                     _hover={{ bg: "rgba(255,255,255,0.1)", color: "white", transform: "translateY(-3px)" }}
                     transition="all 0.25s" borderRadius="xl">
-                    Browse opportunities
+                    {t.landing.cta.browse}
                   </Button>
                 </Link>
               </Flex>
