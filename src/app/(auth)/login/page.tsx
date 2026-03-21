@@ -15,13 +15,17 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [unverified, setUnverified] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+    setUnverified(false);
     const res = await signIn("credentials", { email, password, redirect: false });
     setLoading(false);
-    if (res?.error) {
+    if (res?.error === "EMAIL_NOT_VERIFIED") {
+      setUnverified(true);
+    } else if (res?.error) {
       toast({ title: "Invalid email or password", status: "error", duration: 3000, isClosable: true });
     } else {
       router.push("/dashboard");
@@ -70,6 +74,12 @@ export default function LoginPage() {
                     _focus={{ borderColor: "purple.500", boxShadow: "0 0 0 1px #7c3aed" }}
                     borderRadius="xl" />
                 </FormControl>
+                {unverified && (
+                  <Box bg="rgba(234,179,8,0.08)" border="1px solid rgba(234,179,8,0.25)" borderRadius="xl" px={4} py={3}>
+                    <Text color="yellow.300" fontSize="sm" fontWeight="semibold">📬 Check your email</Text>
+                    <Text color="gray.400" fontSize="xs" mt={1}>We sent you a verification link when you registered. Click it to activate your account.</Text>
+                  </Box>
+                )}
                 <Button type="submit" isLoading={loading} w="full"
                   bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                   _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
