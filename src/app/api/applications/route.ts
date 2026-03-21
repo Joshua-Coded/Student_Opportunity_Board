@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { sendNewApplicationEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
 
 const applySchema = z.object({
   opportunityId: z.string(),
@@ -18,6 +19,9 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { allowed } = rateLimit(`apply:${session.user.id}`, 10, 60 * 60 * 1000); // 10 per hour
+    if (!allowed) return NextResponse.json({ error: "Too many applications. Try again later." }, { status: 429 });
 
     const body = await req.json();
     const parsed = applySchema.safeParse(body);
