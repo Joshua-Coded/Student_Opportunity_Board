@@ -80,6 +80,29 @@ export async function sendPaymentReceivedEmail({
   });
 }
 
+// Sent when user requests password reset
+export async function sendPasswordResetEmail({
+  to, name, token,
+}: {
+  to: string; name: string; token: string;
+}) {
+  const resetUrl = `${APP_URL}/reset-password?token=${token}`;
+  const content = `
+    <h2 style="color:#fff;margin:0 0 8px;">🔐 Reset your password</h2>
+    <p style="color:#9ca3af;font-size:14px;margin:0 0 24px;">Hi ${name}, we received a request to reset your OpportunityBoard password.</p>
+    <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(to right,#7c3aed,#2563eb);color:#fff;font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;text-decoration:none;">
+      Reset Password →
+    </a>
+    <p style="color:#6b7280;font-size:12px;margin-top:24px;">This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>`;
+
+  await transporter.sendMail({
+    from: `"OpportunityBoard" <${FROM}>`,
+    to,
+    subject: "Reset your OpportunityBoard password",
+    html: baseTemplate(content),
+  });
+}
+
 // Sent to opportunity poster when someone applies
 export async function sendNewApplicationEmail({
   to,
