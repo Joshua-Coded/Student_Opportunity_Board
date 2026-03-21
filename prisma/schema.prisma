@@ -25,6 +25,8 @@ model User {
   opportunities  Opportunity[]
   payments       Payment[]
   applications   Application[]
+  ratingsGiven   Rating[]      @relation("RatingsGiven")
+  ratingsReceived Rating[]     @relation("RatingsReceived")
 
   @@map("users")
 }
@@ -71,6 +73,7 @@ model Opportunity {
   author               User              @relation(fields: [authorId], references: [id])
   payments             Payment[]
   applications         Application[]
+  ratings              Rating[]
   expiresAt            DateTime?
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
@@ -132,6 +135,23 @@ model Payment {
   payer             User          @relation(fields: [payerId], references: [id])
 
   @@map("payments")
+}
+
+model Rating {
+  id            String      @id @default(cuid())
+  raterId       String
+  rateeId       String
+  opportunityId String
+  stars         Int
+  comment       String?
+  createdAt     DateTime    @default(now())
+
+  rater         User        @relation("RatingsGiven", fields: [raterId], references: [id])
+  ratee         User        @relation("RatingsReceived", fields: [rateeId], references: [id])
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id])
+
+  @@unique([raterId, opportunityId])
+  @@map("ratings")
 }
 
 model EmailVerificationToken {
