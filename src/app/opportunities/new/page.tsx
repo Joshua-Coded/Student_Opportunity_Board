@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import UploadImage from "@/components/UploadImage";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const TYPES = ["GIG", "INTERNSHIP", "PART_TIME", "FULL_TIME", "VOLUNTEER", "RESEARCH"];
 const PAYMENT_TYPES = ["FREE", "CRYPTO", "NEGOTIABLE"];
@@ -17,6 +19,7 @@ const CURRENCIES = ["ETH", "USDC", "USDT", "MATIC", "BNB", "AVAX", "DAI", "ARB"]
 export default function NewOpportunityPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [form, setForm] = useState({
     title: "", description: "", type: "GIG", paymentType: "FREE",
@@ -106,45 +109,48 @@ export default function NewOpportunityPage() {
         borderBottom="1px solid rgba(255,255,255,0.07)" px={{ base: 4, md: 6 }} py={4}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
-          <Link href="/opportunities"><Button variant="ghost" size="sm" color="gray.400">Cancel</Button></Link>
+          <Flex gap={3} align="center">
+            <LanguageToggle />
+            <Link href="/opportunities"><Button variant="ghost" size="sm" color="gray.400">{t.newOpp.cancel}</Button></Link>
+          </Flex>
         </Flex>
       </Box>
 
       <Container maxW="3xl" py={{ base: 6, md: 10 }} px={{ base: 4, md: 6 }}>
         <Stack spacing={8}>
           <Stack spacing={1}>
-            <Heading size={{ base: "lg", md: "xl" }}>Post an Opportunity</Heading>
-            <Text color="gray.400">Fill in the details — or let Claude AI enhance it for you</Text>
+            <Heading size={{ base: "lg", md: "xl" }}>{t.newOpp.title}</Heading>
+            <Text color="gray.400">{t.newOpp.subtitle}</Text>
           </Stack>
 
           <form onSubmit={handleSubmit}>
             <Stack spacing={6}>
               {/* Title */}
               <Stack spacing={1}>
-                <Text color="gray.400" fontSize="sm">Title *</Text>
+                <Text color="gray.400" fontSize="sm">{t.newOpp.titleLabel}</Text>
                 <Input {...inputStyle} value={form.title} onChange={(e) => set("title", e.target.value)}
-                  placeholder="e.g. UI Designer for FinTech Startup" required />
+                  placeholder={t.newOpp.titlePlaceholder} required />
                 {errors.title && <Text color="red.400" fontSize="xs">{errors.title[0]}</Text>}
               </Stack>
 
               {/* Type & Payment */}
               <Flex gap={4} flexWrap="wrap">
                 <Stack spacing={1} flex={1}>
-                  <Text color="gray.400" fontSize="sm">Type *</Text>
+                  <Text color="gray.400" fontSize="sm">{t.newOpp.typeLabel}</Text>
                   <Flex gap={2} flexWrap="wrap">
-                    {TYPES.map((t) => (
-                      <Button key={t} size="xs" onClick={() => set("type", t)}
-                        bg={form.type === t ? "purple.600" : "rgba(255,255,255,0.05)"}
-                        color={form.type === t ? "white" : "gray.400"}
-                        border="1px solid" borderColor={form.type === t ? "purple.500" : "rgba(255,255,255,0.08)"}
+                    {TYPES.map((ty) => (
+                      <Button key={ty} size="xs" onClick={() => set("type", ty)}
+                        bg={form.type === ty ? "purple.600" : "rgba(255,255,255,0.05)"}
+                        color={form.type === ty ? "white" : "gray.400"}
+                        border="1px solid" borderColor={form.type === ty ? "purple.500" : "rgba(255,255,255,0.08)"}
                         _hover={{ bg: "purple.600", color: "white" }} borderRadius="full">
-                        {t}
+                        {ty}
                       </Button>
                     ))}
                   </Flex>
                 </Stack>
                 <Stack spacing={1} flex={1}>
-                  <Text color="gray.400" fontSize="sm">Payment Type *</Text>
+                  <Text color="gray.400" fontSize="sm">{t.newOpp.paymentLabel}</Text>
                   <Flex gap={2}>
                     {PAYMENT_TYPES.map((p) => (
                       <Button key={p} size="xs" onClick={() => set("paymentType", p)}
@@ -163,12 +169,12 @@ export default function NewOpportunityPage() {
               {form.paymentType === "CRYPTO" && (
                 <Flex gap={3} flexWrap="wrap">
                   <Stack spacing={1} flex={1}>
-                    <Text color="gray.400" fontSize="sm">Amount</Text>
+                    <Text color="gray.400" fontSize="sm">{t.newOpp.amount}</Text>
                     <Input {...inputStyle} type="number" step="0.0001" value={form.compensationAmount}
                       onChange={(e) => set("compensationAmount", e.target.value)} placeholder="0.05" />
                   </Stack>
                   <Stack spacing={1}>
-                    <Text color="gray.400" fontSize="sm">Currency</Text>
+                    <Text color="gray.400" fontSize="sm">{t.newOpp.currency}</Text>
                     <Flex gap={2} flexWrap="wrap">
                       {CURRENCIES.map((c) => (
                         <Button key={c} size="xs" onClick={() => set("compensationCurrency", c)}
@@ -180,7 +186,7 @@ export default function NewOpportunityPage() {
                     </Flex>
                   </Stack>
                   <Stack spacing={1}>
-                    <Text color="gray.400" fontSize="sm">Chain</Text>
+                    <Text color="gray.400" fontSize="sm">{t.newOpp.chain}</Text>
                     <Flex gap={2}>
                       {CHAINS.map((c) => (
                         <Button key={c} size="xs" onClick={() => set("cryptoNetworkChain", c)}
@@ -197,17 +203,17 @@ export default function NewOpportunityPage() {
               {/* Description */}
               <Stack spacing={1}>
                 <Flex justify="space-between" align="center">
-                  <Text color="gray.400" fontSize="sm">Description *</Text>
+                  <Text color="gray.400" fontSize="sm">{t.newOpp.descriptionLabel}</Text>
                   <Button size="xs" onClick={handleEnhance} isLoading={enhancing}
                     bg="rgba(139,92,246,0.15)" color="purple.300"
                     border="1px solid rgba(139,92,246,0.3)"
                     _hover={{ bg: "rgba(139,92,246,0.25)" }} borderRadius="full">
-                    ✨ Enhance with Claude AI
+                    {t.newOpp.enhance}
                   </Button>
                 </Flex>
                 <Textarea {...inputStyle} value={form.description}
                   onChange={(e) => set("description", e.target.value)}
-                  placeholder="Describe the opportunity, requirements, and what the student will gain..."
+                  placeholder={t.newOpp.descPlaceholder}
                   rows={6} required />
                 {errors.description && <Text color="red.400" fontSize="xs">{errors.description[0]}</Text>}
               </Stack>
@@ -219,7 +225,7 @@ export default function NewOpportunityPage() {
                   color={form.isRemote ? "green.300" : "gray.400"}
                   border="1px solid" borderColor={form.isRemote ? "green.600" : "rgba(255,255,255,0.08)"}
                   borderRadius="full" fontSize="xs">
-                  {form.isRemote ? "🌍 Remote" : "📍 On-site"}
+                  {form.isRemote ? t.newOpp.remote : t.newOpp.onsite}
                 </Button>
                 {!form.isRemote && (
                   <Input {...inputStyle} value={form.location}
@@ -230,14 +236,14 @@ export default function NewOpportunityPage() {
 
               {/* Skills */}
               <Stack spacing={2}>
-                <Text color="gray.400" fontSize="sm">Skills Required</Text>
+                <Text color="gray.400" fontSize="sm">{t.newOpp.skills}</Text>
                 <Flex gap={2}>
                   <Input {...inputStyle} value={form.skillInput}
                     onChange={(e) => set("skillInput", e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
-                    placeholder="e.g. React, Python..." flex={1} />
+                    placeholder={t.newOpp.skillsPlaceholder} flex={1} />
                   <Button onClick={addSkill} variant="outline" borderColor="rgba(255,255,255,0.1)"
-                    color="gray.400" borderRadius="xl" size="sm">Add</Button>
+                    color="gray.400" borderRadius="xl" size="sm">{t.newOpp.add}</Button>
                 </Flex>
                 {form.skills.length > 0 && (
                   <Flex gap={2} flexWrap="wrap">
@@ -254,22 +260,22 @@ export default function NewOpportunityPage() {
 
               {/* Tags */}
               <Stack spacing={2}>
-                <Text color="gray.400" fontSize="sm">Tags</Text>
+                <Text color="gray.400" fontSize="sm">{t.newOpp.tags}</Text>
                 <Flex gap={2}>
                   <Input {...inputStyle} value={form.tagInput}
                     onChange={(e) => set("tagInput", e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                    placeholder="e.g. web3, design..." flex={1} />
+                    placeholder={t.newOpp.tagsPlaceholder} flex={1} />
                   <Button onClick={addTag} variant="outline" borderColor="rgba(255,255,255,0.1)"
-                    color="gray.400" borderRadius="xl" size="sm">Add</Button>
+                    color="gray.400" borderRadius="xl" size="sm">{t.newOpp.add}</Button>
                 </Flex>
                 {form.tags.length > 0 && (
                   <Flex gap={2} flexWrap="wrap">
-                    {form.tags.map((t) => (
-                      <Badge key={t} bg="rgba(255,255,255,0.05)" color="gray.400"
+                    {form.tags.map((tag) => (
+                      <Badge key={tag} bg="rgba(255,255,255,0.05)" color="gray.400"
                         borderRadius="full" px={3} py={1} cursor="pointer"
-                        onClick={() => set("tags", form.tags.filter((x) => x !== t))}>
-                        #{t} ×
+                        onClick={() => set("tags", form.tags.filter((x) => x !== tag))}>
+                        #{tag} ×
                       </Badge>
                     ))}
                   </Flex>
@@ -278,7 +284,7 @@ export default function NewOpportunityPage() {
 
               {/* Cover Image */}
               <Stack spacing={2}>
-                <Text color="gray.400" fontSize="sm">Cover Image <Text as="span" color="gray.600" fontWeight="normal">(optional)</Text></Text>
+                <Text color="gray.400" fontSize="sm">{t.newOpp.coverImage} <Text as="span" color="gray.600" fontWeight="normal">{t.newOpp.coverImageOptional}</Text></Text>
                 <UploadImage
                   label="Upload gig cover image"
                   currentUrl={form.images[0]}
@@ -296,7 +302,7 @@ export default function NewOpportunityPage() {
                 bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                 _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                 transition="all 0.2s" borderRadius="xl" py={6} fontSize="md">
-                Post Opportunity
+                {t.newOpp.submit}
               </Button>
             </Stack>
           </form>
