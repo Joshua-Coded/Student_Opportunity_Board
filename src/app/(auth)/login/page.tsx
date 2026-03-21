@@ -8,10 +8,13 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export default function LoginPage() {
   const router = useRouter();
   const toast = useToast();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,7 +42,7 @@ export default function LoginPage() {
     if (res?.error === "EMAIL_NOT_VERIFIED") {
       setUnverified(true);
     } else if (res?.error) {
-      toast({ title: "Invalid email or password", status: "error", duration: 3000, isClosable: true });
+      toast({ title: t.auth.invalidEmail, status: "error", duration: 3000, isClosable: true });
     } else {
       router.push("/dashboard");
     }
@@ -50,6 +53,9 @@ export default function LoginPage() {
       <Box position="absolute" top="20%" left="30%" w="400px" h="400px" borderRadius="full"
         bgColor="purple.900" opacity={0.15} filter="blur(80px)" pointerEvents="none" />
       <Box w="full" maxW="sm" position="relative">
+        <Flex justify="flex-end" mb={3}>
+          <LanguageToggle />
+        </Flex>
         <Box bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.08)"
           borderRadius="2xl" p={8} boxShadow="2xl">
           <Stack spacing={6}>
@@ -58,14 +64,14 @@ export default function LoginPage() {
                 <Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)"
                   bgClip="text" cursor="pointer">OpportunityBoard</Heading>
               </Link>
-              <Heading size="lg" color="white" mt={2}>Welcome back</Heading>
-              <Text color="gray.500" fontSize="sm">Sign in to your account</Text>
+              <Heading size="lg" color="white" mt={2}>{t.auth.welcomeBack}</Heading>
+              <Text color="gray.500" fontSize="sm">{t.auth.signInToAccount}</Text>
             </Stack>
 
             <form onSubmit={handleSubmit}>
               <Stack spacing={4}>
                 <FormControl>
-                  <FormLabel color="gray.400" fontSize="sm">Email</FormLabel>
+                  <FormLabel color="gray.400" fontSize="sm">{t.auth.email}</FormLabel>
                   <Input value={email} onChange={(e) => setEmail(e.target.value)}
                     type="email" placeholder="you@university.edu" required
                     bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
@@ -75,9 +81,9 @@ export default function LoginPage() {
                 </FormControl>
                 <FormControl>
                   <Flex justify="space-between" align="center">
-                    <FormLabel color="gray.400" fontSize="sm" mb={0}>Password</FormLabel>
+                    <FormLabel color="gray.400" fontSize="sm" mb={0}>{t.auth.password}</FormLabel>
                     <Link href="/forgot-password">
-                      <Text color="purple.400" fontSize="xs" _hover={{ color: "purple.300" }} cursor="pointer">Forgot password?</Text>
+                      <Text color="purple.400" fontSize="xs" _hover={{ color: "purple.300" }} cursor="pointer">{t.auth.forgotPassword}</Text>
                     </Link>
                   </Flex>
                   <Input value={password} onChange={(e) => setPassword(e.target.value)}
@@ -89,16 +95,16 @@ export default function LoginPage() {
                 </FormControl>
                 {unverified && (
                   <Box bg="rgba(234,179,8,0.08)" border="1px solid rgba(234,179,8,0.25)" borderRadius="xl" px={4} py={3}>
-                    <Text color="yellow.300" fontSize="sm" fontWeight="semibold">📬 Verify your email first</Text>
-                    <Text color="gray.400" fontSize="xs" mt={1} mb={2}>Check your inbox for the verification link. Can&apos;t find it?</Text>
+                    <Text color="yellow.300" fontSize="sm" fontWeight="semibold">{t.auth.checkEmailVerify}</Text>
+                    <Text color="gray.400" fontSize="xs" mt={1} mb={2}>{t.auth.checkEmailDesc}</Text>
                     {resent ? (
-                      <Text color="green.300" fontSize="xs">✓ New verification email sent!</Text>
+                      <Text color="green.300" fontSize="xs">{t.auth.newVerificationSent}</Text>
                     ) : (
                       <Button size="xs" onClick={handleResend} isLoading={resending}
                         bg="rgba(234,179,8,0.15)" color="yellow.300"
                         border="1px solid rgba(234,179,8,0.3)"
                         _hover={{ bg: "rgba(234,179,8,0.25)" }} borderRadius="lg">
-                        Resend verification email
+                        {t.auth.resendVerification}
                       </Button>
                     )}
                   </Box>
@@ -107,16 +113,16 @@ export default function LoginPage() {
                   bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                   _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                   transition="all 0.2s" borderRadius="xl" py={6}>
-                  Sign in
+                  {t.auth.signIn}
                 </Button>
               </Stack>
             </form>
 
             <Flex justify="center" gap={1}>
-              <Text color="gray.500" fontSize="sm">Don&apos;t have an account?</Text>
+              <Text color="gray.500" fontSize="sm">{t.auth.noAccount}</Text>
               <Link href="/register">
                 <Text color="purple.400" fontSize="sm" _hover={{ color: "purple.300" }} cursor="pointer" ml={1}>
-                  Sign up
+                  {t.auth.signUp}
                 </Text>
               </Link>
             </Flex>
