@@ -10,26 +10,29 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UploadImage from "@/components/UploadImage";
 import MobileNav from "@/components/MobileNav";
+import LanguageToggle from "@/components/LanguageToggle";
 import { connectWallet, switchToSepolia, isMetaMaskInstalled } from "@/lib/web3";
-
-const navItems = [
-  { label: "Overview", href: "/dashboard", icon: "🏠" },
-  { label: "Browse", href: "/opportunities", icon: "🔍" },
-  { label: "Post New", href: "/opportunities/new", icon: "➕" },
-  { label: "Applications", href: "/dashboard/applications", icon: "📨" },
-  { label: "Profile", href: "/dashboard/profile", icon: "👤" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ProfilePage() {
   const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
   const toast = useToast();
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<any>(null);
   const [form, setForm] = useState({ name: "", bio: "", university: "", major: "", graduationYear: "", walletAddress: "", image: "" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [connectingWallet, setConnectingWallet] = useState(false);
   const [walletError, setWalletError] = useState("");
+
+  const navItems = [
+    { label: t.dashboard.overview, href: "/dashboard" },
+    { label: t.dashboard.browse, href: "/opportunities" },
+    { label: t.dashboard.postNew, href: "/opportunities/new" },
+    { label: t.dashboard.applications, href: "/dashboard/applications" },
+    { label: t.dashboard.profile, href: "/dashboard/profile" },
+  ];
 
   useEffect(() => { if (status === "unauthenticated") router.push("/login"); }, [status, router]);
 
@@ -84,7 +87,7 @@ export default function ProfilePage() {
       const updated = await res.json();
       setWalletError("");
       await updateSession({ image: updated.image || null });
-      toast({ title: "Profile saved!", status: "success", duration: 2000 });
+      toast({ title: t.profile.profileSaved, status: "success", duration: 2000 });
     } else {
       const data = await res.json();
       const walletMsg = data.error?.walletAddress?.[0];
@@ -101,7 +104,7 @@ export default function ProfilePage() {
 
   if (loading) return (
     <Box minH="100vh" bg="#050510" display="flex" alignItems="center" justifyContent="center">
-      <Text color="gray.500">Loading...</Text>
+      <Text color="gray.500">{t.common.loading}</Text>
     </Box>
   );
 
@@ -117,12 +120,11 @@ export default function ProfilePage() {
             <Link href="/"><Heading size="sm" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer" px={3}>OpportunityBoard</Heading></Link>
             <Stack spacing={1}>
               {navItems.map((item) => (
-                <Link href={item.href} key={item.label}>
+                <Link href={item.href} key={item.href}>
                   <Flex align="center" gap={3} px={3} py={2} borderRadius="lg" cursor="pointer"
                     transition="all 0.15s" _hover={{ bg: "rgba(255,255,255,0.06)" }}
                     bg={item.href === "/dashboard/profile" ? "rgba(139,92,246,0.1)" : "transparent"}
                     borderLeft="2px solid" borderColor={item.href === "/dashboard/profile" ? "purple.500" : "transparent"}>
-                    <Text>{item.icon}</Text>
                     <Text fontSize="sm" color={item.href === "/dashboard/profile" ? "purple.300" : "gray.400"}
                       fontWeight={item.href === "/dashboard/profile" ? "medium" : "normal"}>{item.label}</Text>
                   </Flex>
@@ -131,10 +133,11 @@ export default function ProfilePage() {
             </Stack>
           </Stack>
           <Box px={3}>
-            <Flex align="center" gap={3}>
+            <Flex align="center" gap={3} mb={3}>
               <Avatar size="sm" name={session?.user?.name || "U"} src={session?.user?.image || undefined} bg="purple.600" color="white" />
               <Text fontSize="xs" color="gray.500" isTruncated>{session?.user?.name}</Text>
             </Flex>
+            <LanguageToggle />
           </Box>
         </Box>
 
@@ -142,7 +145,7 @@ export default function ProfilePage() {
         <Box flex={1} overflowY="auto">
           <Box borderBottom="1px solid rgba(255,255,255,0.06)" px={8} py={4}
             bg="rgba(5,5,16,0.8)" backdropFilter="blur(20px)" position="sticky" top={0} zIndex={10}>
-            <Heading size="md">Profile Settings</Heading>
+            <Heading size="md">{t.profile.title}</Heading>
           </Box>
           <Container maxW="2xl" py={8} px={{ base: 4, md: 8 }} pb={{ base: 24, md: 8 }}>
             <Stack spacing={6}>
@@ -171,7 +174,7 @@ export default function ProfilePage() {
                     </Flex>
                     <Box maxW="280px" mt={2}>
                       <UploadImage
-                        label="Upload Avatar"
+                        label={t.profile.uploadAvatar}
                         currentUrl={form.image}
                         onUpload={(url) => set("image", url)}
                         accept="image/*"
@@ -183,41 +186,41 @@ export default function ProfilePage() {
 
               {/* Form */}
               <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)" borderRadius="2xl" p={6}>
-                <Heading size="sm" mb={6} color="gray.300">Personal Information</Heading>
+                <Heading size="sm" mb={6} color="gray.300">{t.profile.personalInfo}</Heading>
                 <form onSubmit={handleSave}>
                   <Stack spacing={5}>
                     <Flex gap={4} flexWrap="wrap">
                       <FormControl flex={1} minW="180px">
-                        <FormLabel color="gray.400" fontSize="sm">Full Name</FormLabel>
+                        <FormLabel color="gray.400" fontSize="sm">{t.profile.fullName}</FormLabel>
                         <Input {...inputStyle} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Your full name" />
                       </FormControl>
                       <FormControl flex={1} minW="180px">
-                        <FormLabel color="gray.400" fontSize="sm">Email</FormLabel>
+                        <FormLabel color="gray.400" fontSize="sm">{t.profile.email}</FormLabel>
                         <Input {...inputStyle} value={session?.user?.email || ""} isDisabled opacity={0.5} />
                       </FormControl>
                     </Flex>
                     <FormControl>
-                      <FormLabel color="gray.400" fontSize="sm">Bio</FormLabel>
+                      <FormLabel color="gray.400" fontSize="sm">{t.profile.bio}</FormLabel>
                       <Textarea {...inputStyle} value={form.bio} onChange={(e) => set("bio", e.target.value)}
-                        placeholder="Tell others about yourself..." rows={3} resize="none" />
+                        placeholder={t.profile.bioPlaceholder} rows={3} resize="none" />
                     </FormControl>
                     <Flex gap={4} flexWrap="wrap">
                       <FormControl flex={2} minW="180px">
-                        <FormLabel color="gray.400" fontSize="sm">University</FormLabel>
+                        <FormLabel color="gray.400" fontSize="sm">{t.profile.university}</FormLabel>
                         <Input {...inputStyle} value={form.university} onChange={(e) => set("university", e.target.value)} placeholder="e.g. University of Lagos" />
                       </FormControl>
                       <FormControl flex={1} minW="120px">
-                        <FormLabel color="gray.400" fontSize="sm">Grad Year</FormLabel>
+                        <FormLabel color="gray.400" fontSize="sm">{t.profile.gradYear}</FormLabel>
                         <Input {...inputStyle} type="number" value={form.graduationYear}
                           onChange={(e) => set("graduationYear", e.target.value)} placeholder="2026" />
                       </FormControl>
                     </Flex>
                     <FormControl>
-                      <FormLabel color="gray.400" fontSize="sm">Major</FormLabel>
+                      <FormLabel color="gray.400" fontSize="sm">{t.profile.major}</FormLabel>
                       <Input {...inputStyle} value={form.major} onChange={(e) => set("major", e.target.value)} placeholder="e.g. Computer Science" />
                     </FormControl>
                     <FormControl>
-                      <FormLabel color="gray.400" fontSize="sm">Crypto Wallet Address</FormLabel>
+                      <FormLabel color="gray.400" fontSize="sm">{t.profile.walletAddress}</FormLabel>
                       <Flex gap={2}>
                         <Input {...inputStyle} value={form.walletAddress} onChange={(e) => set("walletAddress", e.target.value)}
                           placeholder="0x..." fontFamily="mono" fontSize="sm" flex={1} />
@@ -231,7 +234,7 @@ export default function ProfilePage() {
                         <Text color="red.400" fontSize="xs" mt={1}>⚠ {walletError}</Text>
                       ) : (
                         <Text color="gray.600" fontSize="xs" mt={1}>
-                          {form.walletAddress ? "✓ Wallet set — you can receive crypto payments" : "Connect MetaMask or paste your address to receive payments"}
+                          {form.walletAddress ? t.profile.walletSet : t.profile.walletHint}
                         </Text>
                       )}
                     </FormControl>
@@ -239,7 +242,7 @@ export default function ProfilePage() {
                       bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                       _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                       transition="all 0.2s" borderRadius="xl" py={6}>
-                      Save Changes
+                      {t.profile.saveChanges}
                     </Button>
                   </Stack>
                 </form>
