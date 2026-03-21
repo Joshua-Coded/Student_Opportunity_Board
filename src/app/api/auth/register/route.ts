@@ -4,9 +4,13 @@ import { registerSchema } from "@/lib/validations";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { sendVerificationEmail } from "@/lib/email";
+import { rateLimit, getIP } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
+    const { allowed } = rateLimit(`register:${getIP(req)}`, 5, 60 * 60 * 1000); // 5 per hour
+    if (!allowed) return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
+
     const body = await req.json();
     const parsed = registerSchema.safeParse(body);
 
