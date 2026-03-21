@@ -16,6 +16,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [unverified, setUnverified] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
+
+  async function handleResend() {
+    setResending(true);
+    await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    setResending(false);
+    setResent(true);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -76,8 +89,18 @@ export default function LoginPage() {
                 </FormControl>
                 {unverified && (
                   <Box bg="rgba(234,179,8,0.08)" border="1px solid rgba(234,179,8,0.25)" borderRadius="xl" px={4} py={3}>
-                    <Text color="yellow.300" fontSize="sm" fontWeight="semibold">📬 Check your email</Text>
-                    <Text color="gray.400" fontSize="xs" mt={1}>We sent you a verification link when you registered. Click it to activate your account.</Text>
+                    <Text color="yellow.300" fontSize="sm" fontWeight="semibold">📬 Verify your email first</Text>
+                    <Text color="gray.400" fontSize="xs" mt={1} mb={2}>Check your inbox for the verification link. Can&apos;t find it?</Text>
+                    {resent ? (
+                      <Text color="green.300" fontSize="xs">✓ New verification email sent!</Text>
+                    ) : (
+                      <Button size="xs" onClick={handleResend} isLoading={resending}
+                        bg="rgba(234,179,8,0.15)" color="yellow.300"
+                        border="1px solid rgba(234,179,8,0.3)"
+                        _hover={{ bg: "rgba(234,179,8,0.25)" }} borderRadius="lg">
+                        Resend verification email
+                      </Button>
+                    )}
                   </Box>
                 )}
                 <Button type="submit" isLoading={loading} w="full"
