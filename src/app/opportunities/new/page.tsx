@@ -11,7 +11,8 @@ import UploadImage from "@/components/UploadImage";
 
 const TYPES = ["GIG", "INTERNSHIP", "PART_TIME", "FULL_TIME", "VOLUNTEER", "RESEARCH"];
 const PAYMENT_TYPES = ["FREE", "CRYPTO", "NEGOTIABLE"];
-const CHAINS = ["ethereum", "polygon"];
+const CHAINS = ["ethereum", "polygon", "bnb", "avalanche", "arbitrum", "base"];
+const CURRENCIES = ["ETH", "USDC", "USDT", "MATIC", "BNB", "AVAX", "DAI", "ARB"];
 
 export default function NewOpportunityPage() {
   const { data: session, status } = useSession();
@@ -168,8 +169,8 @@ export default function NewOpportunityPage() {
                   </Stack>
                   <Stack spacing={1}>
                     <Text color="gray.400" fontSize="sm">Currency</Text>
-                    <Flex gap={2}>
-                      {["ETH", "USDC", "MATIC"].map((c) => (
+                    <Flex gap={2} flexWrap="wrap">
+                      {CURRENCIES.map((c) => (
                         <Button key={c} size="xs" onClick={() => set("compensationCurrency", c)}
                           bg={form.compensationCurrency === c ? "purple.600" : "rgba(255,255,255,0.05)"}
                           color={form.compensationCurrency === c ? "white" : "gray.400"}
