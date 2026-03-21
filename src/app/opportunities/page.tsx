@@ -7,6 +7,8 @@ import {
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const TYPES = ["ALL", "GIG", "INTERNSHIP", "PART_TIME", "FULL_TIME", "VOLUNTEER", "RESEARCH"];
 const PAYMENT = ["ALL", "FREE", "CRYPTO", "NEGOTIABLE"];
@@ -17,6 +19,7 @@ const typeColor: Record<string, string> = {
 
 export default function OpportunitiesPage() {
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -28,7 +31,6 @@ export default function OpportunitiesPage() {
   const [university, setUniversity] = useState("");
   const [universities, setUniversities] = useState<string[]>([]);
 
-  // Fetch prices and universities once on mount
   useEffect(() => {
     Promise.all([
       fetch("/api/crypto/price?symbol=ETH").then((r) => r.json()),
@@ -65,19 +67,20 @@ export default function OpportunitiesPage() {
               OpportunityBoard
             </Heading>
           </Link>
-          <Flex gap={3}>
+          <Flex gap={3} align="center">
+            <LanguageToggle />
             {session ? (
               <Link href="/dashboard">
                 <Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                   _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)" }} borderRadius="lg">
-                  Dashboard
+                  {t.nav.dashboard}
                 </Button>
               </Link>
             ) : (
               <>
-                <Link href="/login"><Button variant="ghost" size="sm" color="gray.300">Log in</Button></Link>
+                <Link href="/login"><Button variant="ghost" size="sm" color="gray.300">{t.nav.login}</Button></Link>
                 <Link href="/register">
-                  <Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)" color="white" borderRadius="lg">Sign up</Button>
+                  <Button size="sm" bgGradient="linear(to-r, purple.500, blue.500)" color="white" borderRadius="lg">{t.nav.signup}</Button>
                 </Link>
               </>
             )}
@@ -89,15 +92,15 @@ export default function OpportunitiesPage() {
         <Stack spacing={8}>
           <Flex justify="space-between" align="center" flexWrap="wrap" gap={4}>
             <Box>
-              <Heading size={{ base: "lg", md: "xl" }}>Browse Opportunities</Heading>
-              <Text color="gray.400" mt={1}>Find gigs, internships, research and more</Text>
+              <Heading size={{ base: "lg", md: "xl" }}>{t.browse.title}</Heading>
+              <Text color="gray.400" mt={1}>{t.browse.subtitle}</Text>
             </Box>
             {session && (
               <Link href="/opportunities/new">
                 <Button bgGradient="linear(to-r, purple.500, blue.500)" color="white"
                   _hover={{ bgGradient: "linear(to-r, purple.400, blue.400)", transform: "translateY(-1px)" }}
                   transition="all 0.2s" borderRadius="xl">
-                  + Post Opportunity
+                  {t.nav.postOpportunity}
                 </Button>
               </Link>
             )}
@@ -106,7 +109,7 @@ export default function OpportunitiesPage() {
           {/* Filters */}
           <Stack spacing={3}>
             <Flex gap={3} flexWrap="wrap">
-              <Input placeholder="Search opportunities..." value={search}
+              <Input placeholder={t.browse.search} value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                 bg="rgba(255,255,255,0.05)" border="1px solid rgba(255,255,255,0.1)"
                 color="white" _placeholder={{ color: "gray.600" }}
@@ -117,7 +120,7 @@ export default function OpportunitiesPage() {
                   color={university ? "white" : "gray.600"} borderRadius="xl"
                   _focus={{ borderColor: "purple.500" }} maxW={{ base: "full", md: "260px" }}
                   sx={{ option: { bg: "#0d0d1a", color: "white" } }}>
-                  <option value="">All Universities</option>
+                  <option value="">{t.browse.allUniversities}</option>
                   {universities.map((u) => (
                     <option key={u} value={u}>{u}</option>
                   ))}
@@ -125,13 +128,13 @@ export default function OpportunitiesPage() {
               )}
             </Flex>
             <Flex gap={2} flexWrap="wrap">
-              {TYPES.map((t) => (
-                <Button key={t} size="sm" onClick={() => { setType(t); setPage(1); }}
-                  bg={type === t ? "purple.600" : "rgba(255,255,255,0.05)"}
-                  color={type === t ? "white" : "gray.400"}
-                  border="1px solid" borderColor={type === t ? "purple.500" : "rgba(255,255,255,0.08)"}
+              {TYPES.map((ty) => (
+                <Button key={ty} size="sm" onClick={() => { setType(ty); setPage(1); }}
+                  bg={type === ty ? "purple.600" : "rgba(255,255,255,0.05)"}
+                  color={type === ty ? "white" : "gray.400"}
+                  border="1px solid" borderColor={type === ty ? "purple.500" : "rgba(255,255,255,0.08)"}
                   _hover={{ bg: "purple.700", color: "white" }} borderRadius="full" fontSize="xs">
-                  {t}
+                  {ty}
                 </Button>
               ))}
               {PAYMENT.map((p) => (
@@ -157,8 +160,8 @@ export default function OpportunitiesPage() {
           ) : opportunities.length === 0 ? (
             <Box textAlign="center" py={20}>
               <Text fontSize="4xl" mb={4}>🔍</Text>
-              <Heading size="md" color="gray.400">No opportunities found</Heading>
-              <Text color="gray.600" mt={2}>Try adjusting your filters</Text>
+              <Heading size="md" color="gray.400">{t.browse.noResults}</Heading>
+              <Text color="gray.600" mt={2}>{t.browse.adjustFilters}</Text>
             </Box>
           ) : (
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
@@ -173,14 +176,14 @@ export default function OpportunitiesPage() {
                           {opp.type}
                         </Badge>
                         {opp.paymentType === "CRYPTO" && (
-                          <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">⚡ Crypto</Badge>
+                          <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">⚡ {t.common.crypto}</Badge>
                         )}
                       </Flex>
                       <Heading size="sm" color="white" noOfLines={2}>{opp.title}</Heading>
                       <Text color="gray.400" fontSize="sm" noOfLines={2}>{opp.description}</Text>
                       <Flex justify="space-between" align="center" mt="auto">
                         <Text color="gray.600" fontSize="xs">{opp.author?.university || opp.author?.name || "Anonymous"}</Text>
-                        <Text color="gray.600" fontSize="xs">{opp.isRemote ? "🌍 Remote" : opp.location}</Text>
+                        <Text color="gray.600" fontSize="xs">{opp.isRemote ? t.opportunity.remote : opp.location}</Text>
                       </Flex>
                       {opp.compensationAmount && (
                         <Flex align="baseline" gap={2} flexWrap="wrap">
@@ -206,11 +209,11 @@ export default function OpportunitiesPage() {
             <Flex justify="center" gap={3} mt={4}>
               <Button size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))}
                 isDisabled={page === 1} variant="outline" borderColor="rgba(255,255,255,0.1)"
-                color="gray.400" borderRadius="lg">← Prev</Button>
+                color="gray.400" borderRadius="lg">{t.browse.prev}</Button>
               <Text color="gray.500" fontSize="sm" alignSelf="center">Page {page} of {totalPages}</Text>
               <Button size="sm" onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 isDisabled={page === totalPages} variant="outline" borderColor="rgba(255,255,255,0.1)"
-                color="gray.400" borderRadius="lg">Next →</Button>
+                color="gray.400" borderRadius="lg">{t.browse.next}</Button>
             </Flex>
           )}
         </Stack>
