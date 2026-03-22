@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import MobileNav from "@/components/MobileNav";
 import LanguageToggle from "@/components/LanguageToggle";
+import NotificationBell from "@/components/NotificationBell";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const typeColor: Record<string, string> = {
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   const [myOpps, setMyOpps] = useState<any[]>([]);
   const [recentOpps, setRecentOpps] = useState<any[]>([]);
   const [paymentsReceived, setPaymentsReceived] = useState<any[]>([]);
+  const [savedOpps, setSavedOpps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const navItems = [
@@ -45,12 +47,14 @@ export default function DashboardPage() {
       fetch("/api/profile").then((r) => r.json()),
       fetch("/api/opportunities?page=1").then((r) => r.json()),
       fetch("/api/payments/received").then((r) => r.json()),
-    ]).then(([prof, opps, payments]) => {
+      fetch("/api/saved").then((r) => r.json()),
+    ]).then(([prof, opps, payments, saved]) => {
       setProfile(prof);
       const all = opps.opportunities || [];
       setMyOpps(all.filter((o: any) => o.author?.id === session?.user?.id));
       setRecentOpps(all);
       setPaymentsReceived(Array.isArray(payments) ? payments : []);
+      setSavedOpps(Array.isArray(saved) ? saved : []);
       setLoading(false);
     });
   }, [status, session]);
@@ -103,6 +107,7 @@ export default function DashboardPage() {
             </Flex>
             <Flex justify="space-between" align="center" mb={2}>
               <LanguageToggle />
+              <NotificationBell />
             </Flex>
             <Button size="xs" variant="ghost" color="gray.600" w="full"
               _hover={{ color: "gray.400" }} onClick={() => signOut({ callbackUrl: "/" })}>
@@ -149,12 +154,22 @@ export default function DashboardPage() {
                       )}
                     </Stack>
                   </Flex>
-                  <Link href="/dashboard/profile">
-                    <Button size="sm" variant="outline" borderColor="rgba(139,92,246,0.4)"
-                      color="purple.300" _hover={{ bg: "rgba(139,92,246,0.1)" }} borderRadius="lg">
-                      {t.dashboard.editProfile}
-                    </Button>
-                  </Link>
+                  <Flex gap={2} flexWrap="wrap">
+                    {session?.user?.id && (
+                      <Link href={`/profile/${session.user.id}`}>
+                        <Button size="sm" variant="ghost" color="gray.500"
+                          _hover={{ color: "gray.300" }} borderRadius="lg" fontSize="xs">
+                          🔗 Public profile
+                        </Button>
+                      </Link>
+                    )}
+                    <Link href="/dashboard/profile">
+                      <Button size="sm" variant="outline" borderColor="rgba(139,92,246,0.4)"
+                        color="purple.300" _hover={{ bg: "rgba(139,92,246,0.1)" }} borderRadius="lg">
+                        {t.dashboard.editProfile}
+                      </Button>
+                    </Link>
+                  </Flex>
                 </Flex>
               </Box>
 
@@ -270,6 +285,34 @@ export default function DashboardPage() {
                   </Stack>
                 )}
               </Stack>
+
+              {/* Saved Opportunities */}
+              {savedOpps.length > 0 && (
+                <Stack spacing={4}>
+                  <Flex justify="space-between" align="center">
+                    <Heading size="sm" color="white">♥ Saved Opportunities</Heading>
+                    <Link href="/opportunities">
+                      <Button size="xs" variant="ghost" color="red.400" _hover={{ color: "red.300" }}>Browse more →</Button>
+                    </Link>
+                  </Flex>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                    {savedOpps.slice(0, 4).map((s: any) => (
+                      <Link href={`/opportunities/${s.opportunityId}`} key={s.id}>
+                        <Box bg="rgba(255,255,255,0.02)" border="1px solid rgba(255,255,255,0.07)"
+                          borderRadius="xl" p={4} cursor="pointer" transition="all 0.2s"
+                          _hover={{ bg: "rgba(255,255,255,0.05)", borderColor: "red.800", transform: "translateY(-1px)" }}>
+                          <Flex justify="space-between" mb={2}>
+                            <Badge colorScheme={typeColor[s.opportunity?.type] || "gray"} borderRadius="full" px={2} fontSize="xs">{s.opportunity?.type}</Badge>
+                            <Text fontSize="xs" color="red.400">♥</Text>
+                          </Flex>
+                          <Text fontWeight="semibold" color="white" fontSize="sm" noOfLines={1}>{s.opportunity?.title}</Text>
+                          <Text color="gray.500" fontSize="xs" mt={1} noOfLines={1}>{s.opportunity?.author?.university || s.opportunity?.author?.name}</Text>
+                        </Box>
+                      </Link>
+                    ))}
+                  </SimpleGrid>
+                </Stack>
+              )}
 
               {/* Recent on Platform */}
               <Stack spacing={4}>
