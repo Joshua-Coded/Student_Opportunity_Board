@@ -13,6 +13,7 @@ export default function ApplyModal({ opportunity, onClose, onSuccess }: Props) {
   const [coverLetter, setCoverLetter] = useState("");
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
 
   const inputStyle = {
@@ -20,6 +21,23 @@ export default function ApplyModal({ opportunity, onClose, onSuccess }: Props) {
     color: "white", _placeholder: { color: "gray.700" },
     _focus: { borderColor: "purple.500", boxShadow: "0 0 0 1px #7c3aed" }, borderRadius: "xl",
   };
+
+  async function handleGenerateCoverLetter() {
+    setGenerating(true);
+    setError("");
+    const res = await fetch("/api/ai/cover-letter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ opportunityId: opportunity.id }),
+    });
+    const data = await res.json();
+    setGenerating(false);
+    if (res.ok && data.coverLetter) {
+      setCoverLetter(data.coverLetter);
+    } else {
+      setError("AI generation failed. Please write your cover letter manually.");
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -62,7 +80,14 @@ export default function ApplyModal({ opportunity, onClose, onSuccess }: Props) {
         <form onSubmit={handleSubmit}>
           <Stack spacing={5}>
             <Stack spacing={1}>
-              <Text color="gray.400" fontSize="sm" fontWeight="medium">Cover Letter <Text as="span" color="red.400">*</Text></Text>
+              <Flex justify="space-between" align="center">
+                <Text color="gray.400" fontSize="sm" fontWeight="medium">Cover Letter <Text as="span" color="red.400">*</Text></Text>
+                <Button size="xs" onClick={handleGenerateCoverLetter} isLoading={generating}
+                  bg="rgba(124,58,237,0.15)" color="purple.300" border="1px solid rgba(124,58,237,0.3)"
+                  _hover={{ bg: "rgba(124,58,237,0.25)" }} borderRadius="lg" loadingText="Generating...">
+                  ✨ Generate with AI
+                </Button>
+              </Flex>
               <Text color="gray.600" fontSize="xs">Introduce yourself and explain why you&apos;re a great fit.</Text>
               <Textarea {...inputStyle} value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)}
                 placeholder={`Hi, I'm [your name]...\n\nI bring experience in...\n\nI'm excited because...`}
