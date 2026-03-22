@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import LanguageToggle from "@/components/LanguageToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const MotionBox = motion(Box);
@@ -349,6 +350,7 @@ export default function HomePage() {
             </Text>
           </HStack>
           <HStack gap={3}>
+            <ThemeToggle />
             <LanguageToggle />
             <Link href="/login">
               <Button variant="ghost" size="sm" color="rgba(255,255,255,0.5)"

@@ -9,6 +9,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Light mode ── */
+html[data-theme="light"] body {
+  background: #f8f7ff;
+  color: #0d0d1a;
+}
+
+html[data-theme="light"] body > * {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html[data-theme="light"] img,
+html[data-theme="light"] video,
+html[data-theme="light"] [data-no-invert] {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
 ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 3px; }
