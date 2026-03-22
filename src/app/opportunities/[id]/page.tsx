@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Avatar, Badge, Box, Button, Container, Flex, Heading, Stack, Text,
+  Avatar, Badge, Box, Button, Container, Flex, Heading, Stack, Text, useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -27,6 +27,7 @@ export default function OpportunityDetailPage() {
   const [applied, setApplied] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [filling, setFilling] = useState(false);
+  const toast = useToast();
   const [cryptoPrice, setCryptoPrice] = useState<number | null>(null);
   const [acceptedApplicants, setAcceptedApplicants] = useState<any[]>([]);
   const [paidApplicants, setPaidApplicants] = useState<Set<string>>(new Set());
@@ -70,6 +71,19 @@ export default function OpportunityDetailPage() {
     router.push("/dashboard");
   }
 
+  function handleShare() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      toast({ title: "Link copied!", status: "success", duration: 2000, isClosable: true, position: "top" });
+    });
+  }
+
+  function handleShareTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`Check out this opportunity: ${opp?.title}`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+  }
+
   async function handleMarkFilled() {
     if (!confirm("Mark this opportunity as filled? It will no longer accept applications.")) return;
     setFilling(true);
@@ -111,7 +125,17 @@ export default function OpportunityDetailPage() {
         position="sticky" top={0} zIndex={50}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
-          <Link href="/opportunities"><Button variant="ghost" size="sm" color="gray.400">{t.common.backToBrowse}</Button></Link>
+          <Flex gap={2} align="center">
+            <Button size="sm" variant="ghost" color="gray.500" onClick={handleShare}
+              _hover={{ color: "white", bg: "rgba(255,255,255,0.06)" }} borderRadius="lg" title="Copy link">
+              🔗
+            </Button>
+            <Button size="sm" variant="ghost" color="gray.500" onClick={handleShareTwitter}
+              _hover={{ color: "white", bg: "rgba(255,255,255,0.06)" }} borderRadius="lg" title="Share on X">
+              𝕏
+            </Button>
+            <Link href="/opportunities"><Button variant="ghost" size="sm" color="gray.400">{t.common.backToBrowse}</Button></Link>
+          </Flex>
         </Flex>
       </Box>
 
