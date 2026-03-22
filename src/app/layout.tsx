@@ -46,6 +46,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="twitter:description" content="The global student opportunity platform. Post gigs, find work, and get paid in crypto — no bank required." />
         <link rel="canonical" href="https://student-opportunity-board-smzb.vercel.app" />
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#7c3aed" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="OppBoard" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
       <body>
         <SessionProvider>

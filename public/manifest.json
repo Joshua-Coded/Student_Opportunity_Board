@@ -1,0 +1,41 @@
+{
+  "name": "OpportunityBoard",
+  "short_name": "OppBoard",
+  "description": "Find gigs, internships & research roles. Get paid in crypto.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050510",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Browse Opportunities",
+      "short_name": "Browse",
+      "description": "Browse all student opportunities",
+      "url": "/opportunities",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Post Opportunity",
+      "short_name": "Post",
+      "description": "Post a new opportunity",
+      "url": "/opportunities/new",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
