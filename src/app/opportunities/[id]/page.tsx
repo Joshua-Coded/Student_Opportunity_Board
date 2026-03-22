@@ -186,6 +186,11 @@ export default function OpportunityDetailPage() {
               <Flex gap={5} flexWrap="wrap">
                 <Text color="gray.400" fontSize="sm">{opp.isRemote ? t.opportunity.remote : `📍 ${opp.location}`}</Text>
                 <Text color="gray.400" fontSize="sm">📅 {new Date(opp.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</Text>
+                {opp.expiresAt && (
+                  <Text color={new Date(opp.expiresAt) < new Date() ? "red.400" : "orange.300"} fontSize="sm">
+                    ⏰ {new Date(opp.expiresAt) < new Date() ? "Closed" : "Closes"} {new Date(opp.expiresAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </Text>
+                )}
                 {opp._count?.applications > 0 && (
                   <Text color="gray.400" fontSize="sm">👥 {opp._count.applications} {t.opportunity.applicants}</Text>
                 )}

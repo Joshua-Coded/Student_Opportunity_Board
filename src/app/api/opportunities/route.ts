@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
 
     const where: any = {
       status: "ACTIVE",
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       ...(type ? { type: type as any } : {}),
       ...(paymentType ? { paymentType: paymentType as any } : {}),
       ...(remote === "true" ? { isRemote: true } : {}),

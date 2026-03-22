@@ -24,7 +24,7 @@ export default function NewOpportunityPage() {
   const [form, setForm] = useState({
     title: "", description: "", type: "GIG", paymentType: "FREE",
     compensationAmount: "", compensationCurrency: "ETH", cryptoNetworkChain: "ethereum",
-    isRemote: true, location: "", skillInput: "", tagInput: "",
+    isRemote: true, location: "", skillInput: "", tagInput: "", deadline: "",
     skills: [] as string[], tags: [] as string[], images: [] as string[],
   });
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -80,6 +80,7 @@ export default function NewOpportunityPage() {
       isRemote: form.isRemote, location: form.location,
       skills: form.skills, tags: form.tags, images: form.images,
     };
+    if (form.deadline) payload.expiresAt = new Date(form.deadline).toISOString();
     if (form.paymentType === "CRYPTO" && form.compensationAmount) {
       payload.compensationAmount = parseFloat(form.compensationAmount);
       payload.compensationCurrency = form.compensationCurrency;
@@ -280,6 +281,15 @@ export default function NewOpportunityPage() {
                     ))}
                   </Flex>
                 )}
+              </Stack>
+
+              {/* Application Deadline */}
+              <Stack spacing={1}>
+                <Text color="gray.400" fontSize="sm">Application Deadline <Text as="span" color="gray.600" fontWeight="normal">(optional)</Text></Text>
+                <Input {...inputStyle} type="date" value={form.deadline} onChange={(e) => set("deadline", e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  sx={{ colorScheme: "dark" }} />
+                <Text color="gray.600" fontSize="xs">After this date, the opportunity will automatically close.</Text>
               </Stack>
 
               {/* Cover Image */}
