@@ -43,10 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     // Notify applicant on meaningful status changes
     const notifyStatuses = ["ACCEPTED", "REJECTED", "REVIEWED"] as const;
-    if (
-      notifyStatuses.includes(parsed.data.status as any) &&
-      updated.applicant?.email
-    ) {
+    if (notifyStatuses.includes(parsed.data.status as any) && updated.applicant?.email) {
       sendApplicationStatusEmail({
         to: updated.applicant.email,
         applicantName: updated.applicant.name || "there",
@@ -56,7 +53,28 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         posterName: updated.opportunity.author?.name || undefined,
         posterEmail: updated.opportunity.author?.email || undefined,
       }).catch((err) => console.error("[email] status change:", err));
+
+      // In-app notification to applicant
+      const statusLabels: Record<string, { title: string; message: string }> = {
+        ACCEPTED: { title: "Application accepted! 🎉", message: `Your application for "${updated.opportunity.title}" was accepted.` },
+        REJECTED: { title: "Application update", message: `Your application for "${updated.opportunity.title}" was not selected.` },
+        REVIEWED: { title: "Application reviewed 👀", message: `Your application for "${updated.opportunity.title}" has been reviewed.` },
+      };
+      const label = statusLabels[parsed.data.status];
+      if (label) {
+        prisma.notification.create({
+          data: {
+            userId: updated.applicantId,
+            type: `APPLICATION_${parsed.data.status}`,
+            title: label.title,
+            message: label.message,
+            link: `/opportunities/${updated.opportunity.id}`,
+          },
+        }).catch(() => {});
+      }
     }
+
+    // In-app notification to opportunity owner when new application submitted (handled in POST /api/applications)
 
     return NextResponse.json(updated);
   } catch {

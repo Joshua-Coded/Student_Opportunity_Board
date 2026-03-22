@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Notify the opportunity poster
+    // Notify the opportunity poster (email + in-app)
     if (application.opportunity.author?.email) {
       sendNewApplicationEmail({
         to: application.opportunity.author.email,
@@ -75,6 +75,16 @@ export async function POST(req: NextRequest) {
         applicationId: application.id,
       }).catch((err) => console.error("[email] new application:", err));
     }
+
+    prisma.notification.create({
+      data: {
+        userId: opportunity.authorId,
+        type: "NEW_APPLICATION",
+        title: "New application received 📨",
+        message: `${application.applicant.name || "Someone"} applied to "${application.opportunity.title}".`,
+        link: `/dashboard/applications`,
+      },
+    }).catch(() => {});
 
     return NextResponse.json(application, { status: 201 });
   } catch {

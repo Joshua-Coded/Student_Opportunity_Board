@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
+import NotificationBell from "@/components/NotificationBell";
 
 const TYPES = ["ALL", "GIG", "INTERNSHIP", "PART_TIME", "FULL_TIME", "VOLUNTEER", "RESEARCH"];
 const PAYMENT = ["ALL", "FREE", "CRYPTO", "NEGOTIABLE"];
@@ -92,6 +93,7 @@ export default function OpportunitiesPage() {
             </Heading>
           </Link>
           <Flex gap={3} align="center">
+            <NotificationBell />
             <LanguageToggle />
             {session ? (
               <Link href="/dashboard">
