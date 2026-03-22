@@ -7,10 +7,13 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import UploadImage from "@/components/UploadImage";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const TYPES = ["GIG", "INTERNSHIP", "PART_TIME", "FULL_TIME", "VOLUNTEER", "RESEARCH"];
 const PAYMENT_TYPES = ["FREE", "CRYPTO", "NEGOTIABLE"];
-const CHAINS = ["ethereum", "polygon"];
+const CHAINS = ["ethereum", "polygon", "bnb", "avalanche", "arbitrum", "base"];
+const CURRENCIES = ["ETH", "USDC", "USDT", "MATIC", "BNB", "AVAX", "DAI", "ARB"];
 
 export default function EditOpportunityPage() {
   const { id } = useParams();
@@ -23,6 +26,7 @@ export default function EditOpportunityPage() {
   const [errors, setErrors] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [enhancing, setEnhancing] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -47,7 +51,9 @@ export default function EditOpportunityPage() {
         location: data.location || "",
         skills: data.skills || [],
         tags: data.tags || [],
+        images: data.images || [],
         status: data.status || "ACTIVE",
+        deadline: data.expiresAt ? new Date(data.expiresAt).toISOString().split("T")[0] : "",
       });
       setLoading(false);
     });
@@ -69,6 +75,24 @@ export default function EditOpportunityPage() {
     setTagInput("");
   }
 
+  async function handleEnhance() {
+    if (!form.title || !form.description) return;
+    setEnhancing(true);
+    const res = await fetch("/api/ai/enhance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: form.title, description: form.description, type: form.type, skills: form.skills }),
+    });
+    const data = await res.json();
+    setEnhancing(false);
+    if (res.ok) {
+      set("title", data.improvedTitle || form.title);
+      set("description", data.improvedDescription || form.description);
+      if (data.suggestedTags) set("tags", Array.from(new Set([...form.tags, ...data.suggestedTags])));
+      if (data.suggestedSkills) set("skills", Array.from(new Set([...form.skills, ...data.suggestedSkills])));
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -78,7 +102,10 @@ export default function EditOpportunityPage() {
       type: form.type, paymentType: form.paymentType,
       isRemote: form.isRemote, location: form.location,
       skills: form.skills, tags: form.tags, status: form.status,
+      images: form.images,
     };
+    if (form.deadline) payload.expiresAt = new Date(form.deadline).toISOString();
+    else payload.expiresAt = null;
     if (form.paymentType === "CRYPTO" && form.compensationAmount) {
       payload.compensationAmount = parseFloat(form.compensationAmount);
       payload.compensationCurrency = form.compensationCurrency;
@@ -113,17 +140,20 @@ export default function EditOpportunityPage() {
   return (
     <Box minH="100vh" bg="#050510" color="white">
       <Box bg="rgba(5,5,16,0.85)" backdropFilter="blur(20px)"
-        borderBottom="1px solid rgba(255,255,255,0.07)" px={6} py={4}>
+        borderBottom="1px solid rgba(255,255,255,0.07)" px={{ base: 4, md: 6 }} py={4}>
         <Flex maxW="4xl" mx="auto" justify="space-between" align="center">
           <Link href="/"><Heading size="md" bgGradient="linear(to-r, purple.400, blue.400)" bgClip="text" cursor="pointer">OpportunityBoard</Heading></Link>
-          <Link href={`/opportunities/${id}`}><Button variant="ghost" size="sm" color="gray.400">Cancel</Button></Link>
+          <Flex gap={3} align="center">
+            <LanguageToggle />
+            <Link href={`/opportunities/${id}`}><Button variant="ghost" size="sm" color="gray.400">Cancel</Button></Link>
+          </Flex>
         </Flex>
       </Box>
 
-      <Container maxW="3xl" py={10}>
+      <Container maxW="3xl" py={{ base: 6, md: 10 }} px={{ base: 4, md: 6 }}>
         <Stack spacing={8}>
           <Stack spacing={1}>
-            <Heading size="xl">Edit Opportunity</Heading>
+            <Heading size={{ base: "lg", md: "xl" }}>Edit Opportunity</Heading>
             <Text color="gray.400">Update your listing details</Text>
           </Stack>
 
@@ -141,12 +171,14 @@ export default function EditOpportunityPage() {
                 ))}
               </Flex>
 
+              {/* Title */}
               <Stack spacing={1}>
                 <Text color="gray.400" fontSize="sm">Title *</Text>
                 <Input {...inputStyle} value={form.title} onChange={(e) => set("title", e.target.value)} required />
                 {errors.title && <Text color="red.400" fontSize="xs">{errors.title[0]}</Text>}
               </Stack>
 
+              {/* Type & Payment */}
               <Flex gap={4} flexWrap="wrap">
                 <Stack spacing={1} flex={1}>
                   <Text color="gray.400" fontSize="sm">Type *</Text>
@@ -174,6 +206,7 @@ export default function EditOpportunityPage() {
                 </Stack>
               </Flex>
 
+              {/* Crypto fields */}
               {form.paymentType === "CRYPTO" && (
                 <Flex gap={3} flexWrap="wrap">
                   <Stack spacing={1} flex={1}>
@@ -183,8 +216,8 @@ export default function EditOpportunityPage() {
                   </Stack>
                   <Stack spacing={1}>
                     <Text color="gray.400" fontSize="sm">Currency</Text>
-                    <Flex gap={2}>
-                      {["ETH", "USDC", "MATIC"].map((c) => (
+                    <Flex gap={2} flexWrap="wrap">
+                      {CURRENCIES.map((c) => (
                         <Button key={c} size="xs" onClick={() => set("compensationCurrency", c)}
                           bg={form.compensationCurrency === c ? "purple.600" : "rgba(255,255,255,0.05)"}
                           color={form.compensationCurrency === c ? "white" : "gray.400"}
@@ -195,7 +228,7 @@ export default function EditOpportunityPage() {
                   </Stack>
                   <Stack spacing={1}>
                     <Text color="gray.400" fontSize="sm">Chain</Text>
-                    <Flex gap={2}>
+                    <Flex gap={2} flexWrap="wrap">
                       {CHAINS.map((c) => (
                         <Button key={c} size="xs" onClick={() => set("cryptoNetworkChain", c)}
                           bg={form.cryptoNetworkChain === c ? "blue.700" : "rgba(255,255,255,0.05)"}
@@ -208,14 +241,24 @@ export default function EditOpportunityPage() {
                 </Flex>
               )}
 
+              {/* Description */}
               <Stack spacing={1}>
-                <Text color="gray.400" fontSize="sm">Description *</Text>
+                <Flex justify="space-between" align="center">
+                  <Text color="gray.400" fontSize="sm">Description *</Text>
+                  <Button size="xs" onClick={handleEnhance} isLoading={enhancing}
+                    bg="rgba(139,92,246,0.15)" color="purple.300"
+                    border="1px solid rgba(139,92,246,0.3)"
+                    _hover={{ bg: "rgba(139,92,246,0.25)" }} borderRadius="full">
+                    ✨ AI Enhance
+                  </Button>
+                </Flex>
                 <Textarea {...inputStyle} value={form.description}
                   onChange={(e) => set("description", e.target.value)}
                   rows={6} required resize="none" />
                 {errors.description && <Text color="red.400" fontSize="xs">{errors.description[0]}</Text>}
               </Stack>
 
+              {/* Location */}
               <Flex gap={4} align="center">
                 <Button size="sm" onClick={() => set("isRemote", !form.isRemote)}
                   bg={form.isRemote ? "green.800" : "rgba(255,255,255,0.05)"}
@@ -231,6 +274,7 @@ export default function EditOpportunityPage() {
                 )}
               </Flex>
 
+              {/* Skills */}
               <Stack spacing={2}>
                 <Text color="gray.400" fontSize="sm">Skills</Text>
                 <Flex gap={2}>
@@ -253,6 +297,7 @@ export default function EditOpportunityPage() {
                 )}
               </Stack>
 
+              {/* Tags */}
               <Stack spacing={2}>
                 <Text color="gray.400" fontSize="sm">Tags</Text>
                 <Flex gap={2}>
@@ -274,6 +319,30 @@ export default function EditOpportunityPage() {
                   </Flex>
                 )}
               </Stack>
+
+              {/* Application Deadline */}
+              <Stack spacing={1}>
+                <Text color="gray.400" fontSize="sm">Application Deadline <Text as="span" color="gray.600" fontWeight="normal">(optional)</Text></Text>
+                <Input {...inputStyle} type="date" value={form.deadline} onChange={(e) => set("deadline", e.target.value)}
+                  sx={{ colorScheme: "dark" }} />
+                <Text color="gray.600" fontSize="xs">After this date, the opportunity will automatically close.</Text>
+              </Stack>
+
+              {/* Cover Image */}
+              <Stack spacing={2}>
+                <Text color="gray.400" fontSize="sm">Cover Image <Text as="span" color="gray.600" fontWeight="normal">(optional)</Text></Text>
+                <UploadImage
+                  label="Upload gig cover image"
+                  currentUrl={form.images?.[0]}
+                  onUpload={(url: string) => set("images", [url])}
+                />
+              </Stack>
+
+              {errors.general && (
+                <Box bg="red.900" border="1px solid" borderColor="red.700" borderRadius="lg" px={4} py={2}>
+                  <Text color="red.300" fontSize="sm">{errors.general}</Text>
+                </Box>
+              )}
 
               <Button type="submit" isLoading={saving}
                 bgGradient="linear(to-r, purple.500, blue.500)" color="white"

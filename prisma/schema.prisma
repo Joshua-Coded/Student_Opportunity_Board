@@ -205,3 +205,11 @@ model PasswordResetToken {
 
   @@map("password_reset_tokens")
 }
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscribers")
+}

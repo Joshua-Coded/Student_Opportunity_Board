@@ -201,14 +201,22 @@ function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setDone(true);
+    setError("");
+    const res = await fetch("/api/newsletter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
     setLoading(false);
+    if (!res.ok) { setError(data.error || "Something went wrong."); return; }
+    setDone(true);
   }
 
   return (
@@ -282,6 +290,7 @@ function NewsletterSection() {
                         transition="all 0.2s" borderRadius="xl" fontWeight="semibold">
                         Subscribe — it's free
                       </Button>
+                      {error && <Text color="red.400" fontSize="xs" textAlign="center">{error}</Text>}
                       <Text color="rgba(255,255,255,0.2)" fontSize="xs" textAlign="center">
                         Join students already subscribed · No spam ever
                       </Text>
