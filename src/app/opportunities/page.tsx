@@ -30,6 +30,7 @@ export default function OpportunitiesPage() {
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [university, setUniversity] = useState("");
   const [universities, setUniversities] = useState<string[]>([]);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     Promise.all([
@@ -41,6 +42,29 @@ export default function OpportunitiesPage() {
       if (Array.isArray(unis)) setUniversities(unis);
     }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!session) return;
+    fetch("/api/saved").then((r) => r.json()).then((data) => {
+      if (Array.isArray(data)) setSavedIds(new Set(data.map((s: any) => s.opportunityId)));
+    }).catch(() => {});
+  }, [session]);
+
+  async function toggleSave(e: React.MouseEvent, oppId: string) {
+    e.preventDefault();
+    if (!session) return;
+    const res = await fetch("/api/saved", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ opportunityId: oppId }),
+    });
+    const data = await res.json();
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      data.saved ? next.add(oppId) : next.delete(oppId);
+      return next;
+    });
+  }
 
   useEffect(() => {
     const params = new URLSearchParams({ page: String(page) });
@@ -172,11 +196,22 @@ export default function OpportunitiesPage() {
                     _hover={{ bg: "rgba(255,255,255,0.06)", borderColor: "purple.800", transform: "translateY(-2px)" }}>
                     <Stack spacing={3}>
                       <Flex justify="space-between" align="flex-start">
-                        <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">
-                          {opp.type}
-                        </Badge>
-                        {opp.paymentType === "CRYPTO" && (
-                          <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">⚡ {t.common.crypto}</Badge>
+                        <Flex gap={2}>
+                          <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">
+                            {opp.type}
+                          </Badge>
+                            {opp.paymentType === "CRYPTO" && (
+                            <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">⚡ {t.common.crypto}</Badge>
+                          )}
+                        </Flex>
+                        {session && (
+                          <Button size="xs" variant="ghost" px={1}
+                            color={savedIds.has(opp.id) ? "red.400" : "gray.600"}
+                            _hover={{ color: "red.400", bg: "transparent" }}
+                            onClick={(e) => toggleSave(e, opp.id)}
+                            title={savedIds.has(opp.id) ? "Unsave" : "Save"}>
+                            {savedIds.has(opp.id) ? "♥" : "♡"}
+                          </Button>
                         )}
                       </Flex>
                       <Heading size="sm" color="white" noOfLines={2}>{opp.title}</Heading>
