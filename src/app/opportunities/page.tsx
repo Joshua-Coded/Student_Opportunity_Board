@@ -4,7 +4,10 @@ import {
   Badge, Box, Button, Container, Flex, Heading,
   Input, Select, SimpleGrid, Stack, Text,
 } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+
+const MotionBox = motion(Box);
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -191,52 +194,74 @@ export default function OpportunitiesPage() {
             </Box>
           ) : (
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-              {opportunities.map((opp) => (
-                <Link href={`/opportunities/${opp.id}`} key={opp.id}>
-                  <Box bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)"
-                    borderRadius="2xl" p={6} cursor="pointer" transition="all 0.2s" h="full"
-                    _hover={{ bg: "rgba(255,255,255,0.06)", borderColor: "purple.800", transform: "translateY(-2px)" }}>
-                    <Stack spacing={3}>
-                      <Flex justify="space-between" align="flex-start">
-                        <Flex gap={2}>
-                          <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">
-                            {opp.type}
-                          </Badge>
+              {opportunities.map((opp, i) => (
+                <MotionBox
+                  key={opp.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: i * 0.05 }}
+                  whileHover={{ y: -6, scale: 1.01 }}
+                  style={{ position: "relative" }}
+                >
+                  <Link href={`/opportunities/${opp.id}`}>
+                    <Box
+                      bg="rgba(255,255,255,0.03)"
+                      border="1px solid rgba(255,255,255,0.07)"
+                      borderRadius="2xl" p={6} cursor="pointer" h="full"
+                      position="relative" overflow="hidden"
+                      transition="border-color 0.25s, background 0.25s, box-shadow 0.25s"
+                      _hover={{
+                        bg: "rgba(255,255,255,0.06)",
+                        borderColor: "rgba(124,58,237,0.5)",
+                        boxShadow: "0 0 32px rgba(124,58,237,0.18), 0 8px 32px rgba(0,0,0,0.4)",
+                      }}
+                    >
+                      {/* top gradient line */}
+                      <Box position="absolute" top={0} left={0} right={0} h="1px"
+                        bgGradient="linear(to-r, transparent, rgba(124,58,237,0.5), transparent)"
+                        opacity={0} _groupHover={{ opacity: 1 }} transition="opacity 0.3s" />
+                      <Stack spacing={3}>
+                        <Flex justify="space-between" align="flex-start">
+                          <Flex gap={2}>
+                            <Badge colorScheme={typeColor[opp.type] || "gray"} borderRadius="full" px={2} fontSize="xs">
+                              {opp.type}
+                            </Badge>
                             {opp.paymentType === "CRYPTO" && (
-                            <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">⚡ {t.common.crypto}</Badge>
+                              <Badge colorScheme="purple" borderRadius="full" px={2} fontSize="xs">⚡ {t.common.crypto}</Badge>
+                            )}
+                          </Flex>
+                          {session && (
+                            <Button size="xs" variant="ghost" px={1}
+                              color={savedIds.has(opp.id) ? "red.400" : "gray.600"}
+                              _hover={{ color: "red.400", bg: "transparent" }}
+                              onClick={(e) => toggleSave(e, opp.id)}
+                              title={savedIds.has(opp.id) ? "Unsave" : "Save"}>
+                              {savedIds.has(opp.id) ? "♥" : "♡"}
+                            </Button>
                           )}
                         </Flex>
-                        {session && (
-                          <Button size="xs" variant="ghost" px={1}
-                            color={savedIds.has(opp.id) ? "red.400" : "gray.600"}
-                            _hover={{ color: "red.400", bg: "transparent" }}
-                            onClick={(e) => toggleSave(e, opp.id)}
-                            title={savedIds.has(opp.id) ? "Unsave" : "Save"}>
-                            {savedIds.has(opp.id) ? "♥" : "♡"}
-                          </Button>
-                        )}
-                      </Flex>
-                      <Heading size="sm" color="white" noOfLines={2}>{opp.title}</Heading>
-                      <Text color="gray.400" fontSize="sm" noOfLines={2}>{opp.description}</Text>
-                      <Flex justify="space-between" align="center" mt="auto">
-                        <Text color="gray.600" fontSize="xs">{opp.author?.university || opp.author?.name || "Anonymous"}</Text>
-                        <Text color="gray.600" fontSize="xs">{opp.isRemote ? t.opportunity.remote : opp.location}</Text>
-                      </Flex>
-                      {opp.compensationAmount && (
-                        <Flex align="baseline" gap={2} flexWrap="wrap">
-                          <Text color="purple.300" fontSize="sm" fontWeight="semibold">
-                            {opp.compensationAmount} {opp.compensationCurrency}
-                          </Text>
-                          {prices[opp.compensationCurrency] && opp.compensationCurrency !== "USDC" && (
-                            <Text color="gray.600" fontSize="xs">
-                              ≈ ${(parseFloat(opp.compensationAmount) * prices[opp.compensationCurrency]).toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                        <Heading size="sm" color="white" noOfLines={2}>{opp.title}</Heading>
+                        <Text color="gray.400" fontSize="sm" noOfLines={2}>{opp.description}</Text>
+                        <Flex justify="space-between" align="center" mt="auto">
+                          <Text color="gray.600" fontSize="xs">{opp.author?.university || opp.author?.name || "Anonymous"}</Text>
+                          <Text color="gray.600" fontSize="xs">{opp.isRemote ? t.opportunity.remote : opp.location}</Text>
+                        </Flex>
+                        {opp.compensationAmount && (
+                          <Flex align="baseline" gap={2} flexWrap="wrap">
+                            <Text color="purple.300" fontSize="sm" fontWeight="semibold">
+                              {opp.compensationAmount} {opp.compensationCurrency}
                             </Text>
-                          )}
-                        </Flex>
-                      )}
-                    </Stack>
-                  </Box>
-                </Link>
+                            {prices[opp.compensationCurrency] && opp.compensationCurrency !== "USDC" && (
+                              <Text color="gray.600" fontSize="xs">
+                                ≈ ${(parseFloat(opp.compensationAmount) * prices[opp.compensationCurrency]).toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                              </Text>
+                            )}
+                          </Flex>
+                        )}
+                      </Stack>
+                    </Box>
+                  </Link>
+                </MotionBox>
               ))}
             </SimpleGrid>
           )}

@@ -197,6 +197,64 @@ function CryptoMarquee() {
   );
 }
 
+function ActivityTicker({ items }: { items: any[] }) {
+  const [index, setIndex] = useState(0);
+  const list = items.length > 0 ? items : [
+    { icon: "📩", message: "Someone applied to a React Developer gig", sub: "Just now" },
+    { icon: "🎓", message: "A student just joined", sub: "African Leadership University" },
+    { icon: "⚡", message: "New GIG posted", sub: "Smart Contract Auditor" },
+    { icon: "📩", message: "Someone applied to a ML Research role", sub: "Remote" },
+    { icon: "🎓", message: "Amara just joined", sub: "University of Lagos" },
+    { icon: "⚡", message: "New INTERNSHIP posted", sub: "Web3 Internship · 0.1 ETH" },
+  ];
+
+  useEffect(() => {
+    const t = setInterval(() => setIndex((i) => (i + 1) % list.length), 3000);
+    return () => clearInterval(t);
+  }, [list.length]);
+
+  return (
+    <Box py={4} borderY="1px solid rgba(255,255,255,0.05)" overflow="hidden">
+      <Flex maxW="5xl" mx="auto" px={6} align="center" gap={4}>
+        <Flex align="center" gap={2} flexShrink={0}>
+          <Box w={1.5} h={1.5} borderRadius="full" bg="green.400"
+            style={{ animation: "pulse 2s infinite" }} />
+          <Text fontSize="xs" color="green.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase">
+            Live
+          </Text>
+        </Flex>
+        <Box flex={1} overflow="hidden" h="20px" position="relative">
+          <AnimatePresence mode="wait">
+            <MotionBox
+              key={index}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              position="absolute" w="full"
+            >
+              <Flex align="center" gap={2}>
+                <Text fontSize="xs">{list[index].icon}</Text>
+                <Text fontSize="xs" color="rgba(255,255,255,0.6)" noOfLines={1}>
+                  {list[index].message}
+                </Text>
+                {list[index].sub && (
+                  <>
+                    <Text fontSize="xs" color="rgba(255,255,255,0.2)">·</Text>
+                    <Text fontSize="xs" color="rgba(255,255,255,0.3)" noOfLines={1} flexShrink={0}>
+                      {list[index].sub}
+                    </Text>
+                  </>
+                )}
+              </Flex>
+            </MotionBox>
+          </AnimatePresence>
+        </Box>
+      </Flex>
+    </Box>
+  );
+}
+
 function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
@@ -316,10 +374,14 @@ export default function HomePage() {
   const [liveData, setLiveData] = useState<{
     opportunities: any[]; users: any[];
     totalOpportunities: number; totalUsers: number; totalPayments: number;
-  }>({ opportunities: [], users: [], totalOpportunities: 0, totalUsers: 0, totalPayments: 0 });
+    totalApplications: number; activity: any[];
+  }>({ opportunities: [], users: [], totalOpportunities: 0, totalUsers: 0, totalPayments: 0, totalApplications: 0, activity: [] });
 
   useEffect(() => {
-    fetch("/api/public/stats").then(r => r.json()).then(setLiveData).catch(() => {});
+    const load = () => fetch("/api/public/stats").then(r => r.json()).then(setLiveData).catch(() => {});
+    load();
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -552,14 +614,29 @@ export default function HomePage() {
         </Container>
       </Box>
 
+      {/* ── Activity Ticker ──────────────────────────────────────── */}
+      <ActivityTicker items={liveData.activity} />
+
       {/* ── Stats bar ───────────────────────────────────────────────── */}
       <Box py={20} position="relative" overflow="hidden">
         <Box position="absolute" inset={0} bgGradient="radial(ellipse at 50% 50%, rgba(124,58,237,0.05) 0%, transparent 70%)" />
         <Container maxW="5xl" position="relative">
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
+          {/* LIVE badge */}
+          <Flex justify="center" mb={8}>
+            <Flex align="center" gap={2} bg="rgba(34,197,94,0.08)" border="1px solid rgba(34,197,94,0.2)"
+              borderRadius="full" px={4} py={1.5}>
+              <Box w={1.5} h={1.5} borderRadius="full" bg="green.400"
+                style={{ animation: "pulse 2s infinite" }} />
+              <Text fontSize="xs" color="green.400" fontWeight="bold" letterSpacing="widest" textTransform="uppercase">
+                Live stats · updates every 30s
+              </Text>
+            </Flex>
+          </Flex>
+          <SimpleGrid columns={{ base: 1, md: 4 }} gap={5}>
             {[
               { value: liveData.totalUsers, label: t.landing.stats.studentsLabel, desc: t.landing.stats.studentsDesc, icon: "🎓", gradient: "linear(135deg, #7c3aed, #4f46e5)", glow: "rgba(124,58,237,0.3)" },
               { value: liveData.totalOpportunities, label: t.landing.stats.listingsLabel, desc: t.landing.stats.listingsDesc, icon: "📋", gradient: "linear(135deg, #2563eb, #0891b2)", glow: "rgba(37,99,235,0.3)" },
+              { value: liveData.totalApplications, label: "Applications", desc: "Submitted across all listings", icon: "📩", gradient: "linear(135deg, #db2777, #9333ea)", glow: "rgba(219,39,119,0.3)" },
               { value: liveData.totalPayments, label: t.landing.stats.paymentsLabel, desc: t.landing.stats.paymentsDesc, icon: "⚡", gradient: "linear(135deg, #059669, #0d9488)", glow: "rgba(5,150,105,0.3)" },
             ].map((s, i) => (
               <MotionBox key={s.label}
